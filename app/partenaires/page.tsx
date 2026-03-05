@@ -11,7 +11,6 @@ interface Partenaire {
     est_transitaire: number;
     num_fne: string | null;
     telephone: string | null;
-    email: string | null;
 }
 
 export default function PartenairesPage() {
@@ -139,9 +138,7 @@ export default function PartenairesPage() {
                                         </td>
                                         <td style={{ padding: '1rem', color: '#64748b' }}>{p.num_fne || '—'}</td>
                                         <td style={{ padding: '1rem', fontSize: '0.8rem', color: '#64748b' }}>
-                                            {p.telephone && <div>📞 {p.telephone}</div>}
-                                            {p.email && <div>✉️ {p.email}</div>}
-                                            {!p.telephone && !p.email && '—'}
+                                            {p.telephone ? <div>📞 {p.telephone}</div> : '—'}
                                         </td>
                                         <td style={{ padding: '1rem', textAlign: 'right' }}>
                                             <button
