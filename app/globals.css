@@ -10,7 +10,6 @@
   /* Soft White/Slate */
 
   /* Vibrant Accents */
-  --accent: #qw2;
   --accent: #4f46e5;
   /* Vibrant Indigo */
   --accent-light: #818cf8;
@@ -285,6 +284,20 @@ label {
 
 .animate-fade-in {
   animation: fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
 }
 
 /* Layout with Sidebar */
