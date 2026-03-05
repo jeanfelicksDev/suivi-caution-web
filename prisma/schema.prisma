@@ -138,3 +138,9 @@ model facture_dmdt {
   created_at         DateTime? @default(now())
   updated_at         DateTime? @default(now())
 }
+
+model armateurs {
+  id         Int       @id @default(autoincrement())
+  nom        String    @unique
+  created_at DateTime? @default(now())
+}

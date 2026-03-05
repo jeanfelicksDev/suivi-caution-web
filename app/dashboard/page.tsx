@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { LayoutDashboard, TrendingUp, Users, Clock, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import ArmateurSelect from '@/app/components/ArmateurSelect';
 
 interface StatsData {
     avgGlobal: number;
@@ -75,15 +76,12 @@ export default function Dashboard() {
                 <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-end' }}>
                     <div>
                         <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: '#64748b', marginBottom: '0.3rem' }}>Armateur :</label>
-                        <select className="input" style={{ background: 'white', padding: '0.5rem', width: '160px', borderRadius: '8px', border: '1px solid #e2e8f0', fontWeight: 600 }} value={armateur} onChange={(e) => setArmateur(e.target.value)}>
-                            <option value="">Tous</option>
-                            <option value="ARKAS">ARKAS</option>
-                            <option value="GSL">GSL</option>
-                            <option value="MSC">MSC</option>
-                            <option value="CMA CGM">CMA CGM</option>
-                            <option value="MAERSK">MAERSK</option>
-                            <option value="OOCL">OOCL</option>
-                        </select>
+                        <ArmateurSelect
+                            value={armateur}
+                            onChange={(val) => setArmateur(val)}
+                            hideAdd={true}
+                            style={{ background: 'white', padding: '0.5rem', width: '160px', borderRadius: '8px', border: '1px solid #e2e8f0', fontWeight: 600 }}
+                        />
                     </div>
                     <div>
                         <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: '#64748b', marginBottom: '0.3rem' }}>Période De Réception Du :</label>

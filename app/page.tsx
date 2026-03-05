@@ -11,6 +11,7 @@ import DetentionModal from '@/app/components/DetentionModal';
 import FicheAvoir from '@/app/components/FicheAvoir';
 import PartenaireModal from '@/app/components/PartenaireModal';
 import PartenaireCombobox from '@/app/components/PartenaireCombobox';
+import ArmateurSelect from '@/app/components/ArmateurSelect';
 
 interface Dossier {
   id?: number;
@@ -200,15 +201,10 @@ function NewDossierModal({
               </div>
               <div>
                 <label>armateur</label>
-                <select name="armateur" value={form.armateur || ''} onChange={handleChange}>
-                  <option value="">Sélectionner...</option>
-                  <option value="ARKAS">ARKAS</option>
-                  <option value="GSL">GSL</option>
-                  <option value="MSC">MSC</option>
-                  <option value="CMA CGM">CMA CGM</option>
-                  <option value="MAERSK">MAERSK</option>
-                  <option value="OOCL">OOCL</option>
-                </select>
+                <ArmateurSelect
+                  value={form.armateur || ''}
+                  onChange={(val) => setForm(prev => ({ ...prev, armateur: val }))}
+                />
               </div>
               <div>
                 <label>date de réception</label>
@@ -613,15 +609,10 @@ function HomePageInternal() {
                 <input type="text" name="num_bl" value={formData.num_bl || ''} onChange={handleChange} placeholder="—" />
               </Field>
               <Field label="armateur">
-                <select name="armateur" value={formData.armateur || ''} onChange={handleChange}>
-                  <option value="">Sélectionner...</option>
-                  <option value="ARKAS">ARKAS</option>
-                  <option value="GSL">GSL</option>
-                  <option value="MSC">MSC</option>
-                  <option value="CMA CGM">CMA CGM</option>
-                  <option value="MAERSK">MAERSK</option>
-                  <option value="OOCL">OOCL</option>
-                </select>
+                <ArmateurSelect
+                  value={formData.armateur || ''}
+                  onChange={(val) => setFormData(prev => ({ ...prev, armateur: val }))}
+                />
               </Field>
               <Field label="date de réception">
                 <input type="date" name="date_reception" value={formData.date_reception || ''} onChange={handleChange} />

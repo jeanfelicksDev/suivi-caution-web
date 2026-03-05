@@ -3,6 +3,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { Search, RefreshCw, FileText, X } from 'lucide-react';
 import Link from 'next/link';
+import ArmateurSelect from '@/app/components/ArmateurSelect';
 
 interface DossierRow {
     id: number;
@@ -244,21 +245,17 @@ export default function HistoriquePage() {
                             {/* Combobox Armateur */}
                             <div style={{ flex: '0 0 170px' }}>
                                 <label>Armateur</label>
-                                <select name="armateur" value={filters.armateur} onChange={handleChange}
+                                <ArmateurSelect
+                                    value={filters.armateur}
+                                    onChange={(val) => setFilters(prev => ({ ...prev, armateur: val }))}
+                                    hideAdd={true}
                                     style={{
                                         width: '100%',
                                         fontWeight: filters.armateur ? 700 : 400,
                                         background: filters.armateur ? '#eff6ff' : 'white',
                                         color: filters.armateur ? '#1d4ed8' : 'inherit',
-                                    }}>
-                                    <option value="">Tous</option>
-                                    <option value="ARKAS">ARKAS</option>
-                                    <option value="GSL">GSL</option>
-                                    <option value="MSC">MSC</option>
-                                    <option value="CMA CGM">CMA CGM</option>
-                                    <option value="MAERSK">MAERSK</option>
-                                    <option value="OOCL">OOCL</option>
-                                </select>
+                                    }}
+                                />
                             </div>
 
                             {/* Combobox Etape */}
