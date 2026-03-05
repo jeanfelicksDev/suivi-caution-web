@@ -99,7 +99,7 @@ export default function PartenaireModal({
                 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                         <ShieldCheck size={20} />
-                        <h3 style={{ margin: 0 }}>Gérer Partenaire</h3>
+                        <h3 style={{ margin: 0, color: 'white' }}>Gérer Partenaire</h3>
                     </div>
                     <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer' }}>
                         <X size={20} />
