@@ -54,3 +54,23 @@ export async function PUT(request: Request) {
         return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
     }
 }
+
+export async function DELETE(request: Request) {
+    try {
+        const { searchParams } = new URL(request.url);
+        const id = searchParams.get('id');
+
+        if (!id) {
+            return NextResponse.json({ error: "ID de l'utilisateur manquant" }, { status: 400 });
+        }
+
+        const deletedUser = await prisma.users.delete({
+            where: { id: Number(id) }
+        });
+
+        return NextResponse.json({ success: true, user: deletedUser });
+    } catch (error) {
+        console.error("Erreur lors de la suppression de l'utilisateur:", error);
+        return NextResponse.json({ error: "Erreur lors de la suppression (utilisateur peut-être inexistant)" }, { status: 500 });
+    }
+}

@@ -21,7 +21,7 @@ async function main() {
     // 3. Importer les Clients manquants
     const dossiersClients = await prisma.dossiers_caution.findMany({
         select: { client_nom: true },
-        where: { client_nom: { notIn: ['', null] } },
+        where: { client_nom: { not: '' } },
         distinct: ['client_nom']
     });
 
@@ -48,7 +48,7 @@ async function main() {
     // 4. Importer les Transitaires manquants
     const dossiersTransitaires = await prisma.dossiers_caution.findMany({
         select: { transitaire_nom: true },
-        where: { transitaire_nom: { notIn: ['', null] } },
+        where: { transitaire_nom: { not: '' } },
         distinct: ['transitaire_nom']
     });
 

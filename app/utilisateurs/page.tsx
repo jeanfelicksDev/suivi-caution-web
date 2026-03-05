@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { ShieldCheck, UserCheck, AlertCircle, Save, CheckCircle2, RefreshCw } from 'lucide-react';
+import { ShieldCheck, UserCheck, AlertCircle, Save, CheckCircle2, RefreshCw, Trash2 } from 'lucide-react';
 
 interface User {
     id: number;
@@ -23,6 +23,7 @@ export default function UsersPermissionsPage() {
     const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
     const [savingId, setSavingId] = useState<number | null>(null);
+    const [deletingId, setDeletingId] = useState<number | null>(null);
     const [successMsg, setSuccessMsg] = useState('');
     const [errorMsg, setErrorMsg] = useState('');
 
@@ -87,6 +88,33 @@ export default function UsersPermissionsPage() {
             setErrorMsg("Erreur réseau pendant l'enregistrement.");
         } finally {
             setSavingId(null);
+        }
+    };
+
+    const deleteUser = async (user: User) => {
+        if (!window.confirm(`Êtes-vous sûr de vouloir supprimer définitivement le compte de ${user.username} ? Cette action est irréversible.`)) {
+            return;
+        }
+
+        setDeletingId(user.id);
+        setSuccessMsg('');
+        setErrorMsg('');
+        try {
+            const res = await fetch(`/api/utilisateurs?id=${user.id}`, {
+                method: 'DELETE',
+            });
+
+            if (res.ok) {
+                setSuccessMsg(`L'utilisateur ${user.username} a été supprimé.`);
+                setUsers(users.filter(u => u.id !== user.id));
+                setTimeout(() => setSuccessMsg(''), 4000);
+            } else {
+                setErrorMsg("Erreur lors de la suppression de l'utilisateur.");
+            }
+        } catch {
+            setErrorMsg("Erreur réseau pendant la suppression.");
+        } finally {
+            setDeletingId(null);
         }
     };
 
@@ -177,15 +205,37 @@ export default function UsersPermissionsPage() {
                                     ))}
 
                                     <td style={{ padding: '1rem', textAlign: 'center', borderLeft: '1px solid var(--border)' }}>
-                                        <button
-                                            className="btn btn-primary"
-                                            onClick={() => saveUser(user)}
-                                            disabled={savingId === user.id}
-                                            style={{ padding: '0.5rem 1rem', fontSize: '0.8rem', display: 'inline-flex', alignItems: 'center', gap: '0.4rem', borderRadius: '8px' }}
-                                        >
-                                            {savingId === user.id ? <RefreshCw size={14} className="animate-spin" /> : <Save size={14} />}
-                                            {savingId === user.id ? '...' : 'Enregistrer'}
-                                        </button>
+                                        <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
+                                            <button
+                                                className="btn btn-primary"
+                                                onClick={() => saveUser(user)}
+                                                disabled={savingId === user.id || deletingId === user.id}
+                                                style={{ padding: '0.5rem 1rem', fontSize: '0.8rem', display: 'inline-flex', alignItems: 'center', gap: '0.4rem', borderRadius: '8px' }}
+                                            >
+                                                {savingId === user.id ? <RefreshCw size={14} className="animate-spin" /> : <Save size={14} />}
+                                            </button>
+                                            <button
+                                                className="btn"
+                                                onClick={() => deleteUser(user)}
+                                                disabled={savingId === user.id || deletingId === user.id}
+                                                style={{
+                                                    padding: '0.5rem 1rem',
+                                                    fontSize: '0.8rem',
+                                                    display: 'inline-flex',
+                                                    alignItems: 'center',
+                                                    gap: '0.4rem',
+                                                    borderRadius: '8px',
+                                                    background: '#fee2e2',
+                                                    color: '#b91c1c',
+                                                    border: '1px solid #fca5a5',
+                                                    cursor: (savingId === user.id || deletingId === user.id) ? 'not-allowed' : 'pointer',
+                                                    opacity: (savingId === user.id || deletingId === user.id) ? 0.6 : 1
+                                                }}
+                                                title="Supprimer l'utilisateur"
+                                            >
+                                                {deletingId === user.id ? <RefreshCw size={14} className="animate-spin" /> : <Trash2 size={14} />}
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             ))}
