@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Search, LayoutDashboard, Database, Settings, LogOut, FileText, CreditCard, ShieldCheck } from 'lucide-react';
+import { Search, LayoutDashboard, Database, LogOut, FileText, CreditCard, ShieldCheck } from 'lucide-react';
 import { useAuth } from './AuthProvider';
 import AttenteTiroir from './AttenteTiroir';
 
@@ -60,13 +60,9 @@ const Sidebar = () => {
             <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '1rem' }}>
                 {isAdmin && (
                     <>
-                        <Link href="/settings" className={`nav-item ${pathname === '/settings' ? 'active' : ''}`}>
-                            <Settings size={20} />
-                            <span>Paramètres</span>
-                        </Link>
                         <Link href="/utilisateurs" className={`nav-item ${pathname === '/utilisateurs' ? 'active' : ''}`}>
                             <ShieldCheck size={20} />
-                            <span>Droits d'Accès</span>
+                            <span>Droits d&apos;Accès</span>
                         </Link>
                     </>
                 )}
@@ -75,7 +71,7 @@ const Sidebar = () => {
                     <span>Déconnexion</span>
                 </button>
             </div>
-        </aside>
+        </aside >
     );
 };
 
