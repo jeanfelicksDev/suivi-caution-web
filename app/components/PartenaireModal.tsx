@@ -10,7 +10,6 @@ interface Partenaire {
     est_transitaire: number;
     num_fne: string | null;
     telephone: string | null;
-    email: string | null;
 }
 
 interface PartenaireModalProps {
@@ -32,7 +31,6 @@ export default function PartenaireModal({
         est_transitaire: 0,
         num_fne: '',
         telephone: '',
-        email: ''
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -50,7 +48,6 @@ export default function PartenaireModal({
                 est_transitaire: 0,
                 num_fne: '',
                 telephone: '',
-                email: ''
             });
         }
     }, [isOpen, partenaireId]);
@@ -144,14 +141,7 @@ export default function PartenaireModal({
                         </div>
                     </div>
 
-                    <div style={{ marginBottom: '1.5rem' }}>
-                        <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 800, marginBottom: '0.25rem', textTransform: 'uppercase' }}>Email</label>
-                        <div style={{ position: 'relative' }}>
-                            <Mail size={16} style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
-                            <input type="email" value={form.email || ''} onChange={e => setForm({ ...form, email: e.target.value })}
-                                style={{ paddingLeft: '2.5rem', width: '100%' }} />
-                        </div>
-                    </div>
+
 
                     <div style={{ display: 'flex', gap: '0.75rem' }}>
                         <button type="button" onClick={onClose} className="btn btn-secondary" style={{ flex: 1 }}>Annuler</button>
