@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import {
   Search, FilePlus, Save, RotateCcw, AlertCircle,
   CheckCircle2, Trash2, X, AlertTriangle, RefreshCw,
-  FileText, ExternalLink, ClipboardList, User
+  FileText, ExternalLink, ClipboardList, User, Mail
 } from 'lucide-react';
 import DetentionModal from '@/app/components/DetentionModal';
 import FicheAvoir from '@/app/components/FicheAvoir';
@@ -91,6 +91,7 @@ function NewDossierModal({
     ...emptyDossier,
     num_facture_caution: numFacture,
   });
+  const [notificationEmail, setNotificationEmail] = useState('');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -111,7 +112,7 @@ function NewDossierModal({
       const res = await fetch('/api/dossier', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, notification_email: notificationEmail }),
       });
       if (!res.ok) throw new Error('Erreur lors de la création');
       const created = await res.json();
@@ -256,6 +257,26 @@ function NewDossierModal({
                 <label>n° pièce mandataire</label>
                 <input type="text" name="num_piece_mandataire" value={form.num_piece_mandataire || ''} onChange={handleChange} placeholder="—" />
               </div>
+            </div>
+          </ModalSection>
+
+          {/* Email de notification */}
+          <ModalSection title="NOTIFICATION PAR EMAIL" accentColor="#7c3aed">
+            <div style={{ position: 'relative' }}>
+              <label>email de notification (optionnel)</label>
+              <div style={{ position: 'relative' }}>
+                <Mail size={16} style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+                <input
+                  type="email"
+                  value={notificationEmail}
+                  onChange={(e) => setNotificationEmail(e.target.value)}
+                  placeholder="ex: client@email.com"
+                  style={{ paddingLeft: '2.5rem' }}
+                />
+              </div>
+              <p style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '0.3rem' }}>
+                Si renseigné, un email récapitulatif sera envoyé à cette adresse lors de la création.
+              </p>
             </div>
           </ModalSection>
 
