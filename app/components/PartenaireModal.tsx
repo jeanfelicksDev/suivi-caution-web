@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { X, Save, Phone, Mail, User, ShieldCheck } from 'lucide-react';
+import { X, Save, Phone, User, ShieldCheck } from 'lucide-react';
 
 interface Partenaire {
     id_partenaire?: number;
