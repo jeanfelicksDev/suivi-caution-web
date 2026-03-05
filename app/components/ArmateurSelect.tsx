@@ -62,13 +62,13 @@ export default function ArmateurSelect({ value, onChange, name = 'armateur', sty
     };
 
     return (
-        <div style={{ position: 'relative' }}>
-            <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
+        <div style={{ position: 'relative', width: '100%' }}>
+            <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'stretch', width: '100%' }}>
                 <select
                     name={name}
                     value={value}
                     onChange={(e) => onChange(e.target.value)}
-                    style={{ flex: 1, ...style }}
+                    style={{ flex: 1, minWidth: 0, ...style }} // minWidth: 0 is key for flex children
                 >
                     <option value="">Sélectionner...</option>
                     {armateurs.map((a) => (
@@ -81,21 +81,21 @@ export default function ArmateurSelect({ value, onChange, name = 'armateur', sty
                         onClick={() => setShowAdd(!showAdd)}
                         title="Ajouter un armateur"
                         style={{
-                            background: 'var(--gradient-primary, linear-gradient(135deg, #4f46e5, #7c3aed))',
+                            background: showAdd ? '#64748b' : 'var(--gradient-primary, linear-gradient(135deg, #4f46e5, #7c3aed))',
                             color: 'white',
                             border: 'none',
                             borderRadius: '6px',
-                            width: 34,
-                            height: 34,
+                            width: 38,
+                            height: 'auto', // Match select height
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
                             cursor: 'pointer',
                             flexShrink: 0,
-                            transition: 'transform 0.2s',
+                            boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)',
                         }}
                     >
-                        <Plus size={16} />
+                        <Plus size={20} />
                     </button>
                 )}
             </div>
