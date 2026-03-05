@@ -15,16 +15,15 @@ async function main() {
         tousPartenaires.map(p => p.nom_partenaire.trim().toUpperCase())
     );
 
-    // 2. Extraire tous les clients et transitaires uniques depuis les dossiers
     const dossiersClients = await prisma.dossiers_caution.findMany({
         select: { client_nom: true },
-        where: { client_nom: { not: null, not: '' } },
+        where: { client_nom: { not: '' } },
         distinct: ['client_nom']
     });
 
     const dossiersTransitaires = await prisma.dossiers_caution.findMany({
         select: { transitaire_nom: true },
-        where: { transitaire_nom: { not: null, not: '' } },
+        where: { transitaire_nom: { not: '' } },
         distinct: ['transitaire_nom']
     });
 
