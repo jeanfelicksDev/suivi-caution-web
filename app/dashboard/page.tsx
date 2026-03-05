@@ -82,6 +82,7 @@ export default function Dashboard() {
                             <option value="MSC">MSC</option>
                             <option value="CMA CGM">CMA CGM</option>
                             <option value="MAERSK">MAERSK</option>
+                            <option value="OOCL">OOCL</option>
                         </select>
                     </div>
                     <div>
