@@ -39,3 +39,21 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+/app/generated/prisma
+
+# Données locales sensibles
+*.xlsx
+*.accdb
+*.mdb
+liste_partenaires.txt
+prisma.config.ts.bak
+
+# Scripts utilitaires locaux (migration, diagnostic)
+audit_dmdt.py
+check_*.py
+explore_access.py
+import_*.py
+migrate_*.py
+diag_dates.js
+clear_users.js

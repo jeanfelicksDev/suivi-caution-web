@@ -1,0 +1,140 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+
+model clients {
+  id_client  Int       @id @default(autoincrement())
+  num_fne    String    @unique(map: "sqlite_autoindex_clients_1")
+  nom_client String
+  created_at DateTime? @default(now())
+}
+
+model dossiers_caution {
+  id                        Int       @id @default(autoincrement())
+  type_remboursement        String?   @map("type_rembt")
+  nature_rembt              String?
+  num_facture_caution       String?
+  montant_caution           Float?
+  date_facture              String?
+  num_bl                    String?
+  armateur                  String?
+  date_reception            String?
+  transitaire_actif         Int?      @default(0)
+  transitaire_nom           String?
+  client_actif              Int?      @default(0)
+  client_nom                String?
+  mandataire_nom            String?
+  num_piece_mandataire      String?   @map("mandataire_piece_id")
+  date_transmission_ligne   String?
+  date_retour_ligne         String?
+  date_mise_litige          String?
+  date_fin_litige           String?
+  date_trans_sce_detention  String?   @map("transmis_sce_detention") // Attention au changement de type Int -> String
+  commentaire_sce_detention String?
+  date_suspendu             String?
+  date_fin_suspension       String?
+  raison_suspension         String?   @map("commentaire_trop_percu")
+  jours_franchise           Int?      @map("nbre_jrs_franchise")
+  date_bad                  String?
+  date_sortie               String?
+  date_retour               String?
+  nbre_20                   Int?
+  nbre_40                   Int?
+  date_mise_avoir           String?
+  date_fin_avoir            String?
+  num_avoir                 String?
+  commentaire_avoir         String?   @map("commentaire_validation")
+  date_piece_caisse         String?
+  date_1er_signature        String?
+  date_retour_1er_signature String?
+  date_2e_signature         String?
+  date_retour_2e_signature String?
+  date_transmission_compta  String?
+  date_retour_compta        String?
+  date_cheque               String?
+  num_cheque                String?
+  montant_final             Float?
+  date_cloture              String?
+  propose_par               String?
+  banque                    String?
+  created_at                DateTime? @default(now())
+  updated_at                DateTime? @default(now())
+}
+
+model cheques_emis {
+  id                  Int       @id @default(autoincrement())
+  date_liste_recu     String?
+  num_facture_caution String?
+  num_cheque          String?
+  montant             Float?
+  banque              String?
+  date_cheque         String?
+  date_rex            String?
+  beneficiaire        String?
+  commentaire         String?
+  imported_at         DateTime? @default(now())
+}
+
+model cheque_disponible {
+  num_dispo_cheque Int       @id
+  date_cheqq       DateTime?
+}
+
+model cheque_details {
+  id               Int       @id @default(autoincrement())
+  num_dispo_cheque Int?
+  num_fact_caution String?
+  montant_cheque   Int?
+  num_cheque       String?
+  banque           String?
+  date_cheque      DateTime?
+  date_cloture     DateTime?
+}
+
+model partenaires {
+  id_partenaire     Int       @id @default(autoincrement())
+  nom_partenaire    String
+  est_client        Int       @default(0) // Case à cocher (0 ou 1)
+  est_transitaire   Int       @default(0) // Case à cocher (0 ou 1)
+  num_fne           String?   @unique
+  telephone         String?
+  email             String?
+  created_at        DateTime? @default(now())
+  updated_at        DateTime? @default(now())
+}
+
+model transitaires {
+  id_transitaire      Int       @id @default(autoincrement())
+  num_fne_transitaire String    @unique(map: "sqlite_autoindex_transitaires_1")
+  nom_transitaire     String
+  created_at          DateTime? @default(now())
+}
+
+model users {
+  id            Int       @id @default(autoincrement())
+  username      String    @unique(map: "sqlite_autoindex_users_1")
+  email         String    @unique(map: "sqlite_autoindex_users_2")
+  password_hash String
+  role          String    @default("USER")
+  permissions   String    @default("[]")
+  reset_token   String?
+  reset_expiry  String?
+  created_at    DateTime? @default(now())
+}
+
+model facture_dmdt {
+  id                 Int       @id @default(autoincrement())
+  num_facture_caution String?                       // Numéro de facture caution (clé liaison)
+  num_facture_dmdt   String?                        // Numéro facture détention/DMDT ex: FD01200049
+  montant_facture    Float?                         // Montant facturé
+  commentaire        String?                        // Commentaire (ex: "02JRS A FACTURER AU TRSPT")
+  date_dmdt          String?                        // Date de la facture/DMDT
+  created_at         DateTime? @default(now())
+  updated_at         DateTime? @default(now())
+}
