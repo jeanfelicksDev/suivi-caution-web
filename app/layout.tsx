@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Outfit } from "next/font/google";
 import "./globals.css";
 import Sidebar from "@/app/components/Sidebar";
 import FieldHighlighter from "@/app/components/FieldHighlighter";
 import AuthProvider from "@/app/components/AuthProvider";
 
-const inter = Inter({
+const outfit = Outfit({
   subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
 });
 
 export const metadata: Metadata = {
@@ -21,7 +22,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr">
-      <body className={inter.className}>
+      <body className={outfit.className}>
         <AuthProvider>
           <div className="layout-wrapper">
             <Sidebar />
