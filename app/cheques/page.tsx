@@ -185,7 +185,7 @@ export default function ChequesPage() {
             </header>
 
             {/* Layout 2 colonnes */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 280px', gap: '1.25rem', alignItems: 'start' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: '2.5rem', alignItems: 'start' }}>
 
                 {/* ── COLONNE GAUCHE ──────────────────────────────── */}
                 <div>
