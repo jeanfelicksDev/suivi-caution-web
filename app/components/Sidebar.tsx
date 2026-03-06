@@ -23,6 +23,7 @@ const Sidebar = () => {
         { name: 'Tableau de Bord', icon: <LayoutDashboard size={20} />, path: '/dashboard', show: canRead },
         { name: 'Nouveau Dossier & Rech.', icon: <Search size={20} />, path: '/', show: true },
         { name: 'Historique', icon: <Database size={20} />, path: '/historique', show: canRead },
+
         { name: 'Partenaires', icon: <ShieldCheck size={20} />, path: '/partenaires', show: true },
         { name: 'Chèques Émis', icon: <CreditCard size={20} />, path: '/cheques', show: canManageCheques },
         { name: 'Reports', icon: <FileText size={20} />, path: '/reports', show: canRead },
