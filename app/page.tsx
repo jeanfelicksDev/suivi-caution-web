@@ -98,7 +98,11 @@ function NewDossierModal({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
-    setForm(prev => ({ ...prev, [name]: type === 'number' ? parseFloat(value) || 0 : value }));
+    let finalValue = value;
+    if (type !== 'number' && type !== 'date' && typeof value === 'string') {
+      finalValue = value.toUpperCase();
+    }
+    setForm(prev => ({ ...prev, [name]: type === 'number' ? parseFloat(value) || 0 : finalValue }));
   };
 
   const handleCheck = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -427,7 +431,11 @@ function HomePageInternal() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
-    setFormData(prev => ({ ...prev, [name]: type === 'number' ? parseFloat(value) || 0 : value }));
+    let finalValue = value;
+    if (type !== 'number' && type !== 'date' && typeof value === 'string' && name !== 'notification_email') {
+      finalValue = value.toUpperCase();
+    }
+    setFormData(prev => ({ ...prev, [name]: type === 'number' ? parseFloat(value) || 0 : finalValue }));
   };
 
   const handleCheck = (e: React.ChangeEvent<HTMLInputElement>) => {

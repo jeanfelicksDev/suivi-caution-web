@@ -87,8 +87,9 @@ export default function PartenaireCombobox({
                     autoComplete="off"
                     value={query}
                     onChange={(e) => {
-                        setQuery(e.target.value);
-                        onChange(e.target.value);
+                        const val = e.target.value.toUpperCase();
+                        setQuery(val);
+                        onChange(val);
                         setOpen(true);
                     }}
                     onFocus={() => setOpen(true)}

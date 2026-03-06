@@ -112,7 +112,7 @@ export default function ArmateurSelect({ value, onChange, name = 'armateur', sty
                         <input
                             type="text"
                             value={newNom}
-                            onChange={(e) => setNewNom(e.target.value)}
+                            onChange={(e) => setNewNom(e.target.value.toUpperCase())}
                             placeholder="Nom du nouvel armateur"
                             style={{ flex: 1, fontSize: '0.85rem', padding: '0.4rem 0.6rem' }}
                             onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAdd())}

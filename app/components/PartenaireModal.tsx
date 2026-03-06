@@ -121,14 +121,14 @@ export default function PartenaireModal({
                         <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 800, marginBottom: '0.25rem', textTransform: 'uppercase' }}>Nom Partenaire</label>
                         <div style={{ position: 'relative' }}>
                             <User size={16} style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
-                            <input type="text" value={form.nom_partenaire} onChange={e => setForm({ ...form, nom_partenaire: e.target.value })}
+                            <input type="text" value={form.nom_partenaire} onChange={e => setForm({ ...form, nom_partenaire: e.target.value.toUpperCase() })}
                                 style={{ paddingLeft: '2.5rem', width: '100%' }} required />
                         </div>
                     </div>
 
                     <div style={{ marginBottom: '1rem' }}>
                         <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 800, marginBottom: '0.25rem', textTransform: 'uppercase' }}>Numéro FNE</label>
-                        <input type="text" value={form.num_fne || ''} onChange={e => setForm({ ...form, num_fne: e.target.value })}
+                        <input type="text" value={form.num_fne || ''} onChange={e => setForm({ ...form, num_fne: e.target.value.toUpperCase() })}
                             style={{ width: '100%' }} placeholder="Ex: FNE-001" />
                     </div>
 
@@ -136,7 +136,7 @@ export default function PartenaireModal({
                         <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 800, marginBottom: '0.25rem', textTransform: 'uppercase' }}>Téléphone</label>
                         <div style={{ position: 'relative' }}>
                             <Phone size={16} style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
-                            <input type="text" value={form.telephone || ''} onChange={e => setForm({ ...form, telephone: e.target.value })}
+                            <input type="text" value={form.telephone || ''} onChange={e => setForm({ ...form, telephone: e.target.value.toUpperCase() })}
                                 style={{ paddingLeft: '2.5rem', width: '100%' }} />
                         </div>
                     </div>

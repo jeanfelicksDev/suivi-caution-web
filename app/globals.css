@@ -96,7 +96,15 @@ textarea {
   color: var(--primary);
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: var(--shadow-sm);
+  text-transform: uppercase;
 }
+
+input[type="email"],
+input[name*="email"],
+.no-uppercase {
+  text-transform: none;
+}
+
 
 input:focus,
 select:focus,
