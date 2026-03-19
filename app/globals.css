@@ -117,8 +117,19 @@ textarea:focus {
 
 input::placeholder,
 textarea::placeholder {
-  color: #94a3b8;
-  font-weight: 400;
+  color: #cbd5e1;
+  font-size: 0.82rem;
+  font-weight: 300;
+}
+
+/* Native Date Input Placeholders/Masks */
+input[type="date"]::-webkit-datetime-edit-text,
+input[type="date"]::-webkit-datetime-edit-month-field,
+input[type="date"]::-webkit-datetime-edit-day-field,
+input[type="date"]::-webkit-datetime-edit-year-field {
+  color: #cbd5e1;
+  font-size: 0.82rem;
+  font-weight: 300;
 }
 
 label {
