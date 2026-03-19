@@ -549,10 +549,23 @@ function HomePageInternal() {
               <Search size={18} style={{ position: 'absolute', left: '0.8rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
               <input
                 type="text"
-                placeholder="Entrez le numéro de facture (ex: FI01202158)..."
+                placeholder="N° de facture (ex: FI01202158)..."
                 value={numFacture}
-                onChange={e => setNumFacture(e.target.value)}
-                style={{ paddingLeft: '2.5rem', fontSize: '1rem', fontFamily: 'Inter, sans-serif' }}
+                onChange={e => setNumFacture(e.target.value.toUpperCase())}
+                style={{ 
+                  paddingLeft: '2.5rem', 
+                  fontSize: '1.1rem', 
+                  fontFamily: '"Inter", system-ui, sans-serif',
+                  fontWeight: 600,
+                  letterSpacing: '0.05em',
+                  color: '#0f172a',
+                  textTransform: 'uppercase',
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '8px',
+                   width: '100%',
+                   padding: '0.6rem 1rem 0.6rem 2.5rem',
+                   boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.02)'
+                }}
               />
             </div>
             <button type="submit" className="btn btn-primary" disabled={loading} style={{ whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.5rem 1.25rem' }}>
