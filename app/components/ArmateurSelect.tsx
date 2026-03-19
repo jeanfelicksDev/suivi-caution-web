@@ -70,7 +70,7 @@ export default function ArmateurSelect({ value, onChange, name = 'armateur', sty
                     onChange={(e) => onChange(e.target.value)}
                     style={{ flex: 1, minWidth: 0, ...style }} // minWidth: 0 is key for flex children
                 >
-                    <option value="">Sélectionner...</option>
+                    <option value="">—</option>
                     {armateurs.map((a) => (
                         <option key={a.id} value={a.nom}>{a.nom}</option>
                     ))}

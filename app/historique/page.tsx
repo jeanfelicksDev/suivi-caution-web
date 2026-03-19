@@ -27,7 +27,7 @@ interface DossierRow {
 
 /* ── Définition des étapes ─────────────────────────────────────────── */
 const ETAPES = [
-    { value: '', label: 'Toutes les étapes' },
+    { value: '', label: '—' },
     { value: 'date_reception', label: 'Dossier Reçu' },
     { value: 'date_transmission_ligne', label: 'Dossier Chez Armateur' },
     { value: 'date_mise_litige', label: 'Dossier En Litige' },
