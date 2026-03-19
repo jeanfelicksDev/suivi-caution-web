@@ -106,7 +106,15 @@ function NewDossierModal({
   };
 
   const handleCheck = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm(prev => ({ ...prev, [e.target.name]: e.target.checked ? 1 : 0 }));
+    const { name, checked } = e.target;
+    setForm(prev => {
+      const nextState = { ...prev, [name]: checked ? 1 : 0 };
+      if (checked) {
+        if (name === 'client_actif') nextState.transitaire_actif = 0;
+        if (name === 'transitaire_actif') nextState.client_actif = 0;
+      }
+      return nextState;
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -215,7 +223,10 @@ function NewDossierModal({
                 <input type="date" name="date_reception" value={form.date_reception || ''} onChange={handleChange} />
               </div>
               <div>
-                <label>nom transitaire</label>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontWeight: 700, fontSize: '0.72rem', color: '#0f172a', marginBottom: '0.15rem', textTransform: 'capitalize' }}>
+                  nom transitaire
+                  <input type="checkbox" name="transitaire_actif" title="transitaire actif" checked={form.transitaire_actif === 1} onChange={handleCheck} style={{ cursor: 'pointer', margin: 0, width: '13px', height: '13px' }} />
+                </label>
                 <PartenaireCombobox
                   name="transitaire_nom"
                   value={form.transitaire_nom || ''}
@@ -227,7 +238,10 @@ function NewDossierModal({
                 />
               </div>
               <div>
-                <label>nom client</label>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontWeight: 700, fontSize: '0.72rem', color: '#0f172a', marginBottom: '0.15rem', textTransform: 'capitalize' }}>
+                  nom client
+                  <input type="checkbox" name="client_actif" title="client actif" checked={form.client_actif === 1} onChange={handleCheck} style={{ cursor: 'pointer', margin: 0, width: '13px', height: '13px' }} />
+                </label>
                 <PartenaireCombobox
                   name="client_nom"
                   value={form.client_nom || ''}
@@ -239,20 +253,8 @@ function NewDossierModal({
                 />
               </div>
               <div>
-                <label className="checkbox-group" style={{ marginTop: '0.1rem' }}>
-                  <input type="checkbox" name="client_actif" checked={form.client_actif === 1} onChange={handleCheck} />
-                  <label style={{ cursor: 'pointer', marginBottom: 0 }}>client actif</label>
-                </label>
-              </div>
-              <div>
                 <label>mandataire</label>
                 <input type="text" name="mandataire_nom" value={form.mandataire_nom || ''} onChange={handleChange} placeholder="—" />
-              </div>
-              <div>
-                <label className="checkbox-group" style={{ marginTop: '0.1rem' }}>
-                  <input type="checkbox" name="transitaire_actif" checked={form.transitaire_actif === 1} onChange={handleCheck} />
-                  <label style={{ cursor: 'pointer', marginBottom: 0 }}>transitaire actif / mandataire</label>
-                </label>
               </div>
               <div>
                 <label>n° pièce mandataire</label>
@@ -439,7 +441,15 @@ function HomePageInternal() {
   };
 
   const handleCheck = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData(prev => ({ ...prev, [e.target.name]: e.target.checked ? 1 : 0 }));
+    const { name, checked } = e.target;
+    setFormData(prev => {
+      const nextState = { ...prev, [name]: checked ? 1 : 0 };
+      if (checked) {
+        if (name === 'client_actif') nextState.transitaire_actif = 0;
+        if (name === 'transitaire_actif') nextState.client_actif = 0;
+      }
+      return nextState;
+    });
   };
 
   const doSave = async () => {
@@ -625,7 +635,12 @@ function HomePageInternal() {
               <Field label="date de réception">
                 <input type="date" name="date_reception" value={formData.date_reception || ''} onChange={handleChange} />
               </Field>
-              <Field label="nom transitaire">
+              <Field label={
+                <>
+                  nom transitaire
+                  <input type="checkbox" name="transitaire_actif" title="transitaire actif" checked={formData.transitaire_actif === 1} onChange={handleCheck} style={{ cursor: 'pointer', margin: 0, width: '13px', height: '13px' }} />
+                </>
+              }>
                 <PartenaireCombobox
                   name="transitaire_nom"
                   value={formData.transitaire_nom || ''}
@@ -636,7 +651,12 @@ function HomePageInternal() {
                   formData={formData}
                 />
               </Field>
-              <Field label="nom client">
+              <Field label={
+                <>
+                  nom client
+                  <input type="checkbox" name="client_actif" title="client actif" checked={formData.client_actif === 1} onChange={handleCheck} style={{ cursor: 'pointer', margin: 0, width: '13px', height: '13px' }} />
+                </>
+              }>
                 <PartenaireCombobox
                   name="client_nom"
                   value={formData.client_nom || ''}
@@ -647,20 +667,8 @@ function HomePageInternal() {
                   formData={formData}
                 />
               </Field>
-              <Field label=" ">
-                <label className="checkbox-group" style={{ marginTop: '0.1rem' }}>
-                  <input type="checkbox" name="client_actif" checked={formData.client_actif === 1} onChange={handleCheck} />
-                  <label style={{ cursor: 'pointer', marginBottom: 0 }}>client actif</label>
-                </label>
-              </Field>
               <Field label="mandataire">
                 <input type="text" name="mandataire_nom" value={formData.mandataire_nom || ''} onChange={handleChange} placeholder="—" />
-              </Field>
-              <Field label=" ">
-                <label className="checkbox-group" style={{ marginTop: '0.1rem' }}>
-                  <input type="checkbox" name="transitaire_actif" checked={formData.transitaire_actif === 1} onChange={handleCheck} />
-                  <label style={{ cursor: 'pointer', marginBottom: 0 }}>transitaire actif</label>
-                </label>
               </Field>
               <Field label="n° pièce mandataire">
                 <input type="text" name="num_piece_mandataire" value={formData.num_piece_mandataire || ''} onChange={handleChange} placeholder="—" />
@@ -791,11 +799,14 @@ function HomePageInternal() {
             </div>
           </Fieldset>
 
-          {/* 6. PIECE DE CAISSE */}
-          <Fieldset title="PIECE DE CAISSE" accentColor="#4f46e5" bgTint="#f8fafc">
+          {/* 6. SIGNATURE & PIECE DE CAISSE */}
+          <Fieldset title="SIGNATURE & PIECE DE CAISSE" accentColor="#4f46e5" bgTint="#f8fafc">
             <div className="grid grid-cols-4">
               <Field label="Date pièce caisse">
                 <input type="date" name="date_piece_caisse" value={formData.date_piece_caisse || ''} onChange={handleChange} />
+              </Field>
+              <Field label="montant final (fcfa)">
+                <input type="number" name="montant_final" value={formData.montant_final ?? 0} onChange={handleChange} />
               </Field>
               <Field label="Date 1ère signature">
                 <input type="date" name="date_1er_signature" value={formData.date_1er_signature || ''} onChange={handleChange} />
@@ -809,6 +820,12 @@ function HomePageInternal() {
               <Field label="Retour Date 2ème Signature">
                 <input type="date" name="date_retour_2e_signature" value={formData.date_retour_2e_signature || ''} onChange={handleChange} />
               </Field>
+            </div>
+          </Fieldset>
+
+          {/* 7. TRANSMISSION COMPTA & EMISSION DE CHEQUE */}
+          <Fieldset title="TRANSMISSION COMPTA & EMISSION DE CHEQUE" accentColor="#0369a1" bgTint="#f0f9ff">
+            <div className="grid grid-cols-4">
               <Field label="Date trans. Compta">
                 <input type="date" name="date_transmission_compta" value={formData.date_transmission_compta || ''} onChange={handleChange} />
               </Field>
@@ -820,9 +837,6 @@ function HomePageInternal() {
               </Field>
               <Field label="Num. chèque">
                 <input type="text" name="num_cheque" value={formData.num_cheque || ''} onChange={handleChange} placeholder="—" />
-              </Field>
-              <Field label="montant final (fcfa)">
-                <input type="number" name="montant_final" value={formData.montant_final ?? 0} onChange={handleChange} />
               </Field>
               <Field label="date clôture">
                 <input type="date" name="date_cloture" value={formData.date_cloture || ''} onChange={handleChange} />
@@ -930,16 +944,6 @@ function Fieldset({ title, children, accentColor = 'var(--accent)', bgTint = 'tr
         fontSize: '0.82rem', fontWeight: 800, color: accentColor,
         textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '1rem'
       }}>
-        <div style={{
-          padding: '0.3rem 0.6rem',
-          background: accentColor,
-          color: 'white',
-          borderRadius: '6px',
-          fontSize: '0.7rem',
-          boxShadow: `0 2px 6px ${accentColor}40`
-        }}>
-          {title.split(' ')[0]}
-        </div>
         {title}
         <span style={{ flex: 1, height: '2px', background: `linear-gradient(to right, ${accentColor}40, transparent)`, borderRadius: 2 }} />
       </div>
@@ -948,11 +952,11 @@ function Fieldset({ title, children, accentColor = 'var(--accent)', bgTint = 'tr
   );
 }
 
-function Field({ label, children, labelStyle }: { label: string; children: React.ReactNode; labelStyle?: React.CSSProperties }) {
+function Field({ label, children, labelStyle }: { label: React.ReactNode; children: React.ReactNode; labelStyle?: React.CSSProperties }) {
   return (
     <div>
-      {label.trim() && (
-        <label style={{ display: 'block', fontWeight: 700, fontSize: '0.72rem', color: '#0f172a', marginBottom: '0.15rem', textTransform: 'capitalize', letterSpacing: '0.03em', ...labelStyle }}>
+      {label && (typeof label === 'string' ? label.trim() !== '' : true) && (
+        <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontWeight: 700, fontSize: '0.72rem', color: '#0f172a', marginBottom: '0.15rem', textTransform: 'capitalize', letterSpacing: '0.03em', ...labelStyle }}>
           {label}
         </label>
       )}
