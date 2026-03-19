@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
-export async function GET(request: Request, context: { params: { num: string } }) {
+export async function GET(request: Request, context: { params: Promise<{ num: string }> }) {
   try {
-    const numFacture = context.params.num.toUpperCase().trim();
+    const params = await context.params;
+    const numFacture = params.num.toUpperCase().trim();
     if (!numFacture) {
       return NextResponse.json({ found: false, error: "Numéro requis" }, { status: 400 });
     }
