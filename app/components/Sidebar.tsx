@@ -27,8 +27,8 @@ const Sidebar = () => {
 
         { name: 'Partenaires', icon: <ShieldCheck size={20} />, path: '/partenaires', show: true },
         { name: 'Chèques Émis', icon: <CreditCard size={20} />, path: '/cheques', show: canManageCheques },
-        { name: 'Reports', icon: <FileText size={20} />, path: '/reports', show: canRead },
     ];
+
 
     return (
         <aside className="sidebar">
