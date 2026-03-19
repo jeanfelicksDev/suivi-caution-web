@@ -197,9 +197,12 @@ export default function ChequesPage() {
                             <div>
                                 <label>Date Liste Reçu</label>
                                 <input
-                                    type="date"
+                                    type={dateListeRecu ? "date" : "text"}
                                     value={dateListeRecu}
                                     onChange={e => setDateListeRecu(e.target.value)}
+                                    onFocus={(e) => (e.target.type = "date")}
+                                    onBlur={(e) => !dateListeRecu && (e.target.type = "text")}
+                                    placeholder="JJ/MM/AAAA"
                                     style={{ fontWeight: 700 }}
                                 />
                             </div>

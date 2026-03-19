@@ -91,7 +91,7 @@ export default function PartenairesPage() {
                     onChange={(e) => setFilterType(e.target.value)}
                     style={{ width: '200px' }}
                 >
-                    <option value="all">Tous les types</option>
+                    <option value="all">—</option>
                     <option value="client">Clients uniquement</option>
                     <option value="transitaire">Transitaires uniquement</option>
                 </select>
