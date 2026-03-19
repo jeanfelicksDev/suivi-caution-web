@@ -742,12 +742,12 @@ function HomePageInternal() {
                   type="button"
                   onClick={() => setShowDetentionModal(true)}
                   style={{
-                    display: 'inline-flex', alignItems: 'center', gap: '0.4rem',
+                    display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
                     background: 'linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%)',
                     color: 'white', border: 'none', borderRadius: '8px',
-                    padding: '0.5rem 0.9rem', fontWeight: 800, fontSize: '0.8rem',
-                    cursor: 'pointer', boxShadow: '0 2px 8px rgba(37,99,235,0.3)',
-                    whiteSpace: 'nowrap', width: '100%', justifyContent: 'center',
+                    padding: '0.8rem 1.5rem', fontWeight: 800, fontSize: '0.8rem',
+                    cursor: 'pointer', boxShadow: '0 4px 12px rgba(37,99,235,0.3)',
+                    whiteSpace: 'nowrap', justifyContent: 'center'
                   }}
                 >
                   <ExternalLink size={14} />
@@ -788,12 +788,12 @@ function HomePageInternal() {
                   type="button"
                   onClick={() => setShowFicheAvoir(true)}
                   style={{
-                    display: 'inline-flex', alignItems: 'center', gap: '0.4rem',
+                    display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
                     background: 'linear-gradient(135deg, #7c3aed, #5b21b6)',
                     color: 'white', border: 'none', borderRadius: '8px',
-                    padding: '0.55rem 1rem', fontWeight: 800, fontSize: '0.82rem',
-                    cursor: 'pointer', boxShadow: '0 2px 8px rgba(124,58,237,0.35)',
-                    whiteSpace: 'nowrap', width: '100%', justifyContent: 'center'
+                    padding: '0.85rem 1.5rem', fontWeight: 800, fontSize: '0.82rem',
+                    cursor: 'pointer', boxShadow: '0 4px 12px rgba(124,58,237,0.35)',
+                    whiteSpace: 'nowrap', justifyContent: 'center'
                   }}
                 >
                   <ClipboardList size={16} />
