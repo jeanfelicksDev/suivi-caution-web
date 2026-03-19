@@ -197,7 +197,8 @@ function NewDossierModal({
               <div>
                 <label>date de facture <span style={{ color: '#ef4444' }}>*</span></label>
                 <input type={form.date_facture ? "date" : "text"} name="date_facture" value={form.date_facture || ''} onChange={handleChange} 
-                  onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !form.date_facture && (e.target.type = "text")} placeholder="JJ/MM/AAAA" required />
+                  onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !form.date_facture && (e.target.type = "text")} 
+                  placeholder="JJ/MM/AAAA" className={form.date_facture ? 'has-value' : ''} required />
               </div>
               <div>
                 <label>montant caution (fcfa) <span style={{ color: '#ef4444' }}>*</span></label>
@@ -217,7 +218,8 @@ function NewDossierModal({
               <div>
                 <label>date de réception <span style={{ color: '#ef4444' }}>*</span></label>
                 <input type={form.date_reception ? "date" : "text"} name="date_reception" value={form.date_reception || ''} onChange={handleChange} 
-                  onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !form.date_reception && (e.target.type = "text")} placeholder="JJ/MM/AAAA" required />
+                  onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !form.date_reception && (e.target.type = "text")} 
+                  placeholder="JJ/MM/AAAA" className={form.date_reception ? 'has-value' : ''} required />
               </div>
               <div>
                 <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontWeight: 700, fontSize: '0.72rem', color: '#0f172a', marginBottom: '0.15rem', textTransform: 'capitalize' }}>
@@ -717,10 +719,10 @@ function HomePageInternal() {
           <Fieldset title="TRANSMISSION A LA LIGNE POUR TRAITEMENT" accentColor="#059669" bgTint="#ecfdf5">
             <div className="grid grid-cols-4">
               <Field label="date trans. ligne">
-                <input type="date" name="date_transmission_ligne" value={formData.date_transmission_ligne || ''} onChange={handleChange} />
+                <input type="date" name="date_transmission_ligne" value={formData.date_transmission_ligne || ''} onChange={handleChange} className={formData.date_transmission_ligne ? 'has-value' : ''} />
               </Field>
               <Field label="date retour ligne">
-                <input type="date" name="date_retour_ligne" value={formData.date_retour_ligne || ''} onChange={handleChange} />
+                <input type="date" name="date_retour_ligne" value={formData.date_retour_ligne || ''} onChange={handleChange} className={formData.date_retour_ligne ? 'has-value' : ''} />
               </Field>
             </div>
           </Fieldset>
@@ -732,13 +734,13 @@ function HomePageInternal() {
                 <input type="number" name="jours_franchise" value={formData.jours_franchise ?? ''} onChange={handleChange} />
               </Field>
               <Field label="date bad">
-                <input type="date" name="date_bad" value={formData.date_bad || ''} onChange={handleChange} />
+                <input type="date" name="date_bad" value={formData.date_bad || ''} onChange={handleChange} className={formData.date_bad ? 'has-value' : ''} />
               </Field>
               <Field label="date de sortie">
-                <input type="date" name="date_sortie" value={formData.date_sortie || ''} onChange={handleChange} />
+                <input type="date" name="date_sortie" value={formData.date_sortie || ''} onChange={handleChange} className={formData.date_sortie ? 'has-value' : ''} />
               </Field>
               <Field label="date de retour">
-                <input type="date" name="date_retour" value={formData.date_retour || ''} onChange={handleChange} />
+                <input type="date" name="date_retour" value={formData.date_retour || ''} onChange={handleChange} className={formData.date_retour ? 'has-value' : ''} />
               </Field>
               <Field label="nbre 20'">
                 <input type="number" name="nbre_20" value={formData.nbre_20 ?? ''} onChange={handleChange} />
@@ -772,13 +774,13 @@ function HomePageInternal() {
           >
             <div className="grid grid-cols-4">
               <Field label="date début litige">
-                <input type="date" name="date_mise_litige" value={formData.date_mise_litige || ''} onChange={handleChange} />
+                <input type="date" name="date_mise_litige" value={formData.date_mise_litige || ''} onChange={handleChange} className={formData.date_mise_litige ? 'has-value' : ''} />
               </Field>
               <Field label="date fin litige">
-                <input type="date" name="date_fin_litige" value={formData.date_fin_litige || ''} onChange={handleChange} />
+                <input type="date" name="date_fin_litige" value={formData.date_fin_litige || ''} onChange={handleChange} className={formData.date_fin_litige ? 'has-value' : ''} />
               </Field>
               <Field label="Date Trans Sce détention">
-                <input type="date" name="date_trans_sce_detention" value={formData.date_trans_sce_detention || ''} onChange={handleChange} />
+                <input type="date" name="date_trans_sce_detention" value={formData.date_trans_sce_detention || ''} onChange={handleChange} className={formData.date_trans_sce_detention ? 'has-value' : ''} />
               </Field>
 
               <div style={{ gridColumn: '1 / span 2' }}>
@@ -786,10 +788,10 @@ function HomePageInternal() {
                 <textarea name="commentaire_sce_detention" value={formData.commentaire_sce_detention || ''} onChange={handleChange} rows={2} style={{ width: '100%' }} />
               </div>
               <Field label="date suspension">
-                <input type="date" name="date_suspendu" value={formData.date_suspendu || ''} onChange={handleChange} />
+                <input type="date" name="date_suspendu" value={formData.date_suspendu || ''} onChange={handleChange} className={formData.date_suspendu ? 'has-value' : ''} />
               </Field>
               <Field label="date fin suspension">
-                <input type="date" name="date_fin_suspension" value={formData.date_fin_suspension || ''} onChange={handleChange} />
+                <input type="date" name="date_fin_suspension" value={formData.date_fin_suspension || ''} onChange={handleChange} className={formData.date_fin_suspension ? 'has-value' : ''} />
               </Field>
               <div style={{ gridColumn: '1 / -1' }}>
                 <label style={{ display: 'block', fontWeight: 700, fontSize: '0.72rem', color: '#0f172a', marginBottom: '0.15rem', textTransform: 'capitalize' }}>Raison Suspension</label>
@@ -821,10 +823,10 @@ function HomePageInternal() {
           >
             <div className="grid grid-cols-4">
               <Field label="Date Trans Avoir">
-                <input type="date" name="date_mise_avoir" value={formData.date_mise_avoir || ''} onChange={handleChange} />
+                <input type="date" name="date_mise_avoir" value={formData.date_mise_avoir || ''} onChange={handleChange} className={formData.date_mise_avoir ? 'has-value' : ''} />
               </Field>
               <Field label="Date Retour Avoir">
-                <input type="date" name="date_fin_avoir" value={formData.date_fin_avoir || ''} onChange={handleChange} />
+                <input type="date" name="date_fin_avoir" value={formData.date_fin_avoir || ''} onChange={handleChange} className={formData.date_fin_avoir ? 'has-value' : ''} />
               </Field>
               <Field label="Numéro avoir">
                 <input type="text" name="num_avoir" value={formData.num_avoir || ''} onChange={handleChange} placeholder="—" />
@@ -846,22 +848,22 @@ function HomePageInternal() {
           <Fieldset title="SIGNATURE & PIECE DE CAISSE" accentColor="#4f46e5" bgTint="#f8fafc">
             <div className="grid grid-cols-4">
               <Field label="Date pièce caisse">
-                <input type="date" name="date_piece_caisse" value={formData.date_piece_caisse || ''} onChange={handleChange} />
+                <input type="date" name="date_piece_caisse" value={formData.date_piece_caisse || ''} onChange={handleChange} className={formData.date_piece_caisse ? 'has-value' : ''} />
               </Field>
               <Field label="montant final (fcfa)">
                 <input type="number" name="montant_final" value={formData.montant_final ?? 0} onChange={handleChange} />
               </Field>
               <Field label="Date 1ère signature">
-                <input type="date" name="date_1er_signature" value={formData.date_1er_signature || ''} onChange={handleChange} />
+                <input type="date" name="date_1er_signature" value={formData.date_1er_signature || ''} onChange={handleChange} className={formData.date_1er_signature ? 'has-value' : ''} />
               </Field>
               <Field label="Date Retour 1ere Signature">
-                <input type="date" name="date_retour_1er_signature" value={formData.date_retour_1er_signature || ''} onChange={handleChange} />
+                <input type="date" name="date_retour_1er_signature" value={formData.date_retour_1er_signature || ''} onChange={handleChange} className={formData.date_retour_1er_signature ? 'has-value' : ''} />
               </Field>
               <Field label="Date 2ème Signature">
-                <input type="date" name="date_2e_signature" value={formData.date_2e_signature || ''} onChange={handleChange} />
+                <input type="date" name="date_2e_signature" value={formData.date_2e_signature || ''} onChange={handleChange} className={formData.date_2e_signature ? 'has-value' : ''} />
               </Field>
               <Field label="Retour Date 2ème Signature">
-                <input type="date" name="date_retour_2e_signature" value={formData.date_retour_2e_signature || ''} onChange={handleChange} />
+                <input type="date" name="date_retour_2e_signature" value={formData.date_retour_2e_signature || ''} onChange={handleChange} className={formData.date_retour_2e_signature ? 'has-value' : ''} />
               </Field>
             </div>
           </Fieldset>
@@ -870,19 +872,19 @@ function HomePageInternal() {
           <Fieldset title="TRANSMISSION COMPTA & EMISSION DE CHEQUE" accentColor="#0369a1" bgTint="#f0f9ff">
             <div className="grid grid-cols-4">
               <Field label="Date trans. Compta">
-                <input type="date" name="date_transmission_compta" value={formData.date_transmission_compta || ''} onChange={handleChange} />
+                <input type="date" name="date_transmission_compta" value={formData.date_transmission_compta || ''} onChange={handleChange} className={formData.date_transmission_compta ? 'has-value' : ''} />
               </Field>
               <Field label="Date retour Compta">
-                <input type="date" name="date_retour_compta" value={formData.date_retour_compta || ''} onChange={handleChange} />
+                <input type="date" name="date_retour_compta" value={formData.date_retour_compta || ''} onChange={handleChange} className={formData.date_retour_compta ? 'has-value' : ''} />
               </Field>
               <Field label="Date chèque">
-                <input type="date" name="date_cheque" value={formData.date_cheque || ''} onChange={handleChange} />
+                <input type="date" name="date_cheque" value={formData.date_cheque || ''} onChange={handleChange} className={formData.date_cheque ? 'has-value' : ''} />
               </Field>
               <Field label="Num. chèque">
                 <input type="text" name="num_cheque" value={formData.num_cheque || ''} onChange={handleChange} placeholder="—" />
               </Field>
               <Field label="date clôture">
-                <input type="date" name="date_cloture" value={formData.date_cloture || ''} onChange={handleChange} />
+                <input type="date" name="date_cloture" value={formData.date_cloture || ''} onChange={handleChange} className={formData.date_cloture ? 'has-value' : ''} />
               </Field>
             </div>
           </Fieldset>
