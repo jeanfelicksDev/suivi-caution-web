@@ -726,7 +726,26 @@ function HomePageInternal() {
           </Fieldset>
 
           {/* 4. DETENTION ET LITIGE */}
-          <Fieldset title="DETENTION ET LITIGE" accentColor="#dc2626" bgTint="#fef2f2">
+          <Fieldset 
+            title="DETENTION ET LITIGE" accentColor="#dc2626" bgTint="#fef2f2"
+            actionButton={
+              <button
+                type="button"
+                onClick={() => setShowDetentionModal(true)}
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
+                  background: 'linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%)',
+                  color: 'white', border: 'none', borderRadius: '8px',
+                  padding: '0.6rem 1.2rem', fontWeight: 800, fontSize: '0.8rem',
+                  cursor: 'pointer', boxShadow: '0 4px 12px rgba(37,99,235,0.3)',
+                  whiteSpace: 'nowrap', justifyContent: 'center'
+                }}
+              >
+                <ExternalLink size={14} />
+                Détentions (DMDT)
+              </button>
+            }
+          >
             <div className="grid grid-cols-4">
               <Field label="date début litige">
                 <input type="date" name="date_mise_litige" value={formData.date_mise_litige || ''} onChange={handleChange} />
@@ -737,23 +756,7 @@ function HomePageInternal() {
               <Field label="Date Trans Sce détention">
                 <input type="date" name="date_trans_sce_detention" value={formData.date_trans_sce_detention || ''} onChange={handleChange} />
               </Field>
-              <Field label=" ">
-                <button
-                  type="button"
-                  onClick={() => setShowDetentionModal(true)}
-                  style={{
-                    display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
-                    background: 'linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%)',
-                    color: 'white', border: 'none', borderRadius: '8px',
-                    padding: '0.8rem 1.5rem', fontWeight: 800, fontSize: '0.8rem',
-                    cursor: 'pointer', boxShadow: '0 4px 12px rgba(37,99,235,0.3)',
-                    whiteSpace: 'nowrap', justifyContent: 'center'
-                  }}
-                >
-                  <ExternalLink size={14} />
-                  Détentions (DMDT)
-                </button>
-              </Field>
+
               <div style={{ gridColumn: '1 / span 2' }}>
                 <label style={{ display: 'block', fontWeight: 700, fontSize: '0.72rem', color: '#0f172a', marginBottom: '0.15rem', textTransform: 'capitalize' }}>Commentaire Sce Détention</label>
                 <textarea name="commentaire_sce_detention" value={formData.commentaire_sce_detention || ''} onChange={handleChange} rows={2} style={{ width: '100%' }} />
@@ -772,7 +775,26 @@ function HomePageInternal() {
           </Fieldset>
 
           {/* 5. AVOIR */}
-          <Fieldset title="AVOIR" accentColor="#7c3aed" bgTint="#f5f3ff">
+          <Fieldset 
+            title="AVOIR" accentColor="#7c3aed" bgTint="#f5f3ff"
+            actionButton={
+              <button
+                type="button"
+                onClick={() => setShowFicheAvoir(true)}
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
+                  background: 'linear-gradient(135deg, #7c3aed, #5b21b6)',
+                  color: 'white', border: 'none', borderRadius: '8px',
+                  padding: '0.6rem 1.2rem', fontWeight: 800, fontSize: '0.82rem',
+                  cursor: 'pointer', boxShadow: '0 4px 12px rgba(124,58,237,0.35)',
+                  whiteSpace: 'nowrap', justifyContent: 'center'
+                }}
+              >
+                <ClipboardList size={16} />
+                Fiche Avoir
+              </button>
+            }
+          >
             <div className="grid grid-cols-4">
               <Field label="Date Trans Avoir">
                 <input type="date" name="date_mise_avoir" value={formData.date_mise_avoir || ''} onChange={handleChange} />
@@ -783,23 +805,7 @@ function HomePageInternal() {
               <Field label="Numéro avoir">
                 <input type="text" name="num_avoir" value={formData.num_avoir || ''} onChange={handleChange} placeholder="—" />
               </Field>
-              <Field label=" ">
-                <button
-                  type="button"
-                  onClick={() => setShowFicheAvoir(true)}
-                  style={{
-                    display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
-                    background: 'linear-gradient(135deg, #7c3aed, #5b21b6)',
-                    color: 'white', border: 'none', borderRadius: '8px',
-                    padding: '0.85rem 1.5rem', fontWeight: 800, fontSize: '0.82rem',
-                    cursor: 'pointer', boxShadow: '0 4px 12px rgba(124,58,237,0.35)',
-                    whiteSpace: 'nowrap', justifyContent: 'center'
-                  }}
-                >
-                  <ClipboardList size={16} />
-                  Fiche Avoir
-                </button>
-              </Field>
+
               <div style={{ gridColumn: '1 / -1' }}>
                 <label style={{ display: 'block', fontWeight: 700, fontSize: '0.72rem', color: '#0f172a', marginBottom: '0.15rem', textTransform: 'capitalize' }}>Commentaire Avoir</label>
                 <input list="prev-comments" name="commentaire_avoir" value={formData.commentaire_avoir || ''} onChange={handleChange} placeholder="Choisir ou saisir un commentaire..." />
@@ -943,7 +949,7 @@ export default function Home() {
 
 /* ─── Sous-composants ─────────────────────────────────────── */
 
-function Fieldset({ title, children, accentColor = 'var(--accent)', bgTint = 'transparent' }: { title: string; children: React.ReactNode; accentColor?: string; bgTint?: string }) {
+function Fieldset({ title, children, accentColor = 'var(--accent)', bgTint = 'transparent', actionButton }: { title: string; children: React.ReactNode; accentColor?: string; bgTint?: string; actionButton?: React.ReactNode }) {
   return (
     <fieldset style={{
       marginBottom: '1.25rem',
@@ -952,8 +958,14 @@ function Fieldset({ title, children, accentColor = 'var(--accent)', bgTint = 'tr
       background: bgTint,
       border: `1px solid ${accentColor}50`,
       margin: 0,
-      minInlineSize: 'auto'
+      minInlineSize: 'auto',
+      position: 'relative'
     }}>
+      {actionButton && (
+        <div style={{ position: 'absolute', top: '1rem', right: '1rem', zIndex: 10 }}>
+          {actionButton}
+        </div>
+      )}
       <legend style={{
         padding: '0 0.5rem',
         fontSize: '0.82rem',
