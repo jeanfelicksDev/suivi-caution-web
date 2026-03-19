@@ -19,6 +19,8 @@ export async function GET(request: Request, context: { params: Promise<{ num: st
         date_transmission_compta: true,
         date_retour_compta: true,
         date_cheque: true,
+        date_suspendu: true,
+        date_fin_suspension: true,
       }
     });
 
@@ -28,6 +30,8 @@ export async function GET(request: Request, context: { params: Promise<{ num: st
 
     let statut_code = 0;
     let statut_text = '';
+
+    const isSuspended = dossier.date_suspendu && !dossier.date_fin_suspension;
 
     if (dossier.date_cheque) {
       statut_code = 5;
@@ -40,7 +44,7 @@ export async function GET(request: Request, context: { params: Promise<{ num: st
       statut_text = 'A la Signature';
     } else if (dossier.date_reception) {
       statut_code = 2; 
-      statut_text = 'En traitement';
+      statut_text = isSuspended ? 'Dossier suspendu' : 'En traitement';
     } else {
       statut_code = 1; 
       statut_text = 'Réception';
