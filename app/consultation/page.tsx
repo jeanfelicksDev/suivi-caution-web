@@ -61,7 +61,7 @@ export default function ConsultationPage() {
 
   const steps = [
     { id: 1, label: 'Réception' },
-    { id: 2, label: searchResult?.statut_text === 'Dossier suspendu' ? 'Dossier suspendu' : 'En traitement', key: 'en_traitement' },
+    { id: 2, label: searchResult?.statut_text === 'Dossier suspendu' ? 'Suspendu' : 'En traitement', key: 'en_traitement' },
     { id: 3, label: 'A la Signature', key: 'a_la_signature' },
     { id: 4, label: 'A la compta', key: 'a_la_compta' },
     { id: 5, label: 'Chèque dispo' },
