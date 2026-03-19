@@ -17,6 +17,7 @@ interface PartenaireComboboxProps {
     placeholder?: string;
     name: string;
     formData: any;
+    required?: boolean;
 }
 
 export default function PartenaireCombobox({
@@ -25,7 +26,8 @@ export default function PartenaireCombobox({
     type,
     onManage,
     placeholder = "Sélectionner...",
-    name
+    name,
+    required = false
 }: PartenaireComboboxProps) {
     const [open, setOpen] = useState(false);
     const [query, setQuery] = useState(value || '');
@@ -95,6 +97,7 @@ export default function PartenaireCombobox({
                     onFocus={() => setOpen(true)}
                     placeholder={placeholder}
                     style={{ width: '100%', paddingRight: '45px' }}
+                    required={required}
                 />
                 <div style={{ position: 'absolute', right: '5px', display: 'flex', gap: '2px', alignItems: 'center' }}>
                     <button
