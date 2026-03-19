@@ -572,6 +572,31 @@ function HomePageInternal() {
                 : <><Search size={15} /> Vérifier</>
               }
             </button>
+
+            {isExisting && (
+              <button 
+                type="button" 
+                className="btn btn-primary" 
+                onClick={doSave} 
+                disabled={saving} 
+                style={{ 
+                  whiteSpace: 'nowrap', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: '0.4rem', 
+                  padding: '0.5rem 1.25rem',
+                  background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
+                  border: 'none',
+                  boxShadow: '0 4px 12px rgba(124, 58, 237, 0.25)'
+                }}
+              >
+                {saving
+                  ? <><RefreshCw size={15} style={{ animation: 'spin 1s linear infinite' }} /> ...</>
+                  : <><Save size={15} /> Mettre à jour</>
+                }
+              </button>
+            )}
+
             {searchResult && (
               <button type="button" className="btn btn-secondary" onClick={doReset} title="Réinitialiser" style={{ padding: '0.5rem' }}>
                 <RotateCcw size={15} />
