@@ -66,14 +66,8 @@ interface Dossier {
 const today = new Date().toISOString().split('T')[0];
 
 const emptyDossier: Dossier = {
-  type_remboursement: 'CAUTION',
-  date_reception: today,
-  transitaire_actif: 1,
+  transitaire_actif: 0,
   client_actif: 0,
-  montant_caution: 0,
-  nbre_20: 0,
-  nbre_40: 0,
-  jours_franchise: 0,
 };
 
 /* ═══════════ MODAL SIMPLIFIÉ ═══════════ */
@@ -102,7 +96,7 @@ function NewDossierModal({
     if (type !== 'number' && type !== 'date' && typeof value === 'string') {
       finalValue = value.toUpperCase();
     }
-    setForm(prev => ({ ...prev, [name]: type === 'number' ? parseFloat(value) || 0 : finalValue }));
+    setForm(prev => ({ ...prev, [name]: type === 'number' ? (value === '' ? null : parseFloat(value)) : finalValue }));
   };
 
   const handleCheck = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -437,7 +431,7 @@ function HomePageInternal() {
     if (type !== 'number' && type !== 'date' && typeof value === 'string' && name !== 'notification_email') {
       finalValue = value.toUpperCase();
     }
-    setFormData(prev => ({ ...prev, [name]: type === 'number' ? parseFloat(value) || 0 : finalValue }));
+    setFormData(prev => ({ ...prev, [name]: type === 'number' ? (value === '' ? null : parseFloat(value)) : finalValue }));
   };
 
   const handleCheck = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -622,6 +616,7 @@ function HomePageInternal() {
             <div className="grid grid-cols-4">
               <Field label="type remboursement">
                 <select name="type_remboursement" value={formData.type_remboursement || ''} onChange={handleChange}>
+                  <option value="">—</option>
                   <option value="CAUTION">CAUTION</option>
                   <option value="TROP_PERCU">TROP PERÇU</option>
                 </select>
@@ -634,7 +629,7 @@ function HomePageInternal() {
                 <input type="date" name="date_facture" value={formData.date_facture || ''} onChange={handleChange} />
               </Field>
               <Field label="montant caution (fcfa)">
-                <input type="number" name="montant_caution" value={formData.montant_caution ?? 0} onChange={handleChange} />
+                <input type="number" name="montant_caution" value={formData.montant_caution ?? ''} onChange={handleChange} />
               </Field>
               <Field label="numéro du bl">
                 <input type="text" name="num_bl" value={formData.num_bl || ''} onChange={handleChange} placeholder="—" />
@@ -705,7 +700,7 @@ function HomePageInternal() {
           <Fieldset title="FRANCHISE ET B.A.D" accentColor="#d97706" bgTint="#fffbeb">
             <div className="grid grid-cols-4">
               <Field label="jours franchise">
-                <input type="number" name="jours_franchise" value={formData.jours_franchise ?? 0} onChange={handleChange} />
+                <input type="number" name="jours_franchise" value={formData.jours_franchise ?? ''} onChange={handleChange} />
               </Field>
               <Field label="date bad">
                 <input type="date" name="date_bad" value={formData.date_bad || ''} onChange={handleChange} />
@@ -717,10 +712,10 @@ function HomePageInternal() {
                 <input type="date" name="date_retour" value={formData.date_retour || ''} onChange={handleChange} />
               </Field>
               <Field label="nbre 20'">
-                <input type="number" name="nbre_20" value={formData.nbre_20 ?? 0} onChange={handleChange} />
+                <input type="number" name="nbre_20" value={formData.nbre_20 ?? ''} onChange={handleChange} />
               </Field>
               <Field label="nbre 40'">
-                <input type="number" name="nbre_40" value={formData.nbre_40 ?? 0} onChange={handleChange} />
+                <input type="number" name="nbre_40" value={formData.nbre_40 ?? ''} onChange={handleChange} />
               </Field>
             </div>
           </Fieldset>

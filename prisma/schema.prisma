@@ -144,3 +144,14 @@ model armateurs {
   nom        String    @unique
   created_at DateTime? @default(now())
 }
+
+model page_visits {
+  id          Int       @id @default(autoincrement())
+  page_name   String
+  visit_date  String    // Format attendu : "YYYY-MM-DD"
+  visit_count Int       @default(0)
+  updated_at  DateTime? @default(now())
+
+  @@unique([page_name, visit_date])
+}
+
