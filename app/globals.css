@@ -116,6 +116,16 @@ select {
   color: #000000 !important;
 }
 
+/* Chrome/Webkit specific for date inputs */
+input[type="date"].has-value::-webkit-datetime-edit,
+input[type="date"].has-value::-webkit-datetime-edit-fields-wrapper,
+input[type="date"].has-value::-webkit-datetime-edit-text,
+input[type="date"].has-value::-webkit-datetime-edit-month-field,
+input[type="date"].has-value::-webkit-datetime-edit-day-field,
+input[type="date"].has-value::-webkit-datetime-edit-year-field {
+  color: #000000 !important;
+}
+
 input[type="email"],
 input[name*="email"],
 .no-uppercase {
