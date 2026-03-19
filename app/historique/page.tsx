@@ -242,6 +242,7 @@ export default function HistoriquePage() {
                                     onFocus={(e) => (e.target.type = "date")}
                                     onBlur={(e) => !filters.dateFrom && (e.target.type = "text")}
                                     placeholder="JJ/MM/AAAA"
+                                    className={filters.dateFrom ? 'has-value' : ''}
                                     style={{ borderRadius: '8px' }} />
                             </div>
                             <div>
@@ -250,6 +251,7 @@ export default function HistoriquePage() {
                                     onFocus={(e) => (e.target.type = "date")}
                                     onBlur={(e) => !filters.dateTo && (e.target.type = "text")}
                                     placeholder="JJ/MM/AAAA"
+                                    className={filters.dateTo ? 'has-value' : ''}
                                     style={{ borderRadius: '8px' }} />
                             </div>
 

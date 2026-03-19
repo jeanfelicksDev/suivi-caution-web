@@ -212,6 +212,7 @@ export default function DetentionModal({ numFacture, onClose }: Props) {
                                         <td style={{ padding: '0.4rem 0.5rem' }}>
                                             <input type="date" value={row.date_dmdt || ''}
                                                 onChange={e => handleChange(idx, 'date_dmdt', e.target.value)}
+                                                className={row.date_dmdt ? 'has-value' : ''}
                                                 style={{ padding: '0.4rem 0.5rem', border: '1px solid var(--border)', borderRadius: '6px', fontSize: '0.875rem' }} />
                                         </td>
                                         <td style={{ padding: '0.4rem 0.5rem' }}>
