@@ -14,6 +14,11 @@ export default function ConsultationPage() {
     statut_text?: string;
     data?: any;
     error?: string;
+    durations?: {
+      en_traitement: number | null;
+      a_la_signature: number | null;
+      a_la_compta: number | null;
+    }
   } | null>(null);
 
   const [visits, setVisits] = useState({ today: 0, total: 0 });
@@ -56,9 +61,9 @@ export default function ConsultationPage() {
 
   const steps = [
     { id: 1, label: 'Réception' },
-    { id: 2, label: 'En traitement' },
-    { id: 3, label: 'A la Signature' },
-    { id: 4, label: 'A la compta' },
+    { id: 2, label: 'En traitement', key: 'en_traitement' },
+    { id: 3, label: 'A la Signature', key: 'a_la_signature' },
+    { id: 4, label: 'A la compta', key: 'a_la_compta' },
     { id: 5, label: 'Chèque dispo' },
   ];
 
@@ -137,7 +142,7 @@ export default function ConsultationPage() {
           </div>
 
           {/* Timeline Schema */}
-          <div style={{ position: 'relative', margin: '2rem 2rem 4rem 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ position: 'relative', margin: '2rem 1rem 4rem 1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             {/* Background Line */}
             <div style={{ position: 'absolute', top: '50%', left: '0', right: '0', height: '6px', background: '#e2e8f0', transform: 'translateY(-50%)', zIndex: 1, borderRadius: '3px' }} />
             
@@ -149,6 +154,7 @@ export default function ConsultationPage() {
             {steps.map((step, index) => {
               const passed = step.id <= currentStep;
               const active = step.id === currentStep;
+              const duration = step.key ? (searchResult.durations ? searchResult.durations[step.key as keyof typeof searchResult.durations] : null) : null;
 
               return (
                 <div key={step.id} style={{ position: 'relative', zIndex: 3, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -162,19 +168,32 @@ export default function ConsultationPage() {
                   }}>
                     {passed && <CheckCircle2 size={16} color="white" />}
                   </div>
-                  <span style={{ 
+                  <div style={{ 
                     position: 'absolute', top: '40px', 
                     fontSize: '0.8rem', fontWeight: passed ? 700 : 500, 
                     color: active ? '#4f46e5' : (passed ? '#1e293b' : '#94a3b8'),
-                    whiteSpace: 'nowrap', textAlign: 'center'
+                    whiteSpace: 'nowrap', textAlign: 'center',
+                    display: 'flex', flexDirection: 'column', alignItems: 'center'
                   }}>
-                    {step.label}
-                  </span>
+                    <span>{step.label}</span>
+                    {duration !== null && (
+                      <span style={{ 
+                        fontSize: '0.65rem', 
+                        background: active ? '#4f46e5' : '#f1f5f9', 
+                        color: active ? 'white' : '#64748b', 
+                        padding: '1px 6px', 
+                        borderRadius: '10px',
+                        marginTop: '4px',
+                        fontWeight: 700
+                      }}>
+                        {duration} {duration > 1 ? 'jours' : 'jour'}
+                      </span>
+                    )}
+                  </div>
                 </div>
               );
             })}
           </div>
-
 
         </section>
       )}

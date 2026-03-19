@@ -46,11 +46,36 @@ export async function GET(request: Request, context: { params: Promise<{ num: st
       statut_text = 'Réception';
     }
 
+    const durations: Record<string, number | null> = {
+      en_traitement: null,
+      a_la_signature: null,
+      a_la_compta: null,
+    };
+
+    const diffDays = (d1: string | null, d2: string | null) => {
+      if (!d1) return null;
+      const start = new Date(d1);
+      const end = d2 ? new Date(d2) : new Date();
+      const diffTime = end.getTime() - start.getTime();
+      return Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
+    };
+
+    if (dossier.date_reception) {
+      durations.en_traitement = diffDays(dossier.date_reception, dossier.date_1er_signature || dossier.date_2e_signature);
+    }
+    if (dossier.date_1er_signature || dossier.date_2e_signature) {
+      durations.a_la_signature = diffDays(dossier.date_1er_signature || dossier.date_2e_signature, dossier.date_transmission_compta || dossier.date_retour_compta);
+    }
+    if (dossier.date_transmission_compta || dossier.date_retour_compta) {
+      durations.a_la_compta = diffDays(dossier.date_transmission_compta || dossier.date_retour_compta, dossier.date_cheque);
+    }
+
     return NextResponse.json({
       found: true,
       data: dossier,
       statut_code,
-      statut_text
+      statut_text,
+      durations
     });
   } catch (error) {
     console.error('Erreur API Suivi:', error);
