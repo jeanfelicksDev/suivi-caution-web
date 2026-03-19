@@ -102,12 +102,12 @@ function NewDossierModal({
   const handleCheck = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, checked } = e.target;
     setForm(prev => {
-      const nextState = { ...prev, [name]: checked ? 1 : 0 };
-      if (checked) {
-        if (name === 'client_actif') nextState.transitaire_actif = 0;
-        if (name === 'transitaire_actif') nextState.client_actif = 0;
-      }
-      return nextState;
+      if (!checked) return prev; // Empêcher de décocher si c'est le seul (optionnel)
+      return { 
+        ...prev, 
+        [name]: 1,
+        [name === 'client_actif' ? 'transitaire_actif' : 'client_actif']: 0
+      };
     });
   };
 
@@ -183,8 +183,9 @@ function NewDossierModal({
           <ModalSection title="PRISE EN COMPTE DE LA DEMANDE DE REMBOURSEMENT" accentColor="#0284c7">
             <div className="grid grid-cols-2">
               <div>
-                <label>type remboursement</label>
-                <select name="type_remboursement" value={form.type_remboursement || ''} onChange={handleChange}>
+                <label>type remboursement <span style={{ color: '#ef4444' }}>*</span></label>
+                <select name="type_remboursement" value={form.type_remboursement || ''} onChange={handleChange} required>
+                  <option value="">—</option>
                   <option value="CAUTION">CAUTION</option>
                   <option value="TROP_PERCU">TROP PERÇU</option>
                 </select>
@@ -194,31 +195,33 @@ function NewDossierModal({
                 <input type="text" name="num_facture_caution" value={form.num_facture_caution || ''} onChange={handleChange} style={{ fontWeight: 700, background: '#f1f5f9' }} readOnly />
               </div>
               <div>
-                <label>date de facture</label>
-                <input type="date" name="date_facture" value={form.date_facture || ''} onChange={handleChange} />
+                <label>date de facture <span style={{ color: '#ef4444' }}>*</span></label>
+                <input type={form.date_facture ? "date" : "text"} name="date_facture" value={form.date_facture || ''} onChange={handleChange} 
+                  onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !form.date_facture && (e.target.type = "text")} placeholder="JJ/MM/AAAA" required />
               </div>
               <div>
-                <label>montant caution (fcfa)</label>
-                <input type="number" name="montant_caution" value={form.montant_caution ?? 0} onChange={handleChange} />
+                <label>montant caution (fcfa) <span style={{ color: '#ef4444' }}>*</span></label>
+                <input type="number" name="montant_caution" value={form.montant_caution ?? ''} onChange={handleChange} required />
               </div>
               <div>
-                <label>numéro du bl</label>
-                <input type="text" name="num_bl" value={form.num_bl || ''} onChange={handleChange} placeholder="—" />
+                <label>numéro du bl <span style={{ color: '#ef4444' }}>*</span></label>
+                <input type="text" name="num_bl" value={form.num_bl || ''} onChange={handleChange} placeholder="—" required />
               </div>
               <div>
-                <label>armateur</label>
+                <label>armateur <span style={{ color: '#ef4444' }}>*</span></label>
                 <ArmateurSelect
                   value={form.armateur || ''}
                   onChange={(val) => setForm(prev => ({ ...prev, armateur: val }))}
                 />
               </div>
               <div>
-                <label>date de réception</label>
-                <input type="date" name="date_reception" value={form.date_reception || ''} onChange={handleChange} />
+                <label>date de réception <span style={{ color: '#ef4444' }}>*</span></label>
+                <input type={form.date_reception ? "date" : "text"} name="date_reception" value={form.date_reception || ''} onChange={handleChange} 
+                  onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !form.date_reception && (e.target.type = "text")} placeholder="JJ/MM/AAAA" required />
               </div>
               <div>
                 <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontWeight: 700, fontSize: '0.72rem', color: '#0f172a', marginBottom: '0.15rem', textTransform: 'capitalize' }}>
-                  nom transitaire
+                  nom transitaire <span style={{ color: '#ef4444' }}>*</span>
                   <input type="checkbox" name="transitaire_actif" title="transitaire actif" checked={form.transitaire_actif === 1} onChange={handleCheck} style={{ cursor: 'pointer', margin: 0, width: '13px', height: '13px' }} />
                 </label>
                 <PartenaireCombobox
@@ -229,11 +232,12 @@ function NewDossierModal({
                   onManage={(id) => setPartenaireModal({ open: true, id })}
                   placeholder="Rechercher transitaire..."
                   formData={form}
+                  required={form.transitaire_actif === 1}
                 />
               </div>
               <div>
                 <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontWeight: 700, fontSize: '0.72rem', color: '#0f172a', marginBottom: '0.15rem', textTransform: 'capitalize' }}>
-                  nom client
+                  nom client <span style={{ color: '#ef4444' }}>*</span>
                   <input type="checkbox" name="client_actif" title="client actif" checked={form.client_actif === 1} onChange={handleCheck} style={{ cursor: 'pointer', margin: 0, width: '13px', height: '13px' }} />
                 </label>
                 <PartenaireCombobox
@@ -244,15 +248,16 @@ function NewDossierModal({
                   onManage={(id) => setPartenaireModal({ open: true, id })}
                   placeholder="Rechercher client..."
                   formData={form}
+                  required={form.client_actif === 1}
                 />
               </div>
               <div>
-                <label>mandataire</label>
-                <input type="text" name="mandataire_nom" value={form.mandataire_nom || ''} onChange={handleChange} placeholder="—" />
+                <label>mandataire <span style={{ color: '#ef4444' }}>*</span></label>
+                <input type="text" name="mandataire_nom" value={form.mandataire_nom || ''} onChange={handleChange} placeholder="—" required />
               </div>
               <div>
-                <label>n° pièce mandataire</label>
-                <input type="text" name="num_piece_mandataire" value={form.num_piece_mandataire || ''} onChange={handleChange} placeholder="—" />
+                <label>n° pièce mandataire <span style={{ color: '#ef4444' }}>*</span></label>
+                <input type="text" name="num_piece_mandataire" value={form.num_piece_mandataire || ''} onChange={handleChange} placeholder="—" required />
               </div>
             </div>
           </ModalSection>
@@ -297,11 +302,11 @@ function NewDossierModal({
 
 function ModalSection({ title, children, accentColor = 'var(--accent)' }: { title: string; children: React.ReactNode; accentColor?: string }) {
   return (
-    <div style={{ marginBottom: '1rem', borderLeft: `3px solid ${accentColor}`, paddingLeft: '0.75rem' }}>
+    <div style={{ marginBottom: '1.25rem', borderLeft: `3px solid ${accentColor}`, paddingLeft: '0.85rem' }}>
       <div style={{
-        fontSize: '0.78rem', fontWeight: 800, color: accentColor,
+        fontSize: '0.82rem', fontWeight: 800, color: accentColor,
         textTransform: 'uppercase', letterSpacing: '0.08em',
-        marginBottom: '0.6rem', display: 'flex', alignItems: 'center', gap: '0.5rem'
+        marginBottom: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.5rem'
       }}>
         {title}
       </div>
@@ -436,14 +441,12 @@ function HomePageInternal() {
 
   const handleCheck = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, checked } = e.target;
-    setFormData(prev => {
-      const nextState = { ...prev, [name]: checked ? 1 : 0 };
-      if (checked) {
-        if (name === 'client_actif') nextState.transitaire_actif = 0;
-        if (name === 'transitaire_actif') nextState.client_actif = 0;
-      }
-      return nextState;
-    });
+    if (!checked) return; // Forcer qu'un soit coché
+    setFormData(prev => ({
+      ...prev,
+      [name]: 1,
+      [name === 'client_actif' ? 'transitaire_actif' : 'client_actif']: 0
+    }));
   };
 
   const doSave = async () => {
