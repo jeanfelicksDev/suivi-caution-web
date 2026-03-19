@@ -85,11 +85,25 @@ export default function Dashboard() {
                     </div>
                     <div>
                         <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: '#64748b', marginBottom: '0.3rem' }}>Période De Réception Du :</label>
-                        <input type="date" className="input" style={{ background: 'white', padding: '0.5rem', width: '160px', borderRadius: '8px', border: '1px solid #e2e8f0' }} value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+                        <input type={startDate ? "date" : "text"} className="input" 
+                            style={{ background: 'white', padding: '0.5rem', width: '160px', borderRadius: '8px', border: '1px solid #e2e8f0' }} 
+                            value={startDate} 
+                            onChange={(e) => setStartDate(e.target.value)}
+                            onFocus={(e) => (e.target.type = "date")}
+                            onBlur={(e) => !startDate && (e.target.type = "text")}
+                            placeholder="JJ/MM/AAAA"
+                        />
                     </div>
                     <div>
                         <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: '#64748b', marginBottom: '0.3rem' }}>Au :</label>
-                        <input type="date" className="input" style={{ background: 'white', padding: '0.5rem', width: '160px', borderRadius: '8px', border: '1px solid #e2e8f0' }} value={endDate} onChange={(e) => setEndDate(e.target.value)} />
+                        <input type={endDate ? "date" : "text"} className="input" 
+                            style={{ background: 'white', padding: '0.5rem', width: '160px', borderRadius: '8px', border: '1px solid #e2e8f0' }} 
+                            value={endDate} 
+                            onChange={(e) => setEndDate(e.target.value)}
+                            onFocus={(e) => (e.target.type = "date")}
+                            onBlur={(e) => !endDate && (e.target.type = "text")}
+                            placeholder="JJ/MM/AAAA"
+                        />
                     </div>
                     <button className="btn btn-primary" onClick={fetchStats} style={{ background: '#334155', color: 'white', fontWeight: 700, letterSpacing: '0.05em', padding: '0.5rem 1.25rem', borderRadius: '8px', height: '38px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         FILTRER

@@ -233,12 +233,18 @@ export default function HistoriquePage() {
                         <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-end', marginBottom: '0.75rem' }}>
                             <div>
                                 <label>Période De Réception Du :</label>
-                                <input type="date" name="dateFrom" value={filters.dateFrom} onChange={handleChange}
+                                <input type={filters.dateFrom ? "date" : "text"} name="dateFrom" value={filters.dateFrom} onChange={handleChange}
+                                    onFocus={(e) => (e.target.type = "date")}
+                                    onBlur={(e) => !filters.dateFrom && (e.target.type = "text")}
+                                    placeholder="JJ/MM/AAAA"
                                     style={{ borderRadius: '8px' }} />
                             </div>
                             <div>
                                 <label>Au :</label>
-                                <input type="date" name="dateTo" value={filters.dateTo} onChange={handleChange}
+                                <input type={filters.dateTo ? "date" : "text"} name="dateTo" value={filters.dateTo} onChange={handleChange}
+                                    onFocus={(e) => (e.target.type = "date")}
+                                    onBlur={(e) => !filters.dateTo && (e.target.type = "text")}
+                                    placeholder="JJ/MM/AAAA"
                                     style={{ borderRadius: '8px' }} />
                             </div>
 
