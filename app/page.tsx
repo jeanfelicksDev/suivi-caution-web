@@ -563,6 +563,7 @@ function HomePageInternal() {
                    padding: '0.6rem 1rem 0.6rem 2.5rem',
                    boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.02)'
                 }}
+                required
               />
             </div>
             <button type="submit" className="btn btn-primary" disabled={loading} style={{ whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.5rem 1.25rem' }}>

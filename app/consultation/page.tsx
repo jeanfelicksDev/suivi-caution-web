@@ -106,6 +106,7 @@ export default function ConsultationPage() {
               }}
               onFocus={e => e.target.style.borderColor = '#4f46e5'}
               onBlur={e => e.target.style.borderColor = '#e2e8f0'}
+              required
             />
           </div>
           <button type="submit" disabled={loading} style={{
