@@ -68,6 +68,7 @@ export default function ArmateurSelect({ value, onChange, name = 'armateur', sty
                     name={name}
                     value={value}
                     onChange={(e) => onChange(e.target.value)}
+                    className={value ? 'has-value' : ''}
                     style={{ flex: 1, minWidth: 0, ...style }} // minWidth: 0 is key for flex children
                 >
                     <option value="">—</option>

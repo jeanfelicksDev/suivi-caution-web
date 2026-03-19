@@ -99,6 +99,21 @@ textarea {
   text-transform: uppercase;
 }
 
+/* Bold for fields with values */
+input:not(:placeholder-shown),
+textarea:not(:placeholder-shown) {
+  font-weight: 800 !important;
+}
+
+select {
+  font-weight: 500;
+  transition: font-weight 0.2s;
+}
+
+.has-value {
+  font-weight: 800 !important;
+}
+
 input[type="email"],
 input[name*="email"],
 .no-uppercase {

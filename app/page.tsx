@@ -184,7 +184,7 @@ function NewDossierModal({
             <div className="grid grid-cols-2">
               <div>
                 <label>type remboursement <span style={{ color: '#ef4444' }}>*</span></label>
-                <select name="type_remboursement" value={form.type_remboursement || ''} onChange={handleChange} required>
+                <select name="type_remboursement" value={form.type_remboursement || ''} onChange={handleChange} className={form.type_remboursement ? "has-value" : ""} required>
                   <option value="">—</option>
                   <option value="CAUTION">CAUTION</option>
                   <option value="TROP_PERCU">TROP PERÇU</option>
@@ -619,7 +619,7 @@ function HomePageInternal() {
           <Fieldset title="PRISE EN COMPTE DE LA DEMANDE DE REMBOURSEMENT" accentColor="#0284c7" bgTint="#f0f9ff">
             <div className="grid grid-cols-4">
               <Field label="type remboursement">
-                <select name="type_remboursement" value={formData.type_remboursement || ''} onChange={handleChange}>
+                <select name="type_remboursement" value={formData.type_remboursement || ''} onChange={handleChange} className={formData.type_remboursement ? "has-value" : ""}>
                   <option value="">—</option>
                   <option value="CAUTION">CAUTION</option>
                   <option value="TROP_PERCU">TROP PERÇU</option>
