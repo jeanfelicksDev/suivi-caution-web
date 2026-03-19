@@ -932,23 +932,30 @@ export default function Home() {
 
 function Fieldset({ title, children, accentColor = 'var(--accent)', bgTint = 'transparent' }: { title: string; children: React.ReactNode; accentColor?: string; bgTint?: string }) {
   return (
-    <div style={{
+    <fieldset style={{
       marginBottom: '1.25rem',
-      padding: '1rem',
-      borderRadius: '12px',
+      padding: '0.5rem 1rem 1rem 1rem',
+      borderRadius: '8px',
       background: bgTint,
-      border: `1px solid ${bgTint === 'transparent' ? 'transparent' : accentColor + '20'}`,
+      border: `1px solid ${accentColor}50`,
+      margin: 0,
+      minInlineSize: 'auto'
     }}>
-      <div style={{
-        display: 'flex', alignItems: 'center', gap: '0.8rem',
-        fontSize: '0.82rem', fontWeight: 800, color: accentColor,
-        textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '1rem'
+      <legend style={{
+        padding: '0 0.5rem',
+        fontSize: '0.82rem',
+        fontWeight: 800,
+        color: accentColor,
+        textTransform: 'uppercase',
+        letterSpacing: '0.08em',
+        marginLeft: '0.5rem'
       }}>
         {title}
-        <span style={{ flex: 1, height: '2px', background: `linear-gradient(to right, ${accentColor}40, transparent)`, borderRadius: 2 }} />
+      </legend>
+      <div style={{ marginTop: '0.5rem' }}>
+        {children}
       </div>
-      {children}
-    </div>
+    </fieldset>
   );
 }
 
