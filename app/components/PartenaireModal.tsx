@@ -54,6 +54,10 @@ export default function PartenaireModal({
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (form.est_client === 0 && form.est_transitaire === 0) {
+            setError('Veuillez cocher Client ou Transitaire.');
+            return;
+        }
         setLoading(true);
         setError(null);
         try {
@@ -107,18 +111,36 @@ export default function PartenaireModal({
                     {error && <div style={{ color: '#dc2626', marginBottom: '1rem', fontSize: '0.8rem' }}>{error}</div>}
 
                     <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.25rem' }}>
-                        <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.875rem', fontWeight: 600 }}>
-                            <input type="checkbox" checked={form.est_client === 1} onChange={e => setForm({ ...form, est_client: e.target.checked ? 1 : 0 })} />
+                        <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>
+                            <input 
+                                type="checkbox" 
+                                checked={form.est_client === 1} 
+                                onChange={e => setForm({ 
+                                    ...form, 
+                                    est_client: e.target.checked ? 1 : 0, 
+                                    est_transitaire: e.target.checked ? 0 : form.est_transitaire 
+                                })} 
+                            />
                             Client
                         </label>
-                        <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.875rem', fontWeight: 600 }}>
-                            <input type="checkbox" checked={form.est_transitaire === 1} onChange={e => setForm({ ...form, est_transitaire: e.target.checked ? 1 : 0 })} />
+                        <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>
+                            <input 
+                                type="checkbox" 
+                                checked={form.est_transitaire === 1} 
+                                onChange={e => setForm({ 
+                                    ...form, 
+                                    est_transitaire: e.target.checked ? 1 : 0, 
+                                    est_client: e.target.checked ? 0 : form.est_client 
+                                })} 
+                            />
                             Transitaire
                         </label>
                     </div>
 
                     <div style={{ marginBottom: '1rem' }}>
-                        <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 800, marginBottom: '0.25rem', textTransform: 'uppercase' }}>Nom Partenaire</label>
+                        <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 800, marginBottom: '0.25rem', textTransform: 'uppercase' }}>
+                            Nom Partenaire <span style={{ color: '#ef4444' }}>*</span>
+                        </label>
                         <div style={{ position: 'relative' }}>
                             <User size={16} style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
                             <input type="text" value={form.nom_partenaire} onChange={e => setForm({ ...form, nom_partenaire: e.target.value.toUpperCase() })}
@@ -127,17 +149,21 @@ export default function PartenaireModal({
                     </div>
 
                     <div style={{ marginBottom: '1rem' }}>
-                        <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 800, marginBottom: '0.25rem', textTransform: 'uppercase' }}>Numéro FNE</label>
+                        <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 800, marginBottom: '0.25rem', textTransform: 'uppercase' }}>
+                            Numéro FNE <span style={{ color: '#ef4444' }}>*</span>
+                        </label>
                         <input type="text" value={form.num_fne || ''} onChange={e => setForm({ ...form, num_fne: e.target.value.toUpperCase() })}
-                            style={{ width: '100%' }} placeholder="Ex: FNE-001" />
+                            style={{ width: '100%' }} placeholder="Ex: FNE-001" required />
                     </div>
 
-                    <div style={{ marginBottom: '1rem' }}>
-                        <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 800, marginBottom: '0.25rem', textTransform: 'uppercase' }}>Téléphone</label>
+                    <div style={{ marginBottom: '1.5rem' }}>
+                        <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 800, marginBottom: '0.25rem', textTransform: 'uppercase' }}>
+                            Téléphone <span style={{ color: '#ef4444' }}>*</span>
+                        </label>
                         <div style={{ position: 'relative' }}>
                             <Phone size={16} style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
                             <input type="text" value={form.telephone || ''} onChange={e => setForm({ ...form, telephone: e.target.value.toUpperCase() })}
-                                style={{ paddingLeft: '2.5rem', width: '100%' }} />
+                                style={{ paddingLeft: '2.5rem', width: '100%' }} required />
                         </div>
                     </div>
 
