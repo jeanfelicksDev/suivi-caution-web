@@ -154,24 +154,25 @@ export default function ConsultationPage() {
             {steps.map((step, index) => {
               const passed = step.id <= currentStep;
               const active = step.id === currentStep;
+              const isSuspStep = step.label === 'Suspendu';
               const duration = step.key ? (searchResult.durations ? searchResult.durations[step.key as keyof typeof searchResult.durations] : null) : null;
 
               return (
                 <div key={step.id} style={{ position: 'relative', zIndex: 3, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                   <div style={{
                     width: '32px', height: '32px', borderRadius: '50%',
-                    background: passed ? '#4f46e5' : '#f8fafc',
-                    border: passed ? '4px solid #c7d2fe' : '4px solid #e2e8f0',
+                    background: passed ? (isSuspStep ? '#ef4444' : '#4f46e5') : '#f8fafc',
+                    border: passed ? (isSuspStep ? '4px solid #fecaca' : '4px solid #c7d2fe') : '4px solid #e2e8f0',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     transition: 'all 0.3s ease',
-                    boxShadow: active ? '0 0 0 4px rgba(79, 70, 229, 0.2)' : 'none'
+                    boxShadow: active ? `0 0 0 4px ${isSuspStep ? 'rgba(239, 68, 68, 0.2)' : 'rgba(79, 70, 229, 0.2)'}` : 'none'
                   }}>
                     {passed && <CheckCircle2 size={16} color="white" />}
                   </div>
                   <div style={{ 
                     position: 'absolute', top: '40px', 
                     fontSize: '0.8rem', fontWeight: passed ? 700 : 500, 
-                    color: active ? '#4f46e5' : (passed ? '#1e293b' : '#94a3b8'),
+                    color: active ? (isSuspStep ? '#ef4444' : '#4f46e5') : (passed ? '#1e293b' : '#94a3b8'),
                     whiteSpace: 'nowrap', textAlign: 'center',
                     display: 'flex', flexDirection: 'column', alignItems: 'center'
                   }}>
@@ -179,8 +180,8 @@ export default function ConsultationPage() {
                     {duration !== null && (
                       <span style={{ 
                         fontSize: '0.65rem', 
-                        background: active ? '#4f46e5' : '#f1f5f9', 
-                        color: active ? 'white' : '#64748b', 
+                        background: active ? (isSuspStep ? '#ef4444' : '#4f46e5') : (isSuspStep ? '#fecaca' : '#f1f5f9'), 
+                        color: active ? 'white' : (isSuspStep ? '#dc2626' : '#64748b'), 
                         padding: '1px 6px', 
                         borderRadius: '10px',
                         marginTop: '4px',
