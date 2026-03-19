@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Search, Eye, RefreshCw, CheckCircle2, AlertTriangle, AlertCircle } from 'lucide-react';
+import { Search, Eye, RefreshCw, CheckCircle2, AlertTriangle, AlertCircle, X } from 'lucide-react';
 
 export default function ConsultationPage() {
   const [numFacture, setNumFacture] = useState('');
@@ -167,7 +167,7 @@ export default function ConsultationPage() {
                     transition: 'all 0.3s ease',
                     boxShadow: active ? `0 0 0 4px ${isSuspStep ? 'rgba(239, 68, 68, 0.2)' : 'rgba(79, 70, 229, 0.2)'}` : 'none'
                   }}>
-                    {passed && <CheckCircle2 size={16} color="white" />}
+                    {passed && (isSuspStep ? <X size={16} color="white" /> : <CheckCircle2 size={16} color="white" />)}
                   </div>
                   <div style={{ 
                     position: 'absolute', top: '40px', 
