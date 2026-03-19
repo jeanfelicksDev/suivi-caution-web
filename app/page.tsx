@@ -585,9 +585,9 @@ function HomePageInternal() {
                   alignItems: 'center', 
                   gap: '0.4rem', 
                   padding: '0.5rem 1.25rem',
-                  background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
+                  background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
                   border: 'none',
-                  boxShadow: '0 4px 12px rgba(124, 58, 237, 0.25)'
+                  boxShadow: '0 4px 12px rgba(16, 185, 129, 0.25)'
                 }}
               >
                 {saving
@@ -898,7 +898,12 @@ function HomePageInternal() {
               <button className="btn btn-secondary" onClick={doReset} style={{ display: 'flex', alignItems: 'center', padding: '0.4rem 1rem', fontSize: '0.85rem' }}>
                 <RotateCcw size={15} style={{ marginRight: '0.4rem' }} /> Réinitialiser
               </button>
-              <button className="btn btn-primary" onClick={doSave} disabled={saving} style={{ display: 'flex', alignItems: 'center', padding: '0.4rem 1rem', fontSize: '0.85rem' }}>
+              <button className="btn btn-primary" onClick={doSave} disabled={saving} style={{ 
+                display: 'flex', alignItems: 'center', padding: '0.4rem 1rem', fontSize: '0.85rem',
+                background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                border: 'none',
+                boxShadow: '0 4px 12px rgba(16, 185, 129, 0.25)'
+              }}>
                 <Save size={15} style={{ marginRight: '0.4rem' }} />
                 {saving ? 'Sauvegarde...' : 'Mettre à jour'}
               </button>
