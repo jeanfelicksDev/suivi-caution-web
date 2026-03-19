@@ -99,10 +99,11 @@ textarea {
   text-transform: uppercase;
 }
 
-/* Bold for fields with values */
+/* Bold and Black for fields with values */
 input:not(:placeholder-shown),
 textarea:not(:placeholder-shown) {
   font-weight: 800 !important;
+  color: #000000 !important;
 }
 
 select {
@@ -112,6 +113,7 @@ select {
 
 .has-value {
   font-weight: 800 !important;
+  color: #000000 !important;
 }
 
 input[type="email"],
