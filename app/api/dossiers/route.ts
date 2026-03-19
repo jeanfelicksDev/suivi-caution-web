@@ -9,8 +9,9 @@ import { prisma } from '@/lib/prisma';
 const ETAPE_FIELDS = [
     'date_reception',          // Dossier Reçu
     'date_transmission_ligne', // Dossier Chez Armateur
+    'date_retour_ligne',       // Dossier Retour Ligne
     'date_mise_litige',        // Dossier En Litige
-    'date_retour_ligne',       // Dossier Suspendu
+    'date_suspendu',           // Dossier Suspendu
     'date_piece_caisse',       // Dossier Pour Avoir
     'date_1er_signature',      // Dossier En Signature 1
     'date_2e_signature',       // Dossier En Signature 2
@@ -82,6 +83,8 @@ export async function GET(request: Request) {
                 date_transmission_ligne: true,
                 date_mise_litige: true,
                 date_retour_ligne: true,
+                date_suspendu: true,
+                date_fin_suspension: true,
                 date_piece_caisse: true,
                 date_1er_signature: true,
                 date_2e_signature: true,

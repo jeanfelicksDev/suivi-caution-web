@@ -16,6 +16,8 @@ interface DossierRow {
     date_reception: string | null;
     date_transmission_ligne: string | null;
     date_mise_litige: string | null;
+    date_suspendu: string | null;
+    date_fin_suspension: string | null;
     date_retour_ligne: string | null;
     date_piece_caisse: string | null;
     date_1er_signature: string | null;
@@ -30,8 +32,9 @@ const ETAPES = [
     { value: '', label: '—' },
     { value: 'date_reception', label: 'Dossier Reçu' },
     { value: 'date_transmission_ligne', label: 'Dossier Chez Armateur' },
+    { value: 'date_retour_ligne', label: 'Dossier Retour Ligne' },
     { value: 'date_mise_litige', label: 'Dossier En Litige' },
-    { value: 'date_retour_ligne', label: 'Dossier Suspendu' },
+    { value: 'date_suspendu', label: 'Dossier Suspendu' },
     { value: 'date_piece_caisse', label: 'Dossier Pour Avoir' },
     { value: 'date_1er_signature', label: 'Dossier En Signature 1' },
     { value: 'date_2e_signature', label: 'Dossier En Signature 2' },
@@ -44,8 +47,9 @@ const ETAPES = [
 const ETAPE_COLORS: Record<string, { bg: string; color: string }> = {
     date_reception: { bg: '#e0f2fe', color: '#0369a1' },
     date_transmission_ligne: { bg: '#fef9c3', color: '#854d0e' },
+    date_retour_ligne: { bg: '#fef3c7', color: '#92400e' },
     date_mise_litige: { bg: '#fee2e2', color: '#b91c1c' },
-    date_retour_ligne: { bg: '#fce7f3', color: '#9d174d' },
+    date_suspendu: { bg: '#fee2e2', color: '#dc2626' }, // Rouge pour suspendu
     date_piece_caisse: { bg: '#ede9fe', color: '#6d28d9' },
     date_1er_signature: { bg: '#dbeafe', color: '#1d4ed8' },
     date_2e_signature: { bg: '#d1fae5', color: '#065f46' },
@@ -58,8 +62,9 @@ const ETAPE_COLORS: Record<string, { bg: string; color: string }> = {
 const ETAPE_SEQUENCE = [
     'date_reception',
     'date_transmission_ligne',
-    'date_mise_litige',
     'date_retour_ligne',
+    'date_mise_litige',
+    'date_suspendu',
     'date_piece_caisse',
     'date_1er_signature',
     'date_2e_signature',
