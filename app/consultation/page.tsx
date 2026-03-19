@@ -174,13 +174,7 @@ export default function ConsultationPage() {
             })}
           </div>
 
-          {/* Footer Note */}
-          <div style={{ marginTop: '2rem', padding: '1rem', background: '#f8fafc', borderLeft: '4px solid #cbd5e1', borderRadius: '0 8px 8px 0', fontSize: '0.85rem', color: '#64748b', fontStyle: 'italic', display: 'flex', gap: '0.5rem', alignItems: 'flex-start' }}>
-            <AlertCircle size={16} style={{ flexShrink: 0, marginTop: '2px' }} />
-            <p style={{ margin: 0 }}>
-              Nb : un dossier est considéré en traitement entre la réception et la première signature.
-            </p>
-          </div>
+
         </section>
       )}
 

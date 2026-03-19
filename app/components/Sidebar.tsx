@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Search, LayoutDashboard, Database, LogOut, FileText, CreditCard, ShieldCheck } from 'lucide-react';
+import { Search, LayoutDashboard, Database, LogOut, FileText, CreditCard, ShieldCheck, Eye } from 'lucide-react';
 import { useAuth } from './AuthProvider';
 import AttenteTiroir from './AttenteTiroir';
 
@@ -22,6 +22,7 @@ const Sidebar = () => {
     const menuItems = [
         { name: 'Tableau de Bord', icon: <LayoutDashboard size={20} />, path: '/dashboard', show: canRead },
         { name: 'Nouveau Dossier & Rech.', icon: <Search size={20} />, path: '/', show: true },
+        { name: 'Consultation Client', icon: <Eye size={20} />, path: '/consultation', show: true },
         { name: 'Historique', icon: <Database size={20} />, path: '/historique', show: canRead },
 
         { name: 'Partenaires', icon: <ShieldCheck size={20} />, path: '/partenaires', show: true },
