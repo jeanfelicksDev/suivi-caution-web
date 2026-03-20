@@ -23,9 +23,11 @@ export default function ConsultationPage() {
 
   const [visits, setVisits] = useState({ today: 0, total: 0 });
 
-  // Tracer la visite au chargement
+  // Tracer la visite au chargement (uniquement pour les visiteurs sans compte)
   useEffect(() => {
-    fetch('/api/visits', { method: 'POST' })
+    const isLoggedIn = !!localStorage.getItem('caution_user');
+    const method = isLoggedIn ? 'GET' : 'POST';
+    fetch('/api/visits', { method })
       .then(res => res.json())
       .then(data => {
         if (data && typeof data.today === 'number') {
