@@ -751,9 +751,9 @@ function HomePageInternal() {
             </div>
           </Fieldset>
 
-          {/* 4. DETENTION ET LITIGE */}
-          <Fieldset 
-            title="DETENTION ET LITIGE" accentColor="#dc2626" bgTint="#fef2f2"
+          {/* 4. MISE EN LITIGE */}
+          <Fieldset
+            title="MISE EN LITIGE (Avec ou sans Détention)" accentColor="#dc2626" bgTint="#fef2f2"
             actionButton={
               <button
                 type="button"
