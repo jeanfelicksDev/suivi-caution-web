@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import { Outfit } from "next/font/google";
 import "./globals.css";
-import Sidebar from "@/app/components/Sidebar";
-import FieldHighlighter from "@/app/components/FieldHighlighter";
 import AuthProvider from "@/app/components/AuthProvider";
+import LayoutContent from "@/app/components/LayoutContent";
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -24,13 +23,9 @@ export default function RootLayout({
     <html lang="fr">
       <body className={outfit.className}>
         <AuthProvider>
-          <div className="layout-wrapper">
-            <Sidebar />
-            <main className="main-content">
-              {children}
-              <FieldHighlighter />
-            </main>
-          </div>
+          <LayoutContent>
+            {children}
+          </LayoutContent>
         </AuthProvider>
       </body>
     </html>

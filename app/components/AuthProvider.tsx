@@ -26,11 +26,15 @@ const AuthContext = createContext<AuthContextProps>({
 
 export const useAuth = () => useContext(AuthContext);
 
+const PUBLIC_ROUTES = ['/login', '/consultation'];
+
 export default function AuthProvider({ children }: { children: React.ReactNode }) {
     const [user, setUser] = useState<UserSession | null>(null);
     const [loading, setLoading] = useState(true);
     const router = useRouter();
     const pathname = usePathname();
+
+    const isPublicRoute = PUBLIC_ROUTES.some(r => pathname.startsWith(r));
 
     useEffect(() => {
         const storedUser = localStorage.getItem('caution_user');
@@ -42,12 +46,12 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
         if (parsedUser) {
             setUser(parsedUser);
         } else {
-            if (pathname !== '/login') {
+            if (!isPublicRoute) {
                 router.push('/login');
             }
         }
         setLoading(false);
-    }, [pathname, router]);
+    }, [pathname, router, isPublicRoute]);
 
     const login = (u: UserSession) => {
         setUser(u);
@@ -63,7 +67,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
 
     if (loading) return null;
 
-    if (!user && pathname !== '/login') {
+    if (!user && !isPublicRoute) {
         return null;
     }
 
