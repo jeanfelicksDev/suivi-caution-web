@@ -12,6 +12,7 @@ import FicheAvoir from '@/app/components/FicheAvoir';
 import PartenaireModal from '@/app/components/PartenaireModal';
 import PartenaireCombobox from '@/app/components/PartenaireCombobox';
 import ArmateurSelect from '@/app/components/ArmateurSelect';
+import RecouvrementModal from '@/app/components/RecouvrementModal';
 
 interface Dossier {
   id?: number;
@@ -373,6 +374,7 @@ function HomePageInternal() {
 
   const [showDetentionModal, setShowDetentionModal] = useState(false);
   const [showFicheAvoir, setShowFicheAvoir] = useState(false);
+  const [showRecouvrementModal, setShowRecouvrementModal] = useState(false);
   const [partenaireModal, setPartenaireModal] = useState<{ open: boolean; id?: number }>({ open: false });
 
   const searchParams = useSearchParams();
@@ -832,7 +834,26 @@ function HomePageInternal() {
           </Fieldset>
 
           {/* 6. RECOUVREMENT */}
-          <Fieldset title="RECOUVREMENT" accentColor="#14b8a6" bgTint="#f0fdfa">
+          <Fieldset 
+            title="RECOUVREMENT" accentColor="#14b8a6" bgTint="#f0fdfa"
+            actionButton={
+              <button
+                type="button"
+                onClick={() => setShowRecouvrementModal(true)}
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
+                  background: 'linear-gradient(135deg, #14b8a6 0%, #0f766e 100%)',
+                  color: 'white', border: 'none', borderRadius: '8px',
+                  padding: '0.6rem 1.2rem', fontWeight: 800, fontSize: '0.8rem',
+                  cursor: 'pointer', boxShadow: '0 4px 12px rgba(20,184,166,0.3)',
+                  whiteSpace: 'nowrap', justifyContent: 'center'
+                }}
+              >
+                <ClipboardList size={14} />
+                Montants à recouvrer
+              </button>
+            }
+          >
             <div className="grid grid-cols-6">
               <div style={{ gridColumn: 'span 2' }}>
                 <Field label="Date Trans Rec.">
@@ -972,6 +993,14 @@ function HomePageInternal() {
         <DetentionModal
           numFacture={formData.num_facture_caution}
           onClose={() => setShowDetentionModal(false)}
+        />
+      )}
+
+      {/* Modale Montants Recouvrement */}
+      {showRecouvrementModal && formData.num_facture_caution && (
+        <RecouvrementModal
+          numFacture={formData.num_facture_caution}
+          onClose={() => setShowRecouvrementModal(false)}
         />
       )}
 

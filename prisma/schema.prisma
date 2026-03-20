@@ -158,3 +158,11 @@ model page_visits {
   @@unique([page_name, visit_date])
 }
 
+model montant_recouvrer {
+  id                 Int       @id @default(autoincrement())
+  num_facture_caution String?
+  libelle            String?
+  montant            Float?
+  created_at         DateTime? @default(now())
+  updated_at         DateTime? @default(now())
+}
