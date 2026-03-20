@@ -64,22 +64,43 @@ export async function GET(
             }
         }
 
-        // ─── Calcul automatique du Montant Final ───
-        const detentions = await prisma.facture_dmdt.aggregate({
-            where: { num_facture_caution: numFacture },
-            _sum: { montant_facture: true }
-        });
-        const recouvrements = await prisma.montant_recouvrer.aggregate({
-            where: { num_facture_caution: numFacture },
-            _sum: { montant: true }
-        });
+        // ─── Calcul automatique du Montant Final & Comptage ───
+        let counts = { detentions: 0, recouvrements: 0 };
+        try {
+            const p = prisma as any;
+            
+            // Détentions
+            const detentionsCount = await p.facture_dmdt.count({
+                where: { num_facture_caution: numFacture }
+            });
+            const detentionsSum = await p.facture_dmdt.aggregate({
+                where: { num_facture_caution: numFacture },
+                _sum: { montant_facture: true }
+            });
+            counts.detentions = detentionsCount;
+            
+            // Recouvrements
+            let recouvrementSum = 0;
+            if (p.montant_recouvrer) {
+                const recCount = await p.montant_recouvrer.count({
+                    where: { num_facture_caution: numFacture }
+                });
+                const recSum = await p.montant_recouvrer.aggregate({
+                    where: { num_facture_caution: numFacture },
+                    _sum: { montant: true }
+                });
+                counts.recouvrements = recCount;
+                recouvrementSum = recSum._sum.montant || 0;
+            }
 
-        const totalDetention = detentions._sum.montant_facture || 0;
-        const totalRecouvrement = recouvrements._sum.montant || 0;
-        dossier.montant_final = (dossier.montant_caution || 0) - totalDetention - totalRecouvrement;
+            const totalDetention = detentionsSum._sum.montant_facture || 0;
+            dossier.montant_final = (dossier.montant_caution || 0) - totalDetention - recouvrementSum;
+        } catch (calcError) {
+            console.error('Erreur lors du calcul/comptage:', calcError);
+        }
         // ───────────────────────────────────────────
 
-        return NextResponse.json({ found: true, dossier });
+        return NextResponse.json({ found: true, dossier, counts });
     } catch (error) {
         console.error('Error fetching dossier:', error);
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });

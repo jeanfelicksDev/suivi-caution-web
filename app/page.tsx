@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import {
   Search, FilePlus, Save, RotateCcw, AlertCircle,
   CheckCircle2, Trash2, X, AlertTriangle, RefreshCw,
-  FileText, ExternalLink, ClipboardList, User, Mail
+  FileText, ExternalLink, ClipboardList, User, Mail, Printer
 } from 'lucide-react';
 import DetentionModal from '@/app/components/DetentionModal';
 import FicheAvoir from '@/app/components/FicheAvoir';
@@ -13,6 +13,7 @@ import PartenaireModal from '@/app/components/PartenaireModal';
 import PartenaireCombobox from '@/app/components/PartenaireCombobox';
 import ArmateurSelect from '@/app/components/ArmateurSelect';
 import RecouvrementModal from '@/app/components/RecouvrementModal';
+import TransmissionReport from '@/app/components/TransmissionReport';
 
 interface Dossier {
   id?: number;
@@ -346,7 +347,11 @@ function HomePageInternal() {
 
   const [numFacture, setNumFacture] = useState(initNumFacture);
   const [loading, setLoading] = useState(false);
-  const [searchResult, setSearchResult] = useState<{ found: boolean; dossier?: Dossier } | null>(initSearchResult);
+  const [searchResult, setSearchResult] = useState<{ 
+    found: boolean; 
+    dossier?: Dossier; 
+    counts?: { detentions: number; recouvrements: number };
+  } | null>(initSearchResult);
   const [showModal, setShowModal] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
@@ -375,6 +380,8 @@ function HomePageInternal() {
   const [showDetentionModal, setShowDetentionModal] = useState(false);
   const [showFicheAvoir, setShowFicheAvoir] = useState(false);
   const [showRecouvrementModal, setShowRecouvrementModal] = useState(false);
+  const [showTransmissionReport, setShowTransmissionReport] = useState(false);
+  const [reportDates, setReportDates] = useState({ from: '', to: '' });
   const [partenaireModal, setPartenaireModal] = useState<{ open: boolean; id?: number }>({ open: false });
 
   const searchParams = useSearchParams();
@@ -542,6 +549,46 @@ function HomePageInternal() {
         background: 'var(--background)',
         padding: '1rem 0 0.5rem 0',
       }}>
+        {/* Rapports / État Journalier */}
+        <div style={{ maxWidth: '570px', margin: '0 auto 0.75rem auto', padding: '0 1.25rem' }}>
+          <div style={{ 
+            background: 'white', borderRadius: '12px', padding: '0.75rem 1rem', 
+            border: '1px solid #e2e8f0', display: 'flex', gap: '1rem', alignItems: 'flex-end',
+            boxShadow: '0 2px 10px rgba(0,0,0,0.05)'
+          }}>
+            <div style={{ flex: 1 }}>
+              <label style={{ display: 'block', fontSize: '0.65rem', fontWeight: 800, color: '#64748b', textTransform: 'uppercase', marginBottom: '0.3rem' }}>PÉRIODE DE RÉCEPTION DU :</label>
+              <input 
+                type="date" 
+                value={reportDates.from} 
+                onChange={(e) => setReportDates(prev => ({ ...prev, from: e.target.value }))}
+                style={{ fontSize: '0.85rem', padding: '0.4rem', border: '1px solid #cbd5e1', borderRadius: '6px', width: '100%' }}
+              />
+            </div>
+            <div style={{ flex: 1 }}>
+              <label style={{ display: 'block', fontSize: '0.65rem', fontWeight: 800, color: '#64748b', textTransform: 'uppercase', marginBottom: '0.3rem' }}>AU :</label>
+              <input 
+                type="date" 
+                value={reportDates.to} 
+                onChange={(e) => setReportDates(prev => ({ ...prev, to: e.target.value }))}
+                style={{ fontSize: '0.85rem', padding: '0.4rem', border: '1px solid #cbd5e1', borderRadius: '6px', width: '100%' }}
+              />
+            </div>
+            {reportDates.from && reportDates.to && (
+              <button 
+                onClick={() => setShowTransmissionReport(true)}
+                className="btn btn-secondary"
+                style={{ 
+                  padding: '0.45rem 0.75rem', fontSize: '0.8rem', whiteSpace: 'nowrap',
+                  background: '#1e293b', color: 'white', border: 'none', minHeight: '34px'
+                }}
+              >
+                <Printer size={14} style={{ marginRight: '0.4rem' }} /> État PDF
+              </button>
+            )}
+          </div>
+        </div>
+
         <section className="card" style={{
           maxWidth: '570px', margin: '0 auto',
           padding: '1rem 1.25rem',
@@ -756,26 +803,8 @@ function HomePageInternal() {
             </div>
           </Fieldset>
 
-          {/* 4. MISE EN LITIGE */}
           <Fieldset
             title="MISE EN LITIGE (Avec ou sans Détention)" accentColor="#dc2626" bgTint="#fef2f2"
-            actionButton={
-              <button
-                type="button"
-                onClick={() => setShowDetentionModal(true)}
-                style={{
-                  display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
-                  background: 'linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%)',
-                  color: 'white', border: 'none', borderRadius: '8px',
-                  padding: '0.6rem 1.2rem', fontWeight: 800, fontSize: '0.8rem',
-                  cursor: 'pointer', boxShadow: '0 4px 12px rgba(37,99,235,0.3)',
-                  whiteSpace: 'nowrap', justifyContent: 'center'
-                }}
-              >
-                <ExternalLink size={14} />
-                Détentions (DMDT)
-              </button>
-            }
           >
             <div className="grid grid-cols-4">
               <Field label="date début litige">
@@ -788,9 +817,38 @@ function HomePageInternal() {
                 <input type="date" name="date_trans_sce_detention" value={formData.date_trans_sce_detention || ''} onChange={handleChange} className={formData.date_trans_sce_detention ? 'has-value' : ''} />
               </Field>
 
+              <div style={{ display: 'flex', alignItems: 'flex-end', paddingTop: '0.5rem' }}>
+                <button
+                  type="button"
+                  onClick={() => setShowDetentionModal(true)}
+                  style={{
+                    display: 'inline-flex', alignItems: 'center', gap: '0.4rem',
+                    background: 'linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%)',
+                    color: 'white', border: 'none', borderRadius: '8px',
+                    padding: '0.5rem 1rem', fontWeight: 800, fontSize: '0.75rem',
+                    cursor: 'pointer', boxShadow: '0 4px 10px rgba(37,99,235,0.3)',
+                    whiteSpace: 'nowrap', width: '100%', justifyContent: 'center'
+                  }}
+                >
+                  <ExternalLink size={14} />
+                  Détentions (DMDT)
+                  {(searchResult?.counts?.detentions ?? 0) > 0 && (
+                    <span style={{
+                      background: '#ef4444', color: 'white', borderRadius: '50%',
+                      width: '18px', height: '18px', display: 'flex', alignItems: 'center',
+                      justifyContent: 'center', fontSize: '0.65rem', fontWeight: 900,
+                      marginLeft: '0.3rem', border: '2px solid white',
+                      boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                    }}>
+                      {searchResult?.counts?.detentions}
+                    </span>
+                  )}
+                </button>
+              </div>
+
               <div style={{ gridColumn: '1 / span 2' }}>
                 <label style={{ display: 'block', fontWeight: 700, fontSize: '0.72rem', color: '#0f172a', marginBottom: '0.15rem', textTransform: 'capitalize' }}>Commentaire Sce Détention</label>
-                <textarea name="commentaire_sce_detention" value={formData.commentaire_sce_detention || ''} onChange={handleChange} rows={2} style={{ width: '100%' }} />
+                <input type="text" name="commentaire_sce_detention" value={formData.commentaire_sce_detention || ''} onChange={handleChange} placeholder="—" />
               </div>
             </div>
           </Fieldset>
@@ -798,23 +856,6 @@ function HomePageInternal() {
           {/* 5. AVOIR */}
           <Fieldset 
             title="AVOIR" accentColor="#7c3aed" bgTint="#f5f3ff"
-            actionButton={
-              <button
-                type="button"
-                onClick={() => setShowFicheAvoir(true)}
-                style={{
-                  display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
-                  background: 'linear-gradient(135deg, #7c3aed, #5b21b6)',
-                  color: 'white', border: 'none', borderRadius: '8px',
-                  padding: '0.6rem 1.2rem', fontWeight: 800, fontSize: '0.82rem',
-                  cursor: 'pointer', boxShadow: '0 4px 12px rgba(124,58,237,0.35)',
-                  whiteSpace: 'nowrap', justifyContent: 'center'
-                }}
-              >
-                <ClipboardList size={16} />
-                Fiche Avoir
-              </button>
-            }
           >
             <div className="grid grid-cols-4">
               <Field label="Date Trans Avoir">
@@ -827,8 +868,27 @@ function HomePageInternal() {
                 <input type="text" name="num_avoir" value={formData.num_avoir || ''} onChange={handleChange} placeholder="—" />
               </Field>
 
+              <div style={{ display: 'flex', alignItems: 'flex-end', paddingTop: '0.5rem' }}>
+                <button
+                  type="button"
+                  onClick={() => setShowFicheAvoir(true)}
+                  style={{
+                    display: 'inline-flex', alignItems: 'center', gap: '0.4rem',
+                    background: 'linear-gradient(135deg, #7c3aed, #5b21b6)',
+                    color: 'white', border: 'none', borderRadius: '8px',
+                    padding: '0.5rem 1rem', fontWeight: 800, fontSize: '0.75rem',
+                    cursor: 'pointer', boxShadow: '0 4px 10px rgba(124,58,237,0.3)',
+                    whiteSpace: 'nowrap', width: '100%', justifyContent: 'center'
+                  }}
+                >
+                  <ClipboardList size={14} />
+                  Fiche Avoir
+                </button>
+              </div>
+
               <div style={{ gridColumn: '1 / -1' }}>
                 <label style={{ display: 'block', fontWeight: 700, fontSize: '0.72rem', color: '#0f172a', marginBottom: '0.15rem', textTransform: 'capitalize' }}>Commentaire Avoir</label>
+                <input type="text" name="commentaire_avoir" value={formData.commentaire_avoir || ''} onChange={handleChange} placeholder="—" />
               </div>
             </div>
           </Fieldset>
@@ -836,47 +896,64 @@ function HomePageInternal() {
           {/* 6. RECOUVREMENT */}
           <Fieldset 
             title="RECOUVREMENT" accentColor="#14b8a6" bgTint="#f0fdfa"
-            actionButton={
-              <button
-                type="button"
-                onClick={() => setShowRecouvrementModal(true)}
-                style={{
-                  display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
-                  background: 'linear-gradient(135deg, #14b8a6 0%, #0f766e 100%)',
-                  color: 'white', border: 'none', borderRadius: '8px',
-                  padding: '0.6rem 1.2rem', fontWeight: 800, fontSize: '0.8rem',
-                  cursor: 'pointer', boxShadow: '0 4px 12px rgba(20,184,166,0.3)',
-                  whiteSpace: 'nowrap', justifyContent: 'center'
-                }}
-              >
-                <ClipboardList size={14} />
-                Montants à recouvrer
-              </button>
-            }
           >
-            <div className="grid grid-cols-6">
-              <div style={{ gridColumn: 'span 2' }}>
+            <div className="grid grid-cols-4">
+              <div>
                 <Field label="Date Trans Rec.">
                   <input type="date" name="date_trans_rec" value={formData.date_trans_rec || ''} onChange={handleChange} className={formData.date_trans_rec ? 'has-value' : ''} />
                 </Field>
               </div>
-              <div style={{ gridColumn: 'span 2' }}>
+              <div>
                 <Field label="Date Ret Rec.">
                   <input type="date" name="date_ret_rec" value={formData.date_ret_rec || ''} onChange={handleChange} className={formData.date_ret_rec ? 'has-value' : ''} />
                 </Field>
               </div>
-              <div style={{ gridColumn: 'span 2' }}>
+              <div>
                 <Field label="Date Suspension">
                   <input type="date" name="date_suspendu" value={formData.date_suspendu || ''} onChange={handleChange} className={formData.date_suspendu ? 'has-value' : ''} />
                 </Field>
               </div>
               
-              <div style={{ gridColumn: 'span 4' }}>
+              <div style={{ display: 'flex', alignItems: 'flex-end', paddingTop: '0.5rem' }}>
+                <button
+                  type="button"
+                  onClick={() => setShowRecouvrementModal(true)}
+                  style={{
+                    display: 'inline-flex', alignItems: 'center', gap: '0.4rem',
+                    background: 'linear-gradient(135deg, #14b8a6 0%, #0f766e 100%)',
+                    color: 'white', border: 'none', borderRadius: '8px',
+                    padding: '0.5rem 1rem', fontWeight: 800, fontSize: '0.75rem',
+                    cursor: 'pointer', boxShadow: '0 4px 10px rgba(20,184,166,0.3)',
+                    whiteSpace: 'nowrap', width: '100%', justifyContent: 'center'
+                  }}
+                >
+                  <ClipboardList size={14} />
+                  Recouvrement
+                  {(searchResult?.counts?.recouvrements ?? 0) > 0 && (
+                    <span style={{
+                      background: '#f97316', color: 'white', borderRadius: '50%',
+                      width: '18px', height: '18px', display: 'flex', alignItems: 'center',
+                      justifyContent: 'center', fontSize: '0.65rem', fontWeight: 900,
+                      marginLeft: '0.3rem', border: '2px solid white',
+                      boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                    }}>
+                      {searchResult?.counts?.recouvrements}
+                    </span>
+                  )}
+                </button>
+              </div>
+
+              <div style={{ gridColumn: 'span 2' }}>
                 <Field label="Observ. Rec.">
                   <input type="text" name="observ_rec" value={formData.observ_rec || ''} onChange={handleChange} placeholder="—" />
                 </Field>
               </div>
-              <div style={{ gridColumn: 'span 2' }}>
+              <div>
+                <Field label="Raison Suspension">
+                  <input type="text" name="raison_suspension" value={formData.raison_suspension || ''} onChange={handleChange} placeholder="—" />
+                </Field>
+              </div>
+              <div>
                 <Field label="Date Fin Suspension">
                   <input type="date" name="date_fin_suspension" value={formData.date_fin_suspension || ''} onChange={handleChange} className={formData.date_fin_suspension ? 'has-value' : ''} />
                 </Field>
@@ -1022,6 +1099,15 @@ function HomePageInternal() {
           // Optionnel: On pourrait mettre à jour le champ actuel si on était en train de le saisir
         }}
       />
+
+      {/* Rapport de Transmission */}
+      {showTransmissionReport && (
+        <TransmissionReport 
+          from={reportDates.from}
+          to={reportDates.to}
+          onClose={() => setShowTransmissionReport(false)}
+        />
+      )}
     </div>
   );
 }
@@ -1036,7 +1122,7 @@ export default function Home() {
 
 /* ─── Sous-composants ─────────────────────────────────────── */
 
-function Fieldset({ title, children, accentColor = 'var(--accent)', bgTint = 'transparent', actionButton }: { title: string; children: React.ReactNode; accentColor?: string; bgTint?: string; actionButton?: React.ReactNode }) {
+function Fieldset({ title, children, accentColor = 'var(--accent)', bgTint = 'transparent' }: { title: string; children: React.ReactNode; accentColor?: string; bgTint?: string }) {
   return (
     <fieldset style={{
       marginBottom: '1.25rem',
@@ -1048,11 +1134,6 @@ function Fieldset({ title, children, accentColor = 'var(--accent)', bgTint = 'tr
       minInlineSize: 'auto',
       position: 'relative'
     }}>
-      {actionButton && (
-        <div style={{ position: 'absolute', top: '1rem', right: '1rem', zIndex: 10 }}>
-          {actionButton}
-        </div>
-      )}
       <legend style={{
         padding: '0 0.5rem',
         fontSize: '0.82rem',

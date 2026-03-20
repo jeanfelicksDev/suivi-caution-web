@@ -10,63 +10,89 @@ export async function GET(request: Request) {
         return NextResponse.json({ error: 'numFacture requis' }, { status: 400 });
     }
 
-    const rows = await prisma.montant_recouvrer.findMany({
-        where: { num_facture_caution: numFacture },
-        orderBy: { id: 'asc' },
-    });
-
-    return NextResponse.json(rows);
+    try {
+        const p = prisma as any;
+        if (!p.montant_recouvrer) {
+            return NextResponse.json([]); // Table pas encore générée localement
+        }
+        const rows = await p.montant_recouvrer.findMany({
+            where: { num_facture_caution: numFacture },
+            orderBy: { id: 'asc' },
+        });
+        return NextResponse.json(rows);
+    } catch (err) {
+        console.error('GET Recouvrement Error:', err);
+        return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
+    }
 }
 
 // POST /api/recouvrement  → créer une nouvelle ligne
 export async function POST(request: Request) {
-    const body = await request.json();
-    const { num_facture_caution, libelle, montant } = body;
+    try {
+        const body = await request.json();
+        const { num_facture_caution, libelle, montant } = body;
 
-    if (!num_facture_caution) {
-        return NextResponse.json({ error: 'num_facture_caution requis' }, { status: 400 });
-    }
-
-    const row = await prisma.montant_recouvrer.create({
-        data: {
-            num_facture_caution,
-            libelle: libelle || null,
-            montant: montant !== null && montant !== undefined && montant !== "" ? parseFloat(montant) : null,
+        if (!num_facture_caution) {
+            return NextResponse.json({ error: 'num_facture_caution requis' }, { status: 400 });
         }
-    });
 
-    return NextResponse.json(row, { status: 201 });
+        const p = prisma as any;
+        if (!p.montant_recouvrer) throw new Error('Table non générée');
+
+        const row = await p.montant_recouvrer.create({
+            data: {
+                num_facture_caution,
+                libelle: libelle || null,
+                montant: montant !== null && montant !== undefined && montant !== "" ? parseFloat(montant) : null,
+            }
+        });
+        return NextResponse.json(row, { status: 201 });
+    } catch (err) {
+        console.error('POST Recouvrement Error:', err);
+        return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
+    }
 }
 
 // PUT /api/recouvrement  → mettre à jour une ligne existante
 export async function PUT(request: Request) {
-    const body = await request.json();
-    const { id, libelle, montant } = body;
+    try {
+        const body = await request.json();
+        const { id, libelle, montant } = body;
 
-    if (!id) {
-        return NextResponse.json({ error: 'id requis' }, { status: 400 });
-    }
-
-    const row = await prisma.montant_recouvrer.update({
-        where: { id: Number(id) },
-        data: {
-            libelle: libelle || null,
-            montant: montant !== null && montant !== undefined && montant !== "" ? parseFloat(montant) : null,
+        if (!id) {
+            return NextResponse.json({ error: 'id requis' }, { status: 400 });
         }
-    });
 
-    return NextResponse.json(row);
+        const p = prisma as any;
+        const row = await p.montant_recouvrer.update({
+            where: { id: Number(id) },
+            data: {
+                libelle: libelle || null,
+                montant: montant !== null && montant !== undefined && montant !== "" ? parseFloat(montant) : null,
+            }
+        });
+        return NextResponse.json(row);
+    } catch (err) {
+        console.error('PUT Recouvrement Error:', err);
+        return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
+    }
 }
 
 // DELETE /api/recouvrement?id=xxx
 export async function DELETE(request: Request) {
-    const { searchParams } = new URL(request.url);
-    const id = searchParams.get('id');
+    try {
+        const { searchParams } = new URL(request.url);
+        const id = searchParams.get('id');
 
-    if (!id) {
-        return NextResponse.json({ error: 'id requis' }, { status: 400 });
+        if (!id) {
+            return NextResponse.json({ error: 'id requis' }, { status: 400 });
+        }
+
+        const p = prisma as any;
+        await p.montant_recouvrer.delete({ where: { id: Number(id) } });
+        return NextResponse.json({ success: true });
+    } catch (err) {
+        console.error('DELETE Recouvrement Error:', err);
+        return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
     }
-
-    await prisma.montant_recouvrer.delete({ where: { id: Number(id) } });
-    return NextResponse.json({ success: true });
 }

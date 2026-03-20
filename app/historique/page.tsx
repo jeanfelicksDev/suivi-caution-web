@@ -4,6 +4,8 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { Search, RefreshCw, FileText, X } from 'lucide-react';
 import Link from 'next/link';
 import ArmateurSelect from '@/app/components/ArmateurSelect';
+import TransmissionReport from '@/app/components/TransmissionReport';
+import { Printer } from 'lucide-react';
 
 interface DossierRow {
     id: number;
@@ -123,6 +125,7 @@ export default function HistoriquePage() {
     const [loading, setLoading] = useState(false);
     const [searched, setSearched] = useState(initSearched);
     const [error, setError] = useState<string | null>(null);
+    const [showTransmissionReport, setShowTransmissionReport] = useState(false);
 
     // Sauvegarde automatique dans sessionStorage à chaque changement
     useEffect(() => {
@@ -316,6 +319,27 @@ export default function HistoriquePage() {
                             ⚠ {error}
                         </p>
                     )}
+
+                    {/* Bouton Dossier Ligne (Conditionnel) */}
+                    {filters.dateFrom && filters.dateTo && filters.etape === 'date_reception' && (
+                        <div style={{ 
+                            marginTop: '1rem', paddingTop: '1rem', borderTop: '1px dashed #e2e8f0',
+                            display: 'flex', justifyContent: 'center'
+                        }}>
+                            <button 
+                                type="button" 
+                                onClick={() => setShowTransmissionReport(true)}
+                                className="btn btn-secondary"
+                                style={{ 
+                                    background: '#1e293b', color: 'white', border: 'none',
+                                    display: 'flex', alignItems: 'center', gap: '0.5rem',
+                                    padding: '0.6rem 1.5rem', borderRadius: '8px', fontWeight: 700
+                                }}
+                            >
+                                <Printer size={16} /> Rapport Dossier Ligne
+                            </button>
+                        </div>
+                    )}
                 </section>
             </div>{/* fin zone sticky */}
 
@@ -428,6 +452,14 @@ export default function HistoriquePage() {
             <style jsx>{`
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
       `}</style>
+            
+            {showTransmissionReport && (
+                <TransmissionReport 
+                    from={filters.dateFrom}
+                    to={filters.dateTo}
+                    onClose={() => setShowTransmissionReport(false)}
+                />
+            )}
         </div>
     );
 }
