@@ -870,7 +870,7 @@ function HomePageInternal() {
 
           {/* 7. TRANSMISSION COMPTA & EMISSION DE CHEQUE */}
           <Fieldset title="TRANSMISSION COMPTA & EMISSION DE CHEQUE" accentColor="#0369a1" bgTint="#f0f9ff">
-            <div className="grid grid-cols-4">
+            <div className="grid grid-cols-5">
               <Field label="Date trans. Compta">
                 <input type="date" name="date_transmission_compta" value={formData.date_transmission_compta || ''} onChange={handleChange} className={formData.date_transmission_compta ? 'has-value' : ''} />
               </Field>
