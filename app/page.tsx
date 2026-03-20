@@ -852,7 +852,7 @@ function HomePageInternal() {
             </div>
           </Fieldset>
 
-          {/* 6. SIGNATURE & PIECE DE CAISSE */}
+          {/* 7. SIGNATURE & PIECE DE CAISSE */}
           <Fieldset title="SIGNATURE & PIECE DE CAISSE" accentColor="#4f46e5" bgTint="#f8fafc">
             <div className="grid grid-cols-6">
               <Field label="Date pièce caisse">
@@ -876,7 +876,7 @@ function HomePageInternal() {
             </div>
           </Fieldset>
 
-          {/* 7. TRANSMISSION COMPTA & EMISSION DE CHEQUE */}
+          {/* 8. TRANSMISSION COMPTA & EMISSION DE CHEQUE */}
           <Fieldset title="TRANSMISSION COMPTA & EMISSION DE CHEQUE" accentColor="#0369a1" bgTint="#f0f9ff">
             <div className="grid grid-cols-5">
               <Field label="Date trans. Compta">
