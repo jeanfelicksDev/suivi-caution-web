@@ -68,6 +68,8 @@ interface Dossier {
   date_cloture?: string | null;
   propose_par?: string | null;
   banque?: string | null;
+  cloture_sans_cheque?: boolean | null;
+  dateClotureSansCheque?: string | null;
 }
 
 const emptyDossier: Dossier = {
@@ -778,6 +780,33 @@ function HomePageInternal() {
                             <Field label="Date Clôture">
                                 <input type={formData.date_cloture ? "date" : "text"} name="date_cloture" value={formData.date_cloture || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_cloture && (e.target.type = "text")} />
                             </Field>
+                        </div>
+                        <div style={{ marginTop: '1rem', borderTop: '1px solid rgba(3, 105, 161, 0.1)', paddingTop: '1rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                            <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontWeight: 800, fontSize: '0.76rem', color: '#0369a1', textTransform: 'uppercase', cursor: 'pointer', letterSpacing: '0.04em' }}>
+                                <input 
+                                    type="checkbox" 
+                                    name="cloture_sans_cheque" 
+                                    checked={formData.cloture_sans_cheque || false} 
+                                    onChange={(e) => setFormData(prev => ({ ...prev, cloture_sans_cheque: e.target.checked }))} 
+                                    style={{ width: '16px', height: '16px', cursor: 'pointer', accentColor: '#0369a1' }}
+                                />
+                                Clôture sans chèque
+                            </label>
+                            
+                            {formData.cloture_sans_cheque && (
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: '#f0f9ff', padding: '0.5rem 0.8rem', borderRadius: '6px', border: '1px solid #bae6fd' }}>
+                                    <span style={{ fontSize: '0.76rem', fontWeight: 800, color: '#0369a1', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                                        Dossier clotué à la date du
+                                    </span>
+                                    <input 
+                                        type="date" 
+                                        name="dateClotureSansCheque" 
+                                        value={formData.dateClotureSansCheque || ''} 
+                                        onChange={handleChange} 
+                                        style={{ border: '1px solid #7dd3fc', background: 'white', padding: '0.3rem 0.5rem', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 600, color: '#0c4a6e', outline: 'none' }}
+                                    />
+                                </div>
+                            )}
                         </div>
                     </Fieldset>
                 </div>
