@@ -57,3 +57,5 @@ import_*.py
 migrate_*.py
 diag_dates.js
 clear_users.js
+
+.vercel

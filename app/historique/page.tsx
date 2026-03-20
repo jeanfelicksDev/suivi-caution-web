@@ -5,7 +5,8 @@ import { Search, RefreshCw, FileText, X } from 'lucide-react';
 import Link from 'next/link';
 import ArmateurSelect from '@/app/components/ArmateurSelect';
 import TransmissionReport from '@/app/components/TransmissionReport';
-import { Printer } from 'lucide-react';
+import { Printer, Download } from 'lucide-react';
+import * as XLSX from 'xlsx';
 
 interface DossierRow {
     id: number;
@@ -183,6 +184,32 @@ export default function HistoriquePage() {
         v != null ? v.toLocaleString('fr-FR') + ' FCFA' : '—';
 
     const etapeLabel = ETAPES.find(e => e.value === filters.etape)?.label || '';
+
+    const handleExportExcel = () => {
+        if (rows.length === 0) return;
+        
+        // Préparation des données pour l'export
+        const exportData = rows.map(row => {
+            const etape = getEtapeCourante(row);
+            return {
+                'Date Réception': row.date_reception ? new Date(row.date_reception).toLocaleDateString('fr-FR') : '',
+                'N° Facture': row.num_facture_caution || '',
+                'N° BL': row.num_bl || '',
+                'Montant Caution': row.montant_caution || 0,
+                'Armateur': row.armateur || '',
+                'Client': row.client_nom || '',
+                'Transitaire': row.transitaire_nom || '',
+                'Étape Courante': etape.label
+            };
+        });
+
+        const worksheet = XLSX.utils.json_to_sheet(exportData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Historique");
+
+        // Génération du fichier
+        XLSX.writeFile(workbook, `Historique_Dossiers_${new Date().toISOString().split('T')[0]}.xlsx`);
+    };
 
     return (
         <div className="container" style={{ maxWidth: 1350 }}>
@@ -424,12 +451,31 @@ export default function HistoriquePage() {
                                 </table>
                             </div>
 
-                            {/* Bouton Rapport Dossier Ligne (Placé ici en dessous de la liste) */}
-                            {filters.dateFrom && filters.dateTo && filters.etape === 'date_reception' && (
-                                <div style={{ 
-                                    padding: '1.5rem', borderTop: '1px solid var(--border)',
-                                    display: 'flex', justifyContent: 'center', background: '#f8fafc'
-                                }}>
+                            {/* Boutons d'action en dessous de la liste */}
+                            <div style={{ 
+                                padding: '1.5rem', borderTop: '1px solid var(--border)',
+                                display: 'flex', justifyContent: 'center', gap: '1rem', background: '#f8fafc'
+                            }}>
+                                {/* Export Excel (Toujours visible si résultats) */}
+                                <button 
+                                    type="button" 
+                                    onClick={handleExportExcel}
+                                    className="btn btn-secondary"
+                                    style={{ 
+                                        background: '#16a34a', color: 'white', border: 'none',
+                                        display: 'flex', alignItems: 'center', gap: '0.6rem',
+                                        padding: '0.75rem 2rem', borderRadius: '8px', fontWeight: 800,
+                                        boxShadow: '0 4px 12px rgba(22, 163, 74, 0.2)',
+                                        transition: 'transform 0.2s'
+                                    }}
+                                    onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+                                    onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+                                >
+                                    <Download size={18} /> Exporter en Excel
+                                </button>
+
+                                {/* Rapport Dossier Ligne (Conditionnel) */}
+                                {filters.dateFrom && filters.dateTo && filters.etape === 'date_reception' && (
                                     <button 
                                         type="button" 
                                         onClick={() => setShowTransmissionReport(true)}
@@ -446,8 +492,8 @@ export default function HistoriquePage() {
                                     >
                                         <Printer size={18} /> Rapport Dossier Ligne (PDF)
                                     </button>
-                                </div>
-                            )}
+                                )}
+                            </div>
                         </>
                     )}
                 </section>
