@@ -891,7 +891,9 @@ function HomePageInternal() {
                 <input type="date" name="date_piece_caisse" value={formData.date_piece_caisse || ''} onChange={handleChange} className={formData.date_piece_caisse ? 'has-value' : ''} />
               </Field>
               <Field label="montant final (fcfa)">
-                <input type="number" name="montant_final" value={formData.montant_final ?? 0} onChange={handleChange} />
+                <input type="number" name="montant_final" value={formData.montant_final ?? 0} readOnly 
+                  style={{ background: '#f1f5f9', color: '#334155', fontWeight: 800, border: '1px solid #cbd5e1' }}
+                  title="Calculé automatiquement : Caution - (Détentions + Recouvrements)" />
               </Field>
               <Field label="Date 1ère signature">
                 <input type="date" name="date_1er_signature" value={formData.date_1er_signature || ''} onChange={handleChange} className={formData.date_1er_signature ? 'has-value' : ''} />
@@ -992,7 +994,10 @@ function HomePageInternal() {
       {showDetentionModal && formData.num_facture_caution && (
         <DetentionModal
           numFacture={formData.num_facture_caution}
-          onClose={() => setShowDetentionModal(false)}
+          onClose={(hasChanges) => {
+            setShowDetentionModal(false);
+            if (hasChanges && formData.num_facture_caution) doSearch(formData.num_facture_caution);
+          }}
         />
       )}
 
@@ -1000,7 +1005,10 @@ function HomePageInternal() {
       {showRecouvrementModal && formData.num_facture_caution && (
         <RecouvrementModal
           numFacture={formData.num_facture_caution}
-          onClose={() => setShowRecouvrementModal(false)}
+          onClose={(hasChanges) => {
+            setShowRecouvrementModal(false);
+            if (hasChanges && formData.num_facture_caution) doSearch(formData.num_facture_caution);
+          }}
         />
       )}
 

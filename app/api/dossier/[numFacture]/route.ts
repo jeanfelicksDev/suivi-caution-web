@@ -64,6 +64,21 @@ export async function GET(
             }
         }
 
+        // ─── Calcul automatique du Montant Final ───
+        const detentions = await prisma.facture_dmdt.aggregate({
+            where: { num_facture_caution: numFacture },
+            _sum: { montant_facture: true }
+        });
+        const recouvrements = await prisma.montant_recouvrer.aggregate({
+            where: { num_facture_caution: numFacture },
+            _sum: { montant: true }
+        });
+
+        const totalDetention = detentions._sum.montant_facture || 0;
+        const totalRecouvrement = recouvrements._sum.montant || 0;
+        dossier.montant_final = (dossier.montant_caution || 0) - totalDetention - totalRecouvrement;
+        // ───────────────────────────────────────────
+
         return NextResponse.json({ found: true, dossier });
     } catch (error) {
         console.error('Error fetching dossier:', error);

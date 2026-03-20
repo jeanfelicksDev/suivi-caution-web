@@ -16,7 +16,7 @@ interface DetentionRow {
 
 interface Props {
     numFacture: string;
-    onClose: () => void;
+    onClose: (hasChanges?: boolean) => void;
 }
 
 const emptyRow = (numFacture: string): DetentionRow => ({
@@ -33,6 +33,7 @@ export default function DetentionModal({ numFacture, onClose }: Props) {
     const [rows, setRows] = useState<DetentionRow[]>([]);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
+    const [hasSavedChanges, setHasSavedChanges] = useState(false);
     const [notification, setNotification] = useState<{ type: 'success' | 'error'; msg: string } | null>(null);
 
     const showNotif = (type: 'success' | 'error', msg: string) => {
@@ -106,6 +107,7 @@ export default function DetentionModal({ numFacture, onClose }: Props) {
                 }
             }
             showNotif('success', `${dirtyOrNew.length} ligne(s) enregistrée(s) avec succès.`);
+            setHasSavedChanges(true);
             await fetchData();
         } catch {
             showNotif('error', 'Erreur lors de la sauvegarde.');
@@ -144,7 +146,7 @@ export default function DetentionModal({ numFacture, onClose }: Props) {
                             Dossier : <strong>{numFacture}</strong>
                         </div>
                     </div>
-                    <button onClick={onClose} style={{ background: 'rgba(255,255,255,0.15)', border: 'none', color: 'white', borderRadius: '6px', padding: '0.4rem 0.6rem', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+                    <button onClick={() => onClose(hasSavedChanges)} style={{ background: 'rgba(255,255,255,0.15)', border: 'none', color: 'white', borderRadius: '6px', padding: '0.4rem 0.6rem', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
                         <X size={18} />
                     </button>
                 </div>
@@ -251,7 +253,7 @@ export default function DetentionModal({ numFacture, onClose }: Props) {
                         <Plus size={16} /> Ajouter une ligne
                     </button>
                     <div style={{ display: 'flex', gap: '0.75rem' }}>
-                        <button onClick={onClose}
+                        <button onClick={() => onClose(hasSavedChanges)}
                             style={{ background: 'white', border: '1px solid var(--border)', borderRadius: '6px', padding: '0.5rem 1rem', cursor: 'pointer', fontWeight: 700, fontSize: '0.85rem' }}>
                             Fermer
                         </button>
