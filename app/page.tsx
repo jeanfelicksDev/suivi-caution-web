@@ -13,7 +13,6 @@ import PartenaireModal from '@/app/components/PartenaireModal';
 import PartenaireCombobox from '@/app/components/PartenaireCombobox';
 import ArmateurSelect from '@/app/components/ArmateurSelect';
 import RecouvrementModal from '@/app/components/RecouvrementModal';
-import TransmissionReport from '@/app/components/TransmissionReport';
 
 interface Dossier {
   id?: number;
@@ -380,8 +379,6 @@ function HomePageInternal() {
   const [showDetentionModal, setShowDetentionModal] = useState(false);
   const [showFicheAvoir, setShowFicheAvoir] = useState(false);
   const [showRecouvrementModal, setShowRecouvrementModal] = useState(false);
-  const [showTransmissionReport, setShowTransmissionReport] = useState(false);
-  const [reportDates, setReportDates] = useState({ from: '', to: '' });
   const [partenaireModal, setPartenaireModal] = useState<{ open: boolean; id?: number }>({ open: false });
 
   const searchParams = useSearchParams();
@@ -549,45 +546,6 @@ function HomePageInternal() {
         background: 'var(--background)',
         padding: '1rem 0 0.5rem 0',
       }}>
-        {/* Rapports / État Journalier */}
-        <div style={{ maxWidth: '570px', margin: '0 auto 0.75rem auto', padding: '0 1.25rem' }}>
-          <div style={{ 
-            background: 'white', borderRadius: '12px', padding: '0.75rem 1rem', 
-            border: '1px solid #e2e8f0', display: 'flex', gap: '1rem', alignItems: 'flex-end',
-            boxShadow: '0 2px 10px rgba(0,0,0,0.05)'
-          }}>
-            <div style={{ flex: 1 }}>
-              <label style={{ display: 'block', fontSize: '0.65rem', fontWeight: 800, color: '#64748b', textTransform: 'uppercase', marginBottom: '0.3rem' }}>PÉRIODE DE RÉCEPTION DU :</label>
-              <input 
-                type="date" 
-                value={reportDates.from} 
-                onChange={(e) => setReportDates(prev => ({ ...prev, from: e.target.value }))}
-                style={{ fontSize: '0.85rem', padding: '0.4rem', border: '1px solid #cbd5e1', borderRadius: '6px', width: '100%' }}
-              />
-            </div>
-            <div style={{ flex: 1 }}>
-              <label style={{ display: 'block', fontSize: '0.65rem', fontWeight: 800, color: '#64748b', textTransform: 'uppercase', marginBottom: '0.3rem' }}>AU :</label>
-              <input 
-                type="date" 
-                value={reportDates.to} 
-                onChange={(e) => setReportDates(prev => ({ ...prev, to: e.target.value }))}
-                style={{ fontSize: '0.85rem', padding: '0.4rem', border: '1px solid #cbd5e1', borderRadius: '6px', width: '100%' }}
-              />
-            </div>
-            {reportDates.from && reportDates.to && (
-              <button 
-                onClick={() => setShowTransmissionReport(true)}
-                className="btn btn-secondary"
-                style={{ 
-                  padding: '0.45rem 0.75rem', fontSize: '0.8rem', whiteSpace: 'nowrap',
-                  background: '#1e293b', color: 'white', border: 'none', minHeight: '34px'
-                }}
-              >
-                <Printer size={14} style={{ marginRight: '0.4rem' }} /> État PDF
-              </button>
-            )}
-          </div>
-        </div>
 
         <section className="card" style={{
           maxWidth: '570px', margin: '0 auto',
@@ -1100,14 +1058,6 @@ function HomePageInternal() {
         }}
       />
 
-      {/* Rapport de Transmission */}
-      {showTransmissionReport && (
-        <TransmissionReport 
-          from={reportDates.from}
-          to={reportDates.to}
-          onClose={() => setShowTransmissionReport(false)}
-        />
-      )}
     </div>
   );
 }
