@@ -846,7 +846,7 @@ function HomePageInternal() {
 
           {/* 6. SIGNATURE & PIECE DE CAISSE */}
           <Fieldset title="SIGNATURE & PIECE DE CAISSE" accentColor="#4f46e5" bgTint="#f8fafc">
-            <div className="grid grid-cols-4">
+            <div className="grid grid-cols-6">
               <Field label="Date pièce caisse">
                 <input type="date" name="date_piece_caisse" value={formData.date_piece_caisse || ''} onChange={handleChange} className={formData.date_piece_caisse ? 'has-value' : ''} />
               </Field>
