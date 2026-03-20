@@ -64,8 +64,8 @@ export default function TransmissionReport({ from, to, onClose }: Props) {
                     * { box-sizing: border-box; margin: 0; padding: 0; }
                     body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 12px; color: #000; background: white; padding: 15mm; }
                     table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-                    th, td { border: 1.5px solid #000; padding: 8px 12px; text-align: left; vertical-align: top; }
-                    th { background: #f0f0f0; font-weight: 700; text-transform: uppercase; }
+                    th, td { border: 1.5px solid #000; padding: 8px 12px; text-align: left; vertical-align: top; height: 5cm; }
+                    th { background: #f0f0f0; font-weight: 700; text-transform: uppercase; height: auto; }
                     .header-box { border: 2px solid #000; padding: 10px; text-align: center; font-weight: 800; font-size: 16px; margin-bottom: 5px; }
                     .info-line { margin-bottom: 20px; font-weight: 700; }
                     @media print { body { padding: 0; } @page { margin: 10mm; } }
@@ -160,18 +160,18 @@ export default function TransmissionReport({ from, to, onClose }: Props) {
                             </thead>
                             <tbody>
                                 {data?.grouped.map((group, idx) => (
-                                    <tr key={idx}>
-                                        <td style={{ border: '1.5px solid #000', padding: '12px', fontWeight: 700, textAlign: 'center', verticalAlign: 'middle' }}>
+                                    <tr key={idx} style={{ height: '5cm' }}>
+                                        <td style={{ border: '1.5px solid #000', padding: '12px', fontWeight: 700, textAlign: 'center', verticalAlign: 'middle', height: '5cm' }}>
                                             {group.name}
                                         </td>
-                                        <td style={{ border: '1.5px solid #000', padding: '12px' }}>
+                                        <td style={{ border: '1.5px solid #000', padding: '12px', height: '5cm' }}>
                                             <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
                                                 {group.bls.map((bl, bIdx) => (
                                                     <li key={bIdx} style={{ marginBottom: '4px' }}>* {bl}</li>
                                                 ))}
                                             </ul>
                                         </td>
-                                        <td style={{ border: '1.5px solid #000', padding: '12px' }}></td>
+                                        <td style={{ border: '1.5px solid #000', padding: '12px', height: '5cm' }}></td>
                                     </tr>
                                 ))}
                                 {(!data || data.grouped.length === 0) && (
