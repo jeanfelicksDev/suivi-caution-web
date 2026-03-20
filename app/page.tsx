@@ -729,7 +729,7 @@ function HomePageInternal() {
 
           {/* 3. FRANCHISE ET B.A.D */}
           <Fieldset title="FRANCHISE ET B.A.D" accentColor="#d97706" bgTint="#fffbeb">
-            <div className="grid grid-cols-4">
+            <div className="grid grid-cols-6">
               <Field label="jours franchise">
                 <input type="number" name="jours_franchise" value={formData.jours_franchise ?? ''} onChange={handleChange} />
               </Field>
