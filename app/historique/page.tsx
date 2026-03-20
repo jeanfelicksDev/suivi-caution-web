@@ -319,27 +319,6 @@ export default function HistoriquePage() {
                             ⚠ {error}
                         </p>
                     )}
-
-                    {/* Bouton Dossier Ligne (Conditionnel) */}
-                    {filters.dateFrom && filters.dateTo && filters.etape === 'date_reception' && (
-                        <div style={{ 
-                            marginTop: '1rem', paddingTop: '1rem', borderTop: '1px dashed #e2e8f0',
-                            display: 'flex', justifyContent: 'center'
-                        }}>
-                            <button 
-                                type="button" 
-                                onClick={() => setShowTransmissionReport(true)}
-                                className="btn btn-secondary"
-                                style={{ 
-                                    background: '#1e293b', color: 'white', border: 'none',
-                                    display: 'flex', alignItems: 'center', gap: '0.5rem',
-                                    padding: '0.6rem 1.5rem', borderRadius: '8px', fontWeight: 700
-                                }}
-                            >
-                                <Printer size={16} /> Rapport Dossier Ligne
-                            </button>
-                        </div>
-                    )}
                 </section>
             </div>{/* fin zone sticky */}
 
@@ -444,6 +423,31 @@ export default function HistoriquePage() {
                                     </tbody>
                                 </table>
                             </div>
+
+                            {/* Bouton Rapport Dossier Ligne (Placé ici en dessous de la liste) */}
+                            {filters.dateFrom && filters.dateTo && filters.etape === 'date_reception' && (
+                                <div style={{ 
+                                    padding: '1.5rem', borderTop: '1px solid var(--border)',
+                                    display: 'flex', justifyContent: 'center', background: '#f8fafc'
+                                }}>
+                                    <button 
+                                        type="button" 
+                                        onClick={() => setShowTransmissionReport(true)}
+                                        className="btn btn-secondary"
+                                        style={{ 
+                                            background: '#1e293b', color: 'white', border: 'none',
+                                            display: 'flex', alignItems: 'center', gap: '0.6rem',
+                                            padding: '0.75rem 2rem', borderRadius: '8px', fontWeight: 800,
+                                            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                                            transition: 'transform 0.2s'
+                                        }}
+                                        onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+                                        onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+                                    >
+                                        <Printer size={18} /> Rapport Dossier Ligne (PDF)
+                                    </button>
+                                </div>
+                            )}
                         </>
                     )}
                 </section>
