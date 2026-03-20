@@ -763,7 +763,7 @@ function HomePageInternal() {
                         </div>
                     </Fieldset>
 
-                    <Fieldset title="TRANSMISSION COMPTA & EMISSION DE CHEQUE" accentColor="#0369a1" bgTint="rgba(3, 105, 161, 0.02)">
+                    <Fieldset title="TRANSMISSION COMPTA / EMISSION DE CHEQUE & CLOTURE DE DOSSIER" accentColor="#0369a1" bgTint="rgba(3, 105, 161, 0.02)">
                         <div className="grid grid-cols-5">
                             <Field label="Date Trans. Compta">
                                 <input type={formData.date_transmission_compta ? "date" : "text"} name="date_transmission_compta" value={formData.date_transmission_compta || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_transmission_compta && (e.target.type = "text")} />
