@@ -793,39 +793,7 @@ function HomePageInternal() {
             </div>
           </Fieldset>
 
-          {/* 5. RECOUVREMENT */}
-          <Fieldset title="RECOUVREMENT" accentColor="#14b8a6" bgTint="#f0fdfa">
-            <div className="grid grid-cols-6">
-              <div style={{ gridColumn: 'span 3' }}>
-                <Field label="Date Trans Rec.">
-                  <input type="date" name="date_trans_rec" value={formData.date_trans_rec || ''} onChange={handleChange} className={formData.date_trans_rec ? 'has-value' : ''} />
-                </Field>
-              </div>
-              <div style={{ gridColumn: 'span 3' }}>
-                <Field label="Date Ret Rec.">
-                  <input type="date" name="date_ret_rec" value={formData.date_ret_rec || ''} onChange={handleChange} className={formData.date_ret_rec ? 'has-value' : ''} />
-                </Field>
-              </div>
-              
-              <div style={{ gridColumn: 'span 2' }}>
-                <Field label="Date Suspension">
-                  <input type="date" name="date_suspendu" value={formData.date_suspendu || ''} onChange={handleChange} className={formData.date_suspendu ? 'has-value' : ''} />
-                </Field>
-              </div>
-              <div style={{ gridColumn: 'span 2' }}>
-                <Field label="Observ. Rec.">
-                  <input type="text" name="observ_rec" value={formData.observ_rec || ''} onChange={handleChange} placeholder="—" />
-                </Field>
-              </div>
-              <div style={{ gridColumn: 'span 2' }}>
-                <Field label="Date Fin Suspension">
-                  <input type="date" name="date_fin_suspension" value={formData.date_fin_suspension || ''} onChange={handleChange} className={formData.date_fin_suspension ? 'has-value' : ''} />
-                </Field>
-              </div>
-            </div>
-          </Fieldset>
-
-          {/* 6. AVOIR */}
+          {/* 5. AVOIR */}
           <Fieldset 
             title="AVOIR" accentColor="#7c3aed" bgTint="#f5f3ff"
             actionButton={
@@ -859,6 +827,38 @@ function HomePageInternal() {
 
               <div style={{ gridColumn: '1 / -1' }}>
                 <label style={{ display: 'block', fontWeight: 700, fontSize: '0.72rem', color: '#0f172a', marginBottom: '0.15rem', textTransform: 'capitalize' }}>Commentaire Avoir</label>
+              </div>
+            </div>
+          </Fieldset>
+
+          {/* 6. RECOUVREMENT */}
+          <Fieldset title="RECOUVREMENT" accentColor="#14b8a6" bgTint="#f0fdfa">
+            <div className="grid grid-cols-6">
+              <div style={{ gridColumn: 'span 2' }}>
+                <Field label="Date Trans Rec.">
+                  <input type="date" name="date_trans_rec" value={formData.date_trans_rec || ''} onChange={handleChange} className={formData.date_trans_rec ? 'has-value' : ''} />
+                </Field>
+              </div>
+              <div style={{ gridColumn: 'span 2' }}>
+                <Field label="Date Ret Rec.">
+                  <input type="date" name="date_ret_rec" value={formData.date_ret_rec || ''} onChange={handleChange} className={formData.date_ret_rec ? 'has-value' : ''} />
+                </Field>
+              </div>
+              <div style={{ gridColumn: 'span 2' }}>
+                <Field label="Date Suspension">
+                  <input type="date" name="date_suspendu" value={formData.date_suspendu || ''} onChange={handleChange} className={formData.date_suspendu ? 'has-value' : ''} />
+                </Field>
+              </div>
+              
+              <div style={{ gridColumn: 'span 4' }}>
+                <Field label="Observ. Rec.">
+                  <input type="text" name="observ_rec" value={formData.observ_rec || ''} onChange={handleChange} placeholder="—" />
+                </Field>
+              </div>
+              <div style={{ gridColumn: 'span 2' }}>
+                <Field label="Date Fin Suspension">
+                  <input type="date" name="date_fin_suspension" value={formData.date_fin_suspension || ''} onChange={handleChange} className={formData.date_fin_suspension ? 'has-value' : ''} />
+                </Field>
               </div>
             </div>
           </Fieldset>
