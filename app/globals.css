@@ -362,7 +362,7 @@ label {
 
 .sidebar {
   width: 280px;
-  background: var(--primary-dark);
+  background: #020617; /* Ultra Dark Slate */
   color: white;
   padding: 2rem 1rem;
   display: flex;
@@ -424,9 +424,9 @@ label {
 }
 
 .nav-item.active {
-  background: var(--gradient-primary);
+  background: var(--item-color, var(--gradient-primary));
   color: white;
-  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 /* Dashboard Stats Cards */

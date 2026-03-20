@@ -1,10 +1,12 @@
 'use client';
 
 import React, { useState, useCallback, useEffect } from 'react';
-import { Search, RefreshCw, FileText, X } from 'lucide-react';
+import { Search, RefreshCw, FileText, X, User } from 'lucide-react';
 import Link from 'next/link';
 import ArmateurSelect from '@/app/components/ArmateurSelect';
 import TransmissionReport from '@/app/components/TransmissionReport';
+import PartenaireCombobox from '@/app/components/PartenaireCombobox';
+import PartenaireModal from '@/app/components/PartenaireModal';
 import { Printer, Download } from 'lucide-react';
 import * as XLSX from 'xlsx';
 
@@ -127,6 +129,7 @@ export default function HistoriquePage() {
     const [searched, setSearched] = useState(initSearched);
     const [error, setError] = useState<string | null>(null);
     const [showTransmissionReport, setShowTransmissionReport] = useState(false);
+    const [partenaireModal, setPartenaireModal] = useState<{ open: boolean; id?: number }>({ open: false });
 
     // Sauvegarde automatique dans sessionStorage à chaque changement
     useEffect(() => {
@@ -254,13 +257,27 @@ export default function HistoriquePage() {
                             </div>
                             <div>
                                 <label>Client</label>
-                                <input type="text" name="client" value={filters.client}
-                                    onChange={handleChange} placeholder="Nom du client" autoComplete="off" />
+                                <PartenaireCombobox
+                                    name="client"
+                                    value={filters.client}
+                                    onChange={(val) => setFilters(prev => ({ ...prev, client: val }))}
+                                    type="client"
+                                    onManage={(id) => setPartenaireModal({ open: true, id })}
+                                    placeholder="Nom du client"
+                                    formData={filters}
+                                />
                             </div>
                             <div>
                                 <label>Transitaire</label>
-                                <input type="text" name="transitaire" value={filters.transitaire}
-                                    onChange={handleChange} placeholder="Nom du transitaire" autoComplete="off" />
+                                <PartenaireCombobox
+                                    name="transitaire"
+                                    value={filters.transitaire}
+                                    onChange={(val) => setFilters(prev => ({ ...prev, transitaire: val }))}
+                                    type="transitaire"
+                                    onManage={(id) => setPartenaireModal({ open: true, id })}
+                                    placeholder="Nom du transitaire"
+                                    formData={filters}
+                                />
                             </div>
                         </div>
 
@@ -510,6 +527,15 @@ export default function HistoriquePage() {
                     onClose={() => setShowTransmissionReport(false)}
                 />
             )}
+
+            <PartenaireModal
+                isOpen={partenaireModal.open}
+                onClose={() => setPartenaireModal({ open: false })}
+                partenaireId={partenaireModal.id}
+                onSaveSuccess={(p) => {
+                    // Optionnel
+                }}
+            />
         </div>
     );
 }

@@ -24,7 +24,6 @@ const Sidebar = () => {
         { name: 'Nouveau Dossier & Rech.', icon: <Search size={20} />, path: '/', show: true },
         { name: 'Consultation Client', icon: <Eye size={20} />, path: '/consultation', show: true },
         { name: 'Historique', icon: <Database size={20} />, path: '/historique', show: canRead },
-
         { name: 'Partenaires', icon: <ShieldCheck size={20} />, path: '/partenaires', show: true },
         { name: 'Chèques Émis', icon: <CreditCard size={20} />, path: '/cheques', show: canManageCheques },
     ];
@@ -34,7 +33,7 @@ const Sidebar = () => {
         <aside className="sidebar">
             <div className="sidebar-logo" style={{ fontSize: '1.4rem', lineHeight: '1.2', padding: '0.5rem 0.25rem 2rem 0.25rem', textAlign: 'left' }}>
                 Gestion des cautions
-                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600, marginTop: '0.5rem' }}>
+                <div style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.6)', fontWeight: 600, marginTop: '0.5rem' }}>
                     {user.username} <span style={{ opacity: 0.5 }}>({user.role})</span>
                 </div>
             </div>
@@ -61,14 +60,16 @@ const Sidebar = () => {
 
             <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '1rem' }}>
                 {isAdmin && (
-                    <>
-                        <Link href="/utilisateurs" className={`nav-item ${pathname === '/utilisateurs' ? 'active' : ''}`}>
-                            <ShieldCheck size={20} />
-                            <span>Droits d&apos;Accès</span>
-                        </Link>
-                    </>
+                    <Link 
+                        href="/utilisateurs" 
+                        className={`nav-item ${pathname === '/utilisateurs' ? 'active' : ''}`}
+                        style={{ color: '#6366f1', '--item-color': '#6366f1' } as any}
+                    >
+                        <ShieldCheck size={20} />
+                        <span>Droits d&apos;Accès</span>
+                    </Link>
                 )}
-                <button onClick={logout} className="nav-item" style={{ background: 'transparent', border: 'none', width: '100%', cursor: 'pointer' }}>
+                <button onClick={logout} className="nav-item" style={{ background: 'transparent', border: 'none', width: '100%', cursor: 'pointer', color: '#94a3b8' }}>
                     <LogOut size={20} />
                     <span>Déconnexion</span>
                 </button>

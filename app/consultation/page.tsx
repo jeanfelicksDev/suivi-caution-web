@@ -75,7 +75,7 @@ export default function ConsultationPage() {
     <div style={{ minHeight: '100vh', background: '#f8fafc', padding: '2rem 1rem', fontFamily: '"Inter", system-ui, sans-serif' }}>
       
       {/* Header & Stats */}
-      <div style={{ maxWidth: '800px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+      <div style={{ maxWidth: '800px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', gap: '1rem', flexWrap: 'wrap' }}>
         <h1 style={{ fontSize: '1.5rem', margin: 0, color: '#1e293b', fontWeight: 800 }}>Suivi Client</h1>
         
         <div style={{ display: 'flex', gap: '1rem', background: 'white', padding: '0.5rem 1rem', borderRadius: '12px', boxShadow: '0 2px 10px rgba(0,0,0,0.05)', alignItems: 'center' }}>
@@ -89,7 +89,7 @@ export default function ConsultationPage() {
 
       {/* Search Box */}
       <section style={{ maxWidth: '800px', margin: '0 auto', background: 'white', padding: '1.5rem', borderRadius: '16px', borderTop: '4px solid #4f46e5', boxShadow: '0 4px 20px rgba(0,0,0,0.08)', marginBottom: '2rem' }}>
-        <form onSubmit={doSearch} style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+        <form onSubmit={doSearch} className="search-form" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
           <div style={{ flex: 1, position: 'relative' }}>
             <Search size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
             <input
@@ -116,7 +116,7 @@ export default function ConsultationPage() {
               required
             />
           </div>
-          <button type="submit" disabled={loading} style={{
+          <button type="submit" disabled={loading} className="btn-consulter" style={{
             background: '#4f46e5', color: 'white', border: 'none', borderRadius: '8px', padding: '0.75rem 1.5rem', fontSize: '1rem', fontWeight: 600, cursor: loading ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', transition: 'background 0.2s', whiteSpace: 'nowrap'
           }}>
             {loading ? <RefreshCw size={18} style={{ animation: 'spin 1s linear infinite' }} /> : <Search size={18} />}
@@ -144,12 +144,12 @@ export default function ConsultationPage() {
           </div>
 
           {/* Timeline Schema */}
-          <div style={{ position: 'relative', margin: '2rem 1rem 4rem 1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div className="timeline-container" style={{ position: 'relative', margin: '2rem 1rem 4rem 1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             {/* Background Line */}
-            <div style={{ position: 'absolute', top: '50%', left: '0', right: '0', height: '6px', background: '#e2e8f0', transform: 'translateY(-50%)', zIndex: 1, borderRadius: '3px' }} />
+            <div className="timeline-bg-line" style={{ position: 'absolute', top: '50%', left: '0', right: '0', height: '6px', background: '#e2e8f0', transform: 'translateY(-50%)', zIndex: 1, borderRadius: '3px' }} />
             
             {/* Active Progress Line */}
-            <div style={{ position: 'absolute', top: '50%', left: '0', height: '6px', background: currentStep >= 5 ? '#16a34a' : '#4f46e5', transform: 'translateY(-50%)', zIndex: 2, borderRadius: '3px', transition: 'width 0.5s ease',
+            <div className="timeline-active-line" style={{ position: 'absolute', top: '50%', left: '0', height: '6px', background: currentStep >= 5 ? '#16a34a' : '#4f46e5', transform: 'translateY(-50%)', zIndex: 2, borderRadius: '3px', transition: 'all 0.5s ease',
               width: currentStep > 0 ? `${((currentStep - 1) / (steps.length - 1)) * 100}%` : '0%'
             }} />
 
@@ -181,7 +181,7 @@ export default function ConsultationPage() {
               };
 
               return (
-                <div key={step.id} style={{ position: 'relative', zIndex: 3, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <div key={step.id} className="step-item" style={{ position: 'relative', zIndex: 3, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                   <div style={{
                     width: '32px', height: '32px', borderRadius: '50%',
                     background: passed ? stepColor : '#f8fafc',
@@ -192,7 +192,7 @@ export default function ConsultationPage() {
                   }}>
                     {passed && (isSuspStep ? <X size={16} color="white" /> : <CheckCircle2 size={16} color="white" />)}
                   </div>
-                  <div style={{ 
+                  <div className="step-label" style={{ 
                     position: 'absolute', top: '40px', 
                     fontSize: '0.8rem', fontWeight: passed ? 700 : 500, 
                     color: active ? stepColor : (passed ? '#1e293b' : '#94a3b8'),
@@ -222,6 +222,52 @@ export default function ConsultationPage() {
         </section>
       )}
 
+      <style jsx>{`
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        
+        @media (max-width: 640px) {
+          .search-form {
+            flex-direction: column;
+          }
+          .btn-consulter {
+            width: 100%;
+            justify-content: center;
+          }
+          .timeline-container {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 3.5rem !important;
+            padding-left: 2rem !important;
+            margin-top: 3rem !important;
+          }
+          .timeline-bg-line {
+            left: 16px !important;
+            top: -10px !important;
+            bottom: -10px !important;
+            width: 6px !important;
+            height: auto !important;
+            transform: translateX(-50%) !important;
+          }
+          .timeline-active-line {
+            left: 16px !important;
+            top: -10px !important;
+            width: 6px !important;
+            transform: translateX(-50%) !important;
+            height: ${currentStep > 0 ? `${((currentStep - 1) / (steps.length - 1)) * 100}%` : '0%'} !important;
+            transition: height 0.5s ease;
+          }
+          .step-item {
+            flex-direction: row !important;
+            gap: 1.5rem !important;
+            width: 100%;
+          }
+          .step-label {
+            position: static !important;
+            text-align: left !important;
+            align-items: flex-start !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }
