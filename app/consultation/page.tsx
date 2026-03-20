@@ -149,7 +149,7 @@ export default function ConsultationPage() {
             <div style={{ position: 'absolute', top: '50%', left: '0', right: '0', height: '6px', background: '#e2e8f0', transform: 'translateY(-50%)', zIndex: 1, borderRadius: '3px' }} />
             
             {/* Active Progress Line */}
-            <div style={{ position: 'absolute', top: '50%', left: '0', height: '6px', background: '#4f46e5', transform: 'translateY(-50%)', zIndex: 2, borderRadius: '3px', transition: 'width 0.5s ease',
+            <div style={{ position: 'absolute', top: '50%', left: '0', height: '6px', background: currentStep >= 5 ? '#16a34a' : '#4f46e5', transform: 'translateY(-50%)', zIndex: 2, borderRadius: '3px', transition: 'width 0.5s ease',
               width: currentStep > 0 ? `${((currentStep - 1) / (steps.length - 1)) * 100}%` : '0%'
             }} />
 
@@ -157,24 +157,45 @@ export default function ConsultationPage() {
               const passed = step.id <= currentStep;
               const active = step.id === currentStep;
               const isSuspStep = step.label === 'Suspendu';
+              const isFinalStep = step.id === 5;
               const duration = step.key ? (searchResult.durations ? searchResult.durations[step.key as keyof typeof searchResult.durations] : null) : null;
+
+              const getStepColor = () => {
+                if (isSuspStep) return '#ef4444';
+                if (isFinalStep && passed) return '#16a34a';
+                return '#4f46e5';
+              };
+              const stepColor = getStepColor();
+
+              const getBorderColor = () => {
+                if (!passed) return '4px solid #e2e8f0';
+                if (isSuspStep) return '4px solid #fecaca';
+                if (isFinalStep) return '4px solid #bbf7d0';
+                return '4px solid #c7d2fe';
+              };
+
+              const getShadowColor = () => {
+                if (isSuspStep) return 'rgba(239, 68, 68, 0.2)';
+                if (isFinalStep) return 'rgba(22, 163, 74, 0.25)';
+                return 'rgba(79, 70, 229, 0.2)';
+              };
 
               return (
                 <div key={step.id} style={{ position: 'relative', zIndex: 3, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                   <div style={{
                     width: '32px', height: '32px', borderRadius: '50%',
-                    background: passed ? (isSuspStep ? '#ef4444' : '#4f46e5') : '#f8fafc',
-                    border: passed ? (isSuspStep ? '4px solid #fecaca' : '4px solid #c7d2fe') : '4px solid #e2e8f0',
+                    background: passed ? stepColor : '#f8fafc',
+                    border: getBorderColor(),
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     transition: 'all 0.3s ease',
-                    boxShadow: active ? `0 0 0 4px ${isSuspStep ? 'rgba(239, 68, 68, 0.2)' : 'rgba(79, 70, 229, 0.2)'}` : 'none'
+                    boxShadow: active ? `0 0 0 4px ${getShadowColor()}` : 'none'
                   }}>
                     {passed && (isSuspStep ? <X size={16} color="white" /> : <CheckCircle2 size={16} color="white" />)}
                   </div>
                   <div style={{ 
                     position: 'absolute', top: '40px', 
                     fontSize: '0.8rem', fontWeight: passed ? 700 : 500, 
-                    color: active ? (isSuspStep ? '#ef4444' : '#4f46e5') : (passed ? '#1e293b' : '#94a3b8'),
+                    color: active ? stepColor : (passed ? '#1e293b' : '#94a3b8'),
                     whiteSpace: 'nowrap', textAlign: 'center',
                     display: 'flex', flexDirection: 'column', alignItems: 'center'
                   }}>
@@ -182,7 +203,7 @@ export default function ConsultationPage() {
                     {duration !== null && (
                       <span style={{ 
                         fontSize: '0.65rem', 
-                        background: active ? (isSuspStep ? '#ef4444' : '#4f46e5') : (isSuspStep ? '#fecaca' : '#f1f5f9'), 
+                        background: active ? stepColor : (isSuspStep ? '#fecaca' : '#f1f5f9'), 
                         color: active ? 'white' : (isSuspStep ? '#dc2626' : '#64748b'), 
                         padding: '1px 6px', 
                         borderRadius: '10px',
