@@ -38,6 +38,9 @@ interface Dossier {
   date_suspendu?: string | null;
   date_fin_suspension?: string | null;
   raison_suspension?: string | null;
+  date_trans_rec?: string | null;
+  date_ret_rec?: string | null;
+  observ_rec?: string | null;
   jours_franchise?: number | null;
   date_bad?: string | null;
   date_sortie?: string | null;
@@ -787,20 +790,31 @@ function HomePageInternal() {
                 <label style={{ display: 'block', fontWeight: 700, fontSize: '0.72rem', color: '#0f172a', marginBottom: '0.15rem', textTransform: 'capitalize' }}>Commentaire Sce Détention</label>
                 <textarea name="commentaire_sce_detention" value={formData.commentaire_sce_detention || ''} onChange={handleChange} rows={2} style={{ width: '100%' }} />
               </div>
-              <Field label="date suspension">
-                <input type="date" name="date_suspendu" value={formData.date_suspendu || ''} onChange={handleChange} className={formData.date_suspendu ? 'has-value' : ''} />
-              </Field>
-              <Field label="date fin suspension">
-                <input type="date" name="date_fin_suspension" value={formData.date_fin_suspension || ''} onChange={handleChange} className={formData.date_fin_suspension ? 'has-value' : ''} />
-              </Field>
-              <div style={{ gridColumn: '1 / -1' }}>
-                <label style={{ display: 'block', fontWeight: 700, fontSize: '0.72rem', color: '#0f172a', marginBottom: '0.15rem', textTransform: 'capitalize' }}>Raison Suspension</label>
-                <textarea name="raison_suspension" value={formData.raison_suspension || ''} onChange={handleChange} rows={1} style={{ width: '100%' }} />
-              </div>
             </div>
           </Fieldset>
 
-          {/* 5. AVOIR */}
+          {/* 5. RECOUVREMENT */}
+          <Fieldset title="RECOUVREMENT" accentColor="#14b8a6" bgTint="#f0fdfa">
+            <div className="grid grid-cols-5">
+              <Field label="Date Trans Rec.">
+                <input type="date" name="date_trans_rec" value={formData.date_trans_rec || ''} onChange={handleChange} className={formData.date_trans_rec ? 'has-value' : ''} />
+              </Field>
+              <Field label="Date Ret Rec.">
+                <input type="date" name="date_ret_rec" value={formData.date_ret_rec || ''} onChange={handleChange} className={formData.date_ret_rec ? 'has-value' : ''} />
+              </Field>
+              <Field label="Date Suspension">
+                <input type="date" name="date_suspendu" value={formData.date_suspendu || ''} onChange={handleChange} className={formData.date_suspendu ? 'has-value' : ''} />
+              </Field>
+              <Field label="Observ. Rec.">
+                <input type="text" name="observ_rec" value={formData.observ_rec || ''} onChange={handleChange} placeholder="—" />
+              </Field>
+              <Field label="Date Fin Suspension">
+                <input type="date" name="date_fin_suspension" value={formData.date_fin_suspension || ''} onChange={handleChange} className={formData.date_fin_suspension ? 'has-value' : ''} />
+              </Field>
+            </div>
+          </Fieldset>
+
+          {/* 6. AVOIR */}
           <Fieldset 
             title="AVOIR" accentColor="#7c3aed" bgTint="#f5f3ff"
             actionButton={
@@ -834,12 +848,6 @@ function HomePageInternal() {
 
               <div style={{ gridColumn: '1 / -1' }}>
                 <label style={{ display: 'block', fontWeight: 700, fontSize: '0.72rem', color: '#0f172a', marginBottom: '0.15rem', textTransform: 'capitalize' }}>Commentaire Avoir</label>
-                <input list="prev-comments" name="commentaire_avoir" value={formData.commentaire_avoir || ''} onChange={handleChange} placeholder="Choisir ou saisir un commentaire..." />
-                <datalist id="prev-comments">
-                  <option value="Dossier conforme" />
-                  <option value="En attente justificatif" />
-                  <option value="Avoir partiel" />
-                </datalist>
               </div>
             </div>
           </Fieldset>

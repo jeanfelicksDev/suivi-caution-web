@@ -40,6 +40,9 @@ model dossiers_caution {
   date_suspendu             String?
   date_fin_suspension       String?
   raison_suspension         String?   @map("commentaire_trop_percu")
+  date_trans_rec            String?
+  date_ret_rec              String?
+  observ_rec                String?
   jours_franchise           Int?      @map("nbre_jrs_franchise")
   date_bad                  String?
   date_sortie               String?
