@@ -523,7 +523,7 @@ function HomePageInternal() {
                   <Search size={18} style={{ position: 'absolute', left: '0.8rem', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
                   <input type="text" placeholder="N° FACTURE" value={numFacture} onChange={e => setNumFacture(e.target.value.toUpperCase())} style={{ paddingLeft: '2.5rem' }} onKeyDown={(e) => e.key === 'Enter' && doSearch()} />
                 </div>
-                <button onClick={() => doSearch()} className="btn btn-primary">RECHERCHER</button>
+                <button onClick={() => doSearch()} className="btn btn-primary">CONSULTER</button>
               </div>
             </div>
           </div>
