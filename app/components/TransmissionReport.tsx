@@ -146,7 +146,7 @@ export default function TransmissionReport({ from, to, type, onClose }: Props) {
                         <div style={{ border: '2px solid #000', padding: '10px', textAlign: 'center', fontWeight: 800, fontSize: '18px', marginBottom: '10px', textTransform: 'uppercase' }}>
                             {type === 'sig1' ? 'BORDEREAU DE TRANSMISSION 1ère SIGNATURE' : 
                              type === 'sig2' ? 'BORDEREAU DE TRANSMISSION 2ème SIGNATURE' : 
-                             'BORDEREAU DE TRANSMISSION A LA LIGNE'}
+                             'DOSSIER DE REMBOURSEMENT CAUTION TRANSMIS A LA LIGNE MARITIME'}
                         </div>
 
                         <div style={{ marginBottom: '20px', fontWeight: 700, fontSize: '14px' }}>
