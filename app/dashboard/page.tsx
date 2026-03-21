@@ -43,15 +43,16 @@ export default function Dashboard() {
     }, []);
 
     const stepNames = [
-        "A la Réception",
-        "Chez Armateur (Traitement)",
-        "Passage en Litige",
-        "Passage en Suspension",
-        "Création des Avoirs",
-        "Pour Signature 1",
-        "Pour Signature 2",
-        "Traitement avant trans. Compta",
-        "Traitement Compta pour Chèque",
+        "Traitement réception",
+        "Traitement armateur",
+        "Sce détention",
+        "Mise en litige",
+        "Traitement des avoirs",
+        "Mise au recouvrement",
+        "1ère signature",
+        "2ème signature",
+        "Pièce de caisse",
+        "Comptabilité"
     ];
 
     const formatPartDate = (d: string) => {

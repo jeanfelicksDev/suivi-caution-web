@@ -5,58 +5,19 @@ const prisma = new PrismaClient();
 
 // Mapping : type → { dateDebut, dateFin }
 const TYPES_CONFIG: Record<string, { dateDebut: string; dateFin: string; label: string; readOnly?: boolean }> = {
-    reception: {
-        dateDebut: 'date_reception',
-        dateFin: 'date_transmission_ligne',
-        label: 'En attente Transmission Ligne',
-    },
-    armateur: {
-        dateDebut: 'date_transmission_ligne',
-        dateFin: 'date_retour_ligne',
-        label: 'En attente retour Armateur',
-    },
-    litige: {
-        dateDebut: 'date_mise_litige',
-        dateFin: 'date_fin_litige',
-        label: 'En attente retour Litige',
-    },
-    suspension: {
-        dateDebut: 'date_suspendu',
-        dateFin: 'date_fin_suspension',
-        label: 'En attente retour Suspension',
-    },
-    avoir: {
-        dateDebut: 'date_mise_avoir',
-        dateFin: 'date_fin_avoir',
-        label: 'En attente retour Avoir',
-    },
-    signature1: {
-        dateDebut: 'date_retour_ligne',
-        dateFin: 'date_1er_signature',
-        label: 'En attente retour Signature 1',
-    },
-    signature2: {
-        dateDebut: 'date_1er_signature',
-        dateFin: 'date_2e_signature',
-        label: 'En attente retour Signature 2',
-    },
-    avant_compta: {
-        dateDebut: 'date_2e_signature',
-        dateFin: 'date_transmission_compta',
-        label: 'En attente Transmission Compta',
-    },
-    compta: {
-        dateDebut: 'date_transmission_compta',
-        dateFin: 'date_cheque',
-        label: 'En attente retour Compta',
-    },
-    // Clôture manuelle : dossiers avec date_cloture renseignée (vue lecture seule)
-    cloture_manuel: {
-        dateDebut: 'date_cloture',
-        dateFin: '__none__',
-        label: 'Dossier Clôturé Manuel',
-        readOnly: true,
-    },
+    reception: { dateDebut: 'date_reception', dateFin: 'date_transmission_ligne', label: 'Traitement Réception' },
+    armateur: { dateDebut: 'date_transmission_ligne', dateFin: 'date_retour_ligne', label: 'Chez Armateur' },
+    litige: { dateDebut: 'date_mise_litige', dateFin: 'date_fin_litige', label: 'Litige sans détention' },
+    detention: { dateDebut: 'date_trans_sce_detention', dateFin: 'date_1er_signature', label: 'Sce Détention' },
+    avoir: { dateDebut: 'date_mise_avoir', dateFin: 'date_fin_avoir', label: 'Traitement Avoirs' },
+    recouvrement: { dateDebut: 'date_trans_rec', dateFin: 'date_ret_rec', label: 'Sce Recouvrement' },
+    suspension: { dateDebut: 'date_suspendu', dateFin: 'date_fin_suspension', label: 'Suspension' },
+    signature1: { dateDebut: 'date_1er_signature', dateFin: 'date_retour_1er_signature', label: '1ère Signature' },
+    signature2: { dateDebut: 'date_2e_signature', dateFin: 'date_retour_2e_signature', label: '2ème Signature' },
+    caisse: { dateDebut: 'date_piece_caisse', dateFin: 'date_transmission_compta', label: 'Pièce de Caisse' },
+    compta: { dateDebut: 'date_transmission_compta', dateFin: 'date_cheque', label: 'Traitement Compta' },
+    cheque: { dateDebut: 'date_cheque', dateFin: 'date_cloture', label: 'Chèque émis' },
+    cloture_manuel: { dateDebut: 'date_cloture', dateFin: '__none__', label: 'Clôturé sans chèque', readOnly: true },
 };
 
 // GET /api/attente?type=armateur
@@ -83,7 +44,9 @@ export async function GET(request: NextRequest) {
                 date_mise_avoir: true,
                 date_fin_avoir: true,
                 date_1er_signature: true,
+                date_retour_1er_signature: true,
                 date_2e_signature: true,
+                date_retour_2e_signature: true,
                 date_transmission_compta: true,
                 armateur: true,
                 client_nom: true,
@@ -92,12 +55,18 @@ export async function GET(request: NextRequest) {
                 date_cloture: true,
                 date_suspendu: true,
                 date_fin_suspension: true,
+                date_trans_sce_detention: true,
+                date_trans_rec: true,
+                date_ret_rec: true,
+                date_piece_caisse: true,
             },
         });
 
-        // Dossier clôturé avec chèque
+        // Dossier clôturé avec chèque ou en cours de paiement
         const isChequeEmis = (d: typeof allDossiers[0]) =>
-            !!(d.date_cheque?.trim()) && !!(d.num_cheque?.trim());
+            !!(d.date_cheque?.trim()) || 
+            !!(d.date_transmission_compta?.trim()) || 
+            !!(d.date_piece_caisse?.trim());
 
         // Dossier clôturé manuellement
         const isClotureManuel = (d: typeof allDossiers[0]) =>

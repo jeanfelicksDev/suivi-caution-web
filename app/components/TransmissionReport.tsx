@@ -17,6 +17,7 @@ interface ReportData {
 interface Props {
     from: string;
     to: string;
+    type?: 'reception' | 'sig1' | 'sig2';
     onClose: () => void;
 }
 
@@ -28,7 +29,7 @@ function fmtDate(dateStr: string): string {
     } catch { return dateStr; }
 }
 
-export default function TransmissionReport({ from, to, onClose }: Props) {
+export default function TransmissionReport({ from, to, type, onClose }: Props) {
     const printRef = useRef<HTMLDivElement>(null);
     const [data, setData] = useState<ReportData | null>(null);
     const [loading, setLoading] = useState(true);
@@ -38,7 +39,7 @@ export default function TransmissionReport({ from, to, onClose }: Props) {
         const fetchData = async () => {
             setLoading(true);
             try {
-                const res = await fetch(`/api/reports/transmission?from=${from}&to=${to}`);
+                const res = await fetch(`/api/reports/transmission?from=${from}&to=${to}&type=${type || 'reception'}`);
                 if (!res.ok) throw new Error('Erreur lors du chargement des données');
                 const json = await res.json();
                 setData(json);
@@ -49,7 +50,7 @@ export default function TransmissionReport({ from, to, onClose }: Props) {
             }
         };
         fetchData();
-    }, [from, to]);
+    }, [from, to, type]);
 
     const handlePrint = () => {
         const content = printRef.current?.innerHTML || '';
@@ -143,7 +144,9 @@ export default function TransmissionReport({ from, to, onClose }: Props) {
                     <div ref={printRef} style={{ background: 'white', padding: '15mm', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)', minHeight: '297mm', margin: '0 auto', maxWidth: '210mm' }}>
                         
                         <div style={{ border: '2px solid #000', padding: '10px', textAlign: 'center', fontWeight: 800, fontSize: '18px', marginBottom: '10px', textTransform: 'uppercase' }}>
-                            TRANSMISSION A LA LIGNE
+                            {type === 'sig1' ? 'BORDEREAU DE TRANSMISSION 1ère SIGNATURE' : 
+                             type === 'sig2' ? 'BORDEREAU DE TRANSMISSION 2ème SIGNATURE' : 
+                             'BORDEREAU DE TRANSMISSION A LA LIGNE'}
                         </div>
 
                         <div style={{ marginBottom: '20px', fontWeight: 700, fontSize: '14px' }}>

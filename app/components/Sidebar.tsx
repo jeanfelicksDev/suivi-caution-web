@@ -32,7 +32,7 @@ const Sidebar = () => {
     return (
         <aside className="sidebar">
             <div className="sidebar-logo" style={{ fontSize: '1.4rem', lineHeight: '1.2', padding: '0.5rem 0.25rem 2rem 0.25rem', textAlign: 'left' }}>
-                Gestion des cautions
+                Suivi des Cautions V2
                 <div style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.6)', fontWeight: 600, marginTop: '0.5rem' }}>
                     {user.username} <span style={{ opacity: 0.5 }}>({user.role})</span>
                 </div>

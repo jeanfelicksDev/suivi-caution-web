@@ -66,6 +66,8 @@ model dossiers_caution {
   date_cloture              String?
   propose_par               String?
   banque                    String?
+  cloture_sans_cheque       Boolean?
+  dateClotureSansCheque     String?
   created_at                DateTime? @default(now())
   updated_at                DateTime? @default(now())
 }

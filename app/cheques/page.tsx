@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { Upload, FileSpreadsheet, Send, RefreshCw, CheckCircle2, AlertTriangle, CalendarDays, List, X } from 'lucide-react';
+import { Upload, FileSpreadsheet, Send, RefreshCw, CheckCircle2, AlertTriangle, CalendarDays, List, X, Trash2 } from 'lucide-react';
 import * as XLSX from 'xlsx';
 
 /* ── Types ───────────────────────────────────────────────── */
@@ -167,6 +167,63 @@ export default function ChequesPage() {
         if (fileRef.current) fileRef.current.value = '';
     };
 
+    /* Suppression d'une liste entière */
+    const handleDeleteList = async (e: React.MouseEvent, list: ListeInfo) => {
+        e.stopPropagation(); // Éviter de sélectionner la liste
+        if (!confirm(`Voulez-vous vraiment supprimer toute la liste "${list.label}" ?\nCette action est irréversible.`)) return;
+        
+        try {
+            const res = await fetch(`/api/cheques/listes?listId=${encodeURIComponent(list.id)}`, { method: 'DELETE' });
+            if (res.ok) {
+                if (selectedListId === list.id) {
+                    setSelectedListId(null);
+                    setSelectedListLabel(null);
+                    setRows([]);
+                }
+                fetchListes();
+            } else {
+                alert('Erreur lors de la suppression.');
+            }
+        } catch {
+            alert('Erreur réseau.');
+        }
+    };
+
+    /* Suppression d'une ligne précise */
+    const handleDeleteRow = async (index: number) => {
+        const row = rows[index];
+        if (!selectedListId) {
+            const newRows = [...rows];
+            newRows.splice(index, 1);
+            setRows(newRows);
+            return;
+        }
+
+        if (!confirm('Supprimer ce chèque de la base de données ?')) return;
+
+        try {
+            // @ts-ignore
+            const id = (row as any).id;
+            if (!id) {
+                 const newRows = [...rows];
+                 newRows.splice(index, 1);
+                 setRows(newRows);
+                 return;
+            }
+
+            const res = await fetch(`/api/cheques/listes?id=${id}`, { method: 'DELETE' });
+            if (res.ok) {
+                const newRows = [...rows];
+                newRows.splice(index, 1);
+                setRows(newRows);
+            } else {
+                alert('Erreur suppression ligne.');
+            }
+        } catch {
+            alert('Erreur réseau.');
+        }
+    };
+
     return (
         <div className="container" style={{ maxWidth: 1400 }}>
 
@@ -301,6 +358,9 @@ export default function ChequesPage() {
                                                     {c.label}
                                                 </th>
                                             ))}
+                                            <th style={{ padding: '0.6rem 0.8rem', textAlign: 'center', fontWeight: 700, fontSize: '0.72rem', textTransform: 'uppercase', width: 50 }}>
+                                                Actions
+                                            </th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -311,6 +371,17 @@ export default function ChequesPage() {
                                                         {row[c.key] != null && row[c.key] !== '' ? String(row[c.key]) : <span style={{ color: '#cbd5e1' }}>—</span>}
                                                     </td>
                                                 ))}
+                                                <td style={{ padding: '0.45rem 0.8rem', textAlign: 'center' }}>
+                                                    <button 
+                                                        onClick={() => handleDeleteRow(i)}
+                                                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#ef4444', opacity: 0.6, transition: 'opacity 0.2s' }}
+                                                        onMouseEnter={e => e.currentTarget.style.opacity = '1'}
+                                                        onMouseLeave={e => e.currentTarget.style.opacity = '0.6'}
+                                                        title="Supprimer la ligne"
+                                                    >
+                                                        <Trash2 size={14} />
+                                                    </button>
+                                                </td>
                                             </tr>
                                         ))}
                                     </tbody>
@@ -350,21 +421,36 @@ export default function ChequesPage() {
                                             color: isActive ? 'white' : 'var(--text-main)',
                                             transition: 'background 0.15s',
                                             display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                                            position: 'relative'
                                         }}
                                         onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = 'var(--primary-light)'; }}
                                         onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = 'transparent'; }}
                                     >
-                                        <div>
+                                        <div style={{ flex: 1, marginRight: '0.5rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                             <div style={{ fontWeight: 700, fontSize: '0.83rem' }}>{l.label}</div>
                                         </div>
-                                        <span style={{
-                                            fontSize: '0.72rem', fontWeight: 700,
-                                            background: isActive ? 'rgba(255,255,255,0.25)' : 'var(--primary-light)',
-                                            color: isActive ? 'white' : 'var(--text-muted)',
-                                            padding: '0.1rem 0.5rem', borderRadius: '4px',
-                                        }}>
-                                            {l.count}
-                                        </span>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                            <span style={{
+                                                fontSize: '0.72rem', fontWeight: 700,
+                                                background: isActive ? 'rgba(255,255,255,0.25)' : 'var(--primary-light)',
+                                                color: isActive ? 'white' : 'var(--text-muted)',
+                                                padding: '0.1rem 0.5rem', borderRadius: '4px',
+                                            }}>
+                                                {l.count}
+                                            </span>
+                                            <button 
+                                                onClick={(e) => handleDeleteList(e, l)}
+                                                style={{ 
+                                                    background: 'none', border: 'none', cursor: 'pointer', 
+                                                    color: isActive ? 'white' : '#ef4444', 
+                                                    padding: '0.2rem', display: 'flex', alignItems: 'center',
+                                                    opacity: 0.6
+                                                }}
+                                                title="Supprimer toute la liste"
+                                            >
+                                                <Trash2 size={14} />
+                                            </button>
+                                        </div>
                                     </button>
                                 );
                             })}

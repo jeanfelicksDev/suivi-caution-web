@@ -689,30 +689,6 @@ function HomePageInternal() {
                         </div>
                     </Fieldset>
 
-                    <Fieldset title="RECOUVREMENT" accentColor="#7c3aed" bgTint="rgba(124, 58, 237, 0.02)">
-                        <div className="grid grid-cols-4">
-                            <Field label="Date Trans Rec">
-                                <input type={formData.date_trans_rec ? "date" : "text"} name="date_trans_rec" value={formData.date_trans_rec || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_trans_rec && (e.target.type = "text")} />
-                            </Field>
-                            <Field label="Date Ret Rec">
-                                <input type={formData.date_ret_rec ? "date" : "text"} name="date_ret_rec" value={formData.date_ret_rec || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_ret_rec && (e.target.type = "text")} />
-                            </Field>
-                            <Field label="Date Fin Suspension">
-                                <input type={formData.date_fin_suspension ? "date" : "text"} name="date_fin_suspension" value={formData.date_fin_suspension || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_fin_suspension && (e.target.type = "text")} />
-                            </Field>
-                            <Field label="Recouvrement" labelStyle={{ justifyContent: 'center' }}>
-                                <button onClick={() => setShowRecouvrementModal(true)} className="btn btn-primary" style={{ width: '100%', gap: '0.5rem', background: '#6d28d9' }}>
-                                    <FileText size={18} /> Recouvrements {searchResult?.counts?.recouvrements !== undefined && `(${searchResult.counts.recouvrements})`}
-                                </button>
-                            </Field>
-                            <div style={{ gridColumn: 'span 4' }}>
-                                <Field label="Observations Rec.">
-                                    <textarea name="observ_rec" value={formData.observ_rec || ''} onChange={handleChange} placeholder="..." style={{ minHeight: '60px' }} />
-                                </Field>
-                            </div>
-                        </div>
-                    </Fieldset>
-
                     <Fieldset title="PIECE COMPTABLE (AVOIR)" accentColor="#6366f1" bgTint="rgba(99, 102, 241, 0.02)">
                         <div className="grid grid-cols-4">
                             <Field label="Date Début Avoir">
@@ -737,9 +713,33 @@ function HomePageInternal() {
                         </div>
                     </Fieldset>
 
+                    <Fieldset title="RECOUVREMENT" accentColor="#7c3aed" bgTint="rgba(124, 58, 237, 0.02)">
+                        <div className="grid grid-cols-4">
+                            <Field label="Date Trans Rec">
+                                <input type={formData.date_trans_rec ? "date" : "text"} name="date_trans_rec" value={formData.date_trans_rec || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_trans_rec && (e.target.type = "text")} />
+                            </Field>
+                            <Field label="Date Ret Rec">
+                                <input type={formData.date_ret_rec ? "date" : "text"} name="date_ret_rec" value={formData.date_ret_rec || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_ret_rec && (e.target.type = "text")} />
+                            </Field>
+                            <Field label="Date Fin Suspension">
+                                <input type={formData.date_fin_suspension ? "date" : "text"} name="date_fin_suspension" value={formData.date_fin_suspension || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_fin_suspension && (e.target.type = "text")} />
+                            </Field>
+                            <Field label="Recouvrement" labelStyle={{ justifyContent: 'center' }}>
+                                <button onClick={() => setShowRecouvrementModal(true)} className="btn btn-primary" style={{ width: '100%', gap: '0.5rem', background: '#6d28d9' }}>
+                                    <FileText size={18} /> Recouvrements {searchResult?.counts?.recouvrements !== undefined && `(${searchResult.counts.recouvrements})`}
+                                </button>
+                            </Field>
+                            <div style={{ gridColumn: 'span 4' }}>
+                                <Field label="Observations Rec.">
+                                    <textarea name="observ_rec" value={formData.observ_rec || ''} onChange={handleChange} placeholder="..." style={{ minHeight: '60px' }} />
+                                </Field>
+                            </div>
+                        </div>
+                    </Fieldset>
+
 
                     <Fieldset title="SIGNATURE & PIECE DE CAISSE" accentColor="#4f46e5" bgTint="rgba(79, 70, 229, 0.02)">
-                        <div className="grid grid-cols-6">
+                        <div className="grid grid-cols-3">
                             <Field label="Date 1ère Signature">
                                 <input type={formData.date_1er_signature ? "date" : "text"} name="date_1er_signature" value={formData.date_1er_signature || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_1er_signature && (e.target.type = "text")} />
                             </Field>

@@ -112,3 +112,59 @@ export async function GET(request: Request) {
         return NextResponse.json({ error: 'Erreur serveur.' }, { status: 500 });
     }
 }
+
+/** DELETE /api/cheques/listes
+ *  - ?listId=xxx : supprime tout un lot
+ *  - ?id=xxx     : supprime un chèque précis (facultatif si on veut plus fin)
+ */
+export async function DELETE(request: Request) {
+    const { searchParams } = new URL(request.url);
+    const listId = searchParams.get('listId')?.trim() || '';
+    const chequeId = searchParams.get('id')?.trim() || '';
+
+    try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const p = prisma as any;
+
+        if (listId) {
+            if (listId.startsWith('excel_')) {
+                const date = listId.replace('excel_', '');
+                await p.cheques_emis.deleteMany({
+                    where: { date_liste_recu: date }
+                });
+                return NextResponse.json({ success: true, message: `Liste Excel du ${date} supprimée.` });
+            } else if (listId.startsWith('access_')) {
+                const numDispo = parseInt(listId.replace('access_', ''), 10);
+                // Supprimer les détails d'abord
+                await p.cheque_details.deleteMany({
+                    where: { num_dispo_cheque: numDispo }
+                });
+                // Puis l'en-tête
+                await p.cheque_disponible.delete({
+                    where: { num_dispo_cheque: numDispo }
+                });
+                return NextResponse.json({ success: true, message: `Disponibilité N°${numDispo} supprimée.` });
+            }
+        }
+
+        if (chequeId) {
+            const id = parseInt(chequeId, 10);
+            // On essaie dans les deux tables selon le contexte (pour être simple)
+            try {
+                await p.cheques_emis.delete({ where: { id } });
+            } catch {
+                try {
+                    await p.cheque_details.delete({ where: { id } });
+                } catch {
+                    return NextResponse.json({ error: 'Chèque introuvable.' }, { status: 404 });
+                }
+            }
+            return NextResponse.json({ success: true });
+        }
+
+        return NextResponse.json({ error: 'Paramètre listId ou id manquant.' }, { status: 400 });
+    } catch (error) {
+        console.error('Error deleting cheques:', error);
+        return NextResponse.json({ error: 'Erreur serveur lors de la suppression.' }, { status: 500 });
+    }
+}

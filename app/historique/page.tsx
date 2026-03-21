@@ -6,6 +6,7 @@ import Link from 'next/link';
 import ArmateurSelect from '@/app/components/ArmateurSelect';
 import TransmissionReport from '@/app/components/TransmissionReport';
 import PartenaireCombobox from '@/app/components/PartenaireCombobox';
+import PartenaireSelect from '@/app/components/PartenaireSelect';
 import PartenaireModal from '@/app/components/PartenaireModal';
 import { Printer, Download } from 'lucide-react';
 import * as XLSX from 'xlsx';
@@ -30,52 +31,61 @@ interface DossierRow {
     date_cloture: string | null;
     date_transmission_compta: string | null;
     date_cheque: string | null;
+    date_trans_sce_detention: string | null;
+    date_mise_avoir: string | null;
+    date_trans_rec: string | null;
 }
 
 /* ── Définition des étapes ─────────────────────────────────────────── */
 const ETAPES = [
     { value: '', label: '—' },
-    { value: 'date_reception', label: 'Dossier Reçu' },
-    { value: 'date_transmission_ligne', label: 'Dossier Chez Armateur' },
-    { value: 'date_retour_ligne', label: 'Dossier Retour Ligne' },
-    { value: 'date_mise_litige', label: 'Dossier En Litige' },
-    { value: 'date_suspendu', label: 'Dossier Suspendu' },
-    { value: 'date_piece_caisse', label: 'Dossier Pour Avoir' },
-    { value: 'date_1er_signature', label: 'Dossier En Signature 1' },
-    { value: 'date_2e_signature', label: 'Dossier En Signature 2' },
-    { value: 'date_cloture', label: 'Dossier Clôture Manuel' },
-    { value: 'date_transmission_compta', label: 'Dossier À la Compta' },
-    { value: 'date_cheque', label: 'Chèque Émis – Dossier Clôturé' },
+    { value: 'date_reception', label: 'Demande Reçu' },
+    { value: 'date_transmission_ligne', label: 'Transmission à l’armateur' },
+    { value: 'date_mise_litige', label: 'Mise en Litige sans détention' },
+    { value: 'date_trans_sce_detention', label: 'Mise en Litige Service détention' },
+    { value: 'date_mise_avoir', label: 'Traitement de l’avoir' },
+    { value: 'date_trans_rec', label: 'Contrôle Sce recouvrement' },
+    { value: 'date_suspendu', label: 'Demande suspendue' },
+    { value: 'date_1er_signature', label: 'Transmission pour 1ère signature' },
+    { value: 'date_2e_signature', label: 'Transmission pour 2ème signature' },
+    { value: 'date_piece_caisse', label: 'Pièce de caisse établie' },
+    { value: 'date_transmission_compta', label: 'Transmission à la compta' },
+    { value: 'date_cheque', label: 'Chèque émis' },
+    { value: 'date_cloture', label: 'Clôturé sans chèque' },
 ] as const;
 
 /** Couleur badge par étape */
 const ETAPE_COLORS: Record<string, { bg: string; color: string }> = {
     date_reception: { bg: '#e0f2fe', color: '#0369a1' },
     date_transmission_ligne: { bg: '#fef9c3', color: '#854d0e' },
-    date_retour_ligne: { bg: '#fef3c7', color: '#92400e' },
     date_mise_litige: { bg: '#fee2e2', color: '#b91c1c' },
-    date_suspendu: { bg: '#fee2e2', color: '#dc2626' }, // Rouge pour suspendu
-    date_piece_caisse: { bg: '#ede9fe', color: '#6d28d9' },
+    date_trans_sce_detention: { bg: '#fecdd3', color: '#be123c' },
+    date_mise_avoir: { bg: '#fce7f3', color: '#be185d' },
+    date_trans_rec: { bg: '#ffedd5', color: '#c2410c' },
+    date_suspendu: { bg: '#fee2e2', color: '#dc2626' },
     date_1er_signature: { bg: '#dbeafe', color: '#1d4ed8' },
-    date_2e_signature: { bg: '#d1fae5', color: '#065f46' },
-    date_cloture: { bg: '#ffedd5', color: '#c2410c' },
+    date_2e_signature: { bg: '#dcfce7', color: '#15803d' },
+    date_piece_caisse: { bg: '#ede9fe', color: '#6d28d9' },
     date_transmission_compta: { bg: '#f0fdf4', color: '#15803d' },
-    date_cheque: { bg: '#f0fdf4', color: '#15803d' },
+    date_cheque: { bg: '#ecfdf5', color: '#047857' },
+    date_cloture: { bg: '#f1f5f9', color: '#475569' },
 };
 
 /** Détermine l'étape courante d'un dossier côté client (pour affichage badge) */
 const ETAPE_SEQUENCE = [
     'date_reception',
     'date_transmission_ligne',
-    'date_retour_ligne',
     'date_mise_litige',
+    'date_trans_sce_detention',
+    'date_mise_avoir',
+    'date_trans_rec',
     'date_suspendu',
-    'date_piece_caisse',
     'date_1er_signature',
     'date_2e_signature',
-    'date_cloture',
+    'date_piece_caisse',
     'date_transmission_compta',
     'date_cheque',
+    'date_cloture',
 ] as const;
 
 function getEtapeCourante(row: DossierRow): { value: string; label: string } {
@@ -256,26 +266,26 @@ export default function HistoriquePage() {
                                     onChange={handleChange} placeholder="ex: MSCUX123456" autoComplete="off" />
                             </div>
                             <div>
-                                <label>Client</label>
+                                <label style={{ textTransform: 'uppercase' }}>Client</label>
                                 <PartenaireCombobox
                                     name="client"
                                     value={filters.client}
                                     onChange={(val) => setFilters(prev => ({ ...prev, client: val }))}
                                     type="client"
                                     onManage={(id) => setPartenaireModal({ open: true, id })}
-                                    placeholder="Nom du client"
+                                    placeholder="NOM DU CLIENT"
                                     formData={filters}
                                 />
                             </div>
                             <div>
-                                <label>Transitaire</label>
+                                <label style={{ textTransform: 'uppercase' }}>Transitaire</label>
                                 <PartenaireCombobox
                                     name="transitaire"
                                     value={filters.transitaire}
                                     onChange={(val) => setFilters(prev => ({ ...prev, transitaire: val }))}
                                     type="transitaire"
                                     onManage={(id) => setPartenaireModal({ open: true, id })}
-                                    placeholder="Nom du transitaire"
+                                    placeholder="NOM DU TRANSITAIRE"
                                     formData={filters}
                                 />
                             </div>
@@ -492,7 +502,7 @@ export default function HistoriquePage() {
                                 </button>
 
                                 {/* Rapport Dossier Ligne (Conditionnel) */}
-                                {filters.dateFrom && filters.dateTo && filters.etape === 'date_reception' && (
+                                {filters.dateFrom && filters.dateTo && (filters.etape === 'date_reception' || filters.etape === 'date_1er_signature' || filters.etape === 'date_2e_signature') && (
                                     <button 
                                         type="button" 
                                         onClick={() => setShowTransmissionReport(true)}
@@ -507,7 +517,11 @@ export default function HistoriquePage() {
                                         onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
                                         onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
                                     >
-                                        <Printer size={18} /> Rapport Dossier Ligne (PDF)
+                                        <Printer size={18} /> {
+                                            filters.etape === 'date_1er_signature' ? 'Bordereau 1ère Signature (PDF)' :
+                                            filters.etape === 'date_2e_signature' ? 'Bordereau 2ème Signature (PDF)' :
+                                            'Rapport Dossier Ligne (PDF)'
+                                        }
                                     </button>
                                 )}
                             </div>
@@ -524,6 +538,7 @@ export default function HistoriquePage() {
                 <TransmissionReport 
                     from={filters.dateFrom}
                     to={filters.dateTo}
+                    type={filters.etape === 'date_1er_signature' ? 'sig1' : filters.etape === 'date_2e_signature' ? 'sig2' : 'reception'}
                     onClose={() => setShowTransmissionReport(false)}
                 />
             )}

@@ -7,17 +7,19 @@ import { prisma } from '@/lib/prisma';
  * suivantes (N+1…) sont nulles.
  */
 const ETAPE_FIELDS = [
-    'date_reception',          // Dossier Reçu
-    'date_transmission_ligne', // Dossier Chez Armateur
-    'date_retour_ligne',       // Dossier Retour Ligne
-    'date_mise_litige',        // Dossier En Litige
-    'date_suspendu',           // Dossier Suspendu
-    'date_piece_caisse',       // Dossier Pour Avoir
-    'date_1er_signature',      // Dossier En Signature 1
-    'date_2e_signature',       // Dossier En Signature 2
-    'date_cloture',            // Dossier Clôture Manuel
-    'date_transmission_compta',// Dossier À la Compta
-    'date_cheque',             // Chèque Émis – Dossier Clôturé
+    'date_reception',          // Demande Reçu
+    'date_transmission_ligne', // Transmission à l’armateur
+    'date_mise_litige',        // Mise en Litige sans détention
+    'date_trans_sce_detention',// Mise en Litige Service détention
+    'date_mise_avoir',         // Traitement de l’avoir
+    'date_trans_rec',          // Contrôle Sce recouvrement
+    'date_suspendu',           // Demande suspendue
+    'date_1er_signature',      // Transmission pour signature
+    'date_2e_signature',       // Transmission pour 2ème signature
+    'date_piece_caisse',       // Pièce de caisse établie
+    'date_transmission_compta',// Transmission à la compta
+    'date_cheque',             // Chèque émis
+    'date_cloture',            // Clôturé sans chèque
 ] as const;
 
 type EtapeField = typeof ETAPE_FIELDS[number];
@@ -41,12 +43,25 @@ export async function GET(request: Request) {
 
         if (etape && (ETAPE_FIELDS as readonly string[]).includes(etape)) {
             const idx = ETAPE_FIELDS.indexOf(etape as EtapeField);
-            // La date de l'étape sélectionnée doit être remplie
-            etapeWhere[etape] = { not: null };
-            // Toutes les étapes SUIVANTES doivent être nulles (dossier bloqué ici)
+            
+            // Le dossier est à cette étape si :
+            // 1. La date de l'étape sélectionnée est remplie (pas null, pas vide)
+            // 2. TOUTES les étapes suivantes sont vides (null ou vide)
+            
+            const conditions: any[] = [
+                { [etape]: { not: null } },
+                { [etape]: { not: '' } }
+            ];
+
             for (let j = idx + 1; j < ETAPE_FIELDS.length; j++) {
-                etapeWhere[ETAPE_FIELDS[j]] = null;
+                conditions.push({
+                    OR: [
+                        { [ETAPE_FIELDS[j]]: null },
+                        { [ETAPE_FIELDS[j]]: '' }
+                    ]
+                });
             }
+            etapeWhere['AND'] = conditions;
         }
 
         // Filtre période réception
@@ -69,7 +84,14 @@ export async function GET(request: Request) {
                 ...(armateur && { armateur: armateur }),
                 ...etapeWhere,
                 ...dateReceptionWhere,
-                ...(!hasFilters && { date_cloture: null, date_cheque: null }),
+                ...(!hasFilters && { 
+                    AND: [
+                        { OR: [{ date_cloture: null }, { date_cloture: '' }] },
+                        { OR: [{ date_cheque: null }, { date_cheque: '' }] },
+                        { OR: [{ date_transmission_compta: null }, { date_transmission_compta: '' }] },
+                        { OR: [{ date_piece_caisse: null }, { date_piece_caisse: '' }] }
+                    ]
+                }),
             },
             select: {
                 id: true,
@@ -82,6 +104,9 @@ export async function GET(request: Request) {
                 date_reception: true,
                 date_transmission_ligne: true,
                 date_mise_litige: true,
+                date_trans_sce_detention: true,
+                date_mise_avoir: true,
+                date_trans_rec: true,
                 date_retour_ligne: true,
                 date_suspendu: true,
                 date_fin_suspension: true,

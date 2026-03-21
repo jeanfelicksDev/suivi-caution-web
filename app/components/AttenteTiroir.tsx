@@ -36,46 +36,12 @@ interface BoutonConfig {
 // ─── Config des boutons ───────────────────────────────────────────────────────
 
 const BOUTONS: BoutonConfig[] = [
-    {
-        key: 'armateur',
-        label: 'En attente retour Armateur',
-        icon: <Ship size={16} />,
-        color: '#2563eb',
-        bg: '#eff6ff',
-        borderColor: '#bfdbfe',
-        labelDebut: 'Date Trans. Ligne',
-        labelFin: 'Date Retour Ligne',
-    },
-    {
-        key: 'avoir',
-        label: 'En attente retour Avoir',
-        icon: <FileCheck size={16} />,
-        color: '#7c3aed',
-        bg: '#f5f3ff',
-        borderColor: '#ddd6fe',
-        labelDebut: 'Date Mise Avoir',
-        labelFin: 'Date Fin Avoir',
-    },
-    {
-        key: 'signature1',
-        label: 'En attente retour Signature 1',
-        icon: <PenLine size={16} />,
-        color: '#d97706',
-        bg: '#fffbeb',
-        borderColor: '#fde68a',
-        labelDebut: 'Date Retour Ligne',
-        labelFin: 'Date 1ère Signature',
-    },
-    {
-        key: 'signature2',
-        label: 'En attente retour Signature 2',
-        icon: <PenSquare size={16} />,
-        color: '#ea580c',
-        bg: '#fff7ed',
-        borderColor: '#fed7aa',
-        labelDebut: 'Date 1ère Signature',
-        labelFin: 'Date 2ème Signature',
-    },
+    { key: 'armateur', label: 'Chez Armateur', icon: <Ship size={16} />, color: '#2563eb', bg: '#eff6ff', borderColor: '#bfdbfe', labelDebut: 'Date Trans. Ligne', labelFin: 'Date Retour Ligne' },
+    { key: 'detention', label: 'Sce Détention', icon: <AlertTriangle size={16} />, color: '#be123c', bg: '#fff1f2', borderColor: '#fecdd3', labelDebut: 'Date Détention', labelFin: 'Date 1ère Signature' },
+    { key: 'avoir', label: 'Traitement Avoirs', icon: <FileCheck size={16} />, color: '#7c3aed', bg: '#f5f3ff', borderColor: '#ddd6fe', labelDebut: 'Date Mise Avoir', labelFin: 'Date Fin Avoir' },
+    { key: 'recouvrement', label: 'Sce Recouvrement', icon: <Calculator size={16} />, color: '#c2410c', bg: '#fff7ed', borderColor: '#fed7aa', labelDebut: 'Date Trans. Recouv.', labelFin: 'Date Retour Recouv.' },
+    { key: 'signature1', label: '1ère Signature', icon: <PenLine size={16} />, color: '#d97706', bg: '#fffbeb', borderColor: '#fde68a', labelDebut: 'Date 1ère Sig.', labelFin: 'Date Retour 1ère' },
+    { key: 'signature2', label: '2ème Signature', icon: <PenSquare size={16} />, color: '#b45309', bg: '#fffbeb', borderColor: '#fde68a', labelDebut: 'Date 2ème Sig.', labelFin: 'Date Retour 2ème' },
 ];
 
 
@@ -551,7 +517,7 @@ export default function AttenteTiroir() {
                 onMouseLeave={(e) => { if (!isOpen) e.currentTarget.style.background = 'transparent'; }}
             >
                 <Clock size={20} />
-                <span style={{ flex: 1 }}>En Attente</span>
+                <span style={{ flex: 1 }}>Dossiers en Attente</span>
                 <ChevronRight
                     size={16}
                     style={{

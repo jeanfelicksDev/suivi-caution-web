@@ -153,6 +153,42 @@ export async function DELETE(
             return NextResponse.json({ error: 'Dossier non trouvé' }, { status: 404 });
         }
 
+        const p = prisma as any;
+        const numAvoir = dossier.num_avoir || '';
+
+        // 1. Supprimer les chèques (Excel)
+        await p.cheques_emis.deleteMany({
+            where: {
+                OR: [
+                    { num_facture_caution: numFacture },
+                    ...(numAvoir ? [{ num_facture_caution: numAvoir }] : [])
+                ]
+            }
+        });
+
+        // 2. Supprimer les détails de chèques (Access)
+        await p.cheque_details.deleteMany({
+            where: {
+                OR: [
+                    { num_fact_caution: numFacture },
+                    ...(numAvoir ? [{ num_fact_caution: numAvoir }] : [])
+                ]
+            }
+        });
+
+        // 3. Supprimer les factures DMDT (Détention)
+        await p.facture_dmdt.deleteMany({
+            where: { num_facture_caution: numFacture }
+        });
+
+        // 4. Supprimer les montants à recouvrer
+        if (p.montant_recouvrer) {
+            await p.montant_recouvrer.deleteMany({
+                where: { num_facture_caution: numFacture }
+            });
+        }
+
+        // 5. Enfin, supprimer le dossier
         await prisma.dossiers_caution.delete({
             where: { id: dossier.id }
         });
