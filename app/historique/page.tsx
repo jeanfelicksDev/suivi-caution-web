@@ -362,7 +362,7 @@ export default function HistoriquePage() {
 
                             {/* Boutons à droite */}
                             <div style={{ flex: 1, display: 'flex', gap: '0.75rem', justifyContent: 'flex-end', alignItems: 'flex-end' }}>
-                                <button type="button" onClick={doReset} title="Réinitialiser les filtres" className="btn-refresh">
+                                <button type="button" onClick={() => { doReset(); window.location.reload(); }} title="Actualiser la page" className="btn-refresh">
                                     <RotateCcw size={18} />
                                 </button>
                                 <button type="submit" className="btn btn-primary" disabled={loading}

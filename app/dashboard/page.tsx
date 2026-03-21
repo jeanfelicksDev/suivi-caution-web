@@ -109,7 +109,7 @@ export default function Dashboard() {
                     <button className="btn btn-primary" onClick={fetchStats} style={{ background: '#334155', color: 'white', fontWeight: 700, letterSpacing: '0.05em', padding: '0.5rem 1.25rem', borderRadius: '8px', height: '38px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         FILTRER
                     </button>
-                    <button type="button" onClick={() => { setStartDate(''); setEndDate(''); setArmateur(''); }} title="Réinitialiser les filtres" className="btn-refresh">
+                    <button type="button" onClick={() => window.location.reload()} title="Actualiser la page" className="btn-refresh">
                         <RotateCcw size={18} />
                     </button>
                 </div>
