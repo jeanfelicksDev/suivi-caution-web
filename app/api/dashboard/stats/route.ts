@@ -265,7 +265,7 @@ export async function GET(request: Request) {
 
         // Calculs pour les 4 cartes (StatCards) du haut
         const totalDossiers = dossiers.length;
-        const actifs = dossiers.filter((d: any) => !d.date_cloture && !d.date_cheque).length;
+        const actifs = dossiers.length;
 
         const clientsUniques = new Set();
         let dosCaches = 0;

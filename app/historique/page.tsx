@@ -533,7 +533,7 @@ export default function HistoriquePage() {
                                 </button>
 
                                 {/* Rapport Dossier Ligne (Conditionnel) */}
-                                {filters.dateFrom && filters.dateTo && (filters.etape === 'date_reception' || filters.etape === 'date_1er_signature' || filters.etape === 'date_2e_signature') && (
+                                {((filters.etape === 'date_reception' || filters.etape === 'date_1er_signature' || filters.etape === 'date_2e_signature' || !filters.etape)) && (
                                     <button 
                                         type="button" 
                                         onClick={() => setShowTransmissionReport(true)}

@@ -92,8 +92,6 @@ export async function GET(request: NextRequest) {
         // Filtrer : dateDebut renseigné ET dateFin vide/null
         // Exclusion : dossier clôturé avec chèque émis OU clôture manuelle
         const filtered = allDossiers.filter((d) => {
-            if (isChequeEmis(d)) return false;    // chèque émis → exclu
-            if (isClotureManuel(d)) return false; // clôture manuelle → exclu
 
             const debut = (d as Record<string, unknown>)[config.dateDebut] as string | null;
             const fin = (d as Record<string, unknown>)[config.dateFin] as string | null;

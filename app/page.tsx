@@ -716,14 +716,14 @@ function HomePageInternal() {
 
                     <Fieldset title="RECOUVREMENT" accentColor="#7c3aed" bgTint="rgba(124, 58, 237, 0.02)">
                         <div className="grid grid-cols-5">
-                            <Field label="Date Début Suspension">
-                                <input type={formData.date_suspendu ? "date" : "text"} name="date_suspendu" value={formData.date_suspendu || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_suspendu && (e.target.type = "text")} />
-                            </Field>
                             <Field label="Date Trans Rec">
                                 <input type={formData.date_trans_rec ? "date" : "text"} name="date_trans_rec" value={formData.date_trans_rec || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_trans_rec && (e.target.type = "text")} />
                             </Field>
                             <Field label="Date Ret Rec">
                                 <input type={formData.date_ret_rec ? "date" : "text"} name="date_ret_rec" value={formData.date_ret_rec || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_ret_rec && (e.target.type = "text")} />
+                            </Field>
+                            <Field label="Date Début Suspension">
+                                <input type={formData.date_suspendu ? "date" : "text"} name="date_suspendu" value={formData.date_suspendu || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_suspendu && (e.target.type = "text")} />
                             </Field>
                             <Field label="Date Fin Suspension">
                                 <input type={formData.date_fin_suspension ? "date" : "text"} name="date_fin_suspension" value={formData.date_fin_suspension || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_fin_suspension && (e.target.type = "text")} />
