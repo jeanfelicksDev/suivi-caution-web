@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { differenceInBusinessDays, parseISO, isValid } from 'date-fns';
 
+export const dynamic = 'force-dynamic';
+
 // Jours fériés fixes en Côte d'Ivoire (format MM-DD)
 const fixedHolidaysCI = [
     '01-01', // Jour de l'An
