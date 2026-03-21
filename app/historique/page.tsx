@@ -362,10 +362,7 @@ export default function HistoriquePage() {
 
                             {/* Boutons à droite */}
                             <div style={{ flex: 1, display: 'flex', gap: '0.75rem', justifyContent: 'flex-end', alignItems: 'flex-end' }}>
-                                <button type="button" onClick={doReset} title="Réinitialiser les filtres"
-                                    style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: '8px', height: '38px', width: '38px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#334155', transition: 'all 0.2s', padding: 0 }}
-                                    onMouseOver={(e) => e.currentTarget.style.background = '#f8fafc'} onMouseOut={(e) => e.currentTarget.style.background = 'white'}
-                                >
+                                <button type="button" onClick={doReset} title="Réinitialiser les filtres" className="btn-refresh">
                                     <RotateCcw size={18} />
                                 </button>
                                 <button type="submit" className="btn btn-primary" disabled={loading}

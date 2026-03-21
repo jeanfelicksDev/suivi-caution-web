@@ -264,6 +264,43 @@ label {
   box-shadow: var(--shadow-sm);
 }
 
+/* Animated Refresh Button */
+.btn-refresh {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border: 1px solid var(--border-thick);
+  border-radius: var(--radius-sm);
+  height: 38px;
+  width: 38px;
+  cursor: pointer;
+  color: var(--text-muted);
+  padding: 0;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-refresh:hover {
+  background: var(--primary-light);
+  color: var(--primary);
+  border-color: #94a3b8;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+
+.btn-refresh svg {
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-refresh:hover svg {
+  transform: rotate(-180deg);
+}
+
+.btn-refresh:active {
+  transform: translateY(1px);
+  box-shadow: var(--shadow-sm);
+}
+
 /* Custom Checkbox */
 .checkbox-group {
   display: flex;
