@@ -1,14 +1,13 @@
 'use client';
 
 import React, { useState, useCallback, useEffect } from 'react';
-import { Search, RefreshCw, FileText, X, User } from 'lucide-react';
+import { Search, RefreshCw, FileText, X, User, Printer, Download, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import ArmateurSelect from '@/app/components/ArmateurSelect';
 import TransmissionReport from '@/app/components/TransmissionReport';
 import PartenaireCombobox from '@/app/components/PartenaireCombobox';
 import PartenaireSelect from '@/app/components/PartenaireSelect';
 import PartenaireModal from '@/app/components/PartenaireModal';
-import { Printer, Download } from 'lucide-react';
 import * as XLSX from 'xlsx';
 
 interface DossierRow {
@@ -195,6 +194,19 @@ export default function HistoriquePage() {
 
     const fmt = (v: number | null) =>
         v != null ? v.toLocaleString('fr-FR') + ' FCFA' : '—';
+
+    const handleDelete = async (id: number) => {
+        if (!window.confirm('Voulez-vous vraiment supprimer ce dossier ?')) return;
+
+        try {
+            const res = await fetch(`/api/dossiers/${id}`, { method: 'DELETE' });
+            if (!res.ok) throw new Error('Erreur lors de la suppression');
+            setRows(prev => prev.filter(r => r.id !== id));
+        } catch (err) {
+            console.error(err);
+            alert('Erreur lors de la suppression du dossier.');
+        }
+    };
 
     const etapeLabel = ETAPES.find(e => e.value === filters.etape)?.label || '';
 
@@ -460,16 +472,35 @@ export default function HistoriquePage() {
                                                         ) : '—'}
                                                     </td>
                                                     <td style={{ padding: '0.55rem 0.5rem', textAlign: 'right' }}>
-                                                        <Link href={`/?facture=${row.num_facture_caution}`}
-                                                            style={{
-                                                                display: 'inline-flex', alignItems: 'center', gap: '0.3rem',
-                                                                fontSize: '0.75rem', fontWeight: 700, color: 'var(--accent)',
-                                                                textDecoration: 'none', padding: '0.2rem 0.6rem',
-                                                                border: '1px solid var(--border)', borderRadius: '4px',
-                                                                background: 'white',
-                                                            }}>
-                                                            <FileText size={14} />
-                                                        </Link>
+                                                        <div style={{ display: 'flex', gap: '0.35rem', justifyContent: 'flex-end' }}>
+                                                            <Link href={`/?facture=${row.num_facture_caution}`}
+                                                                title="Ouvrir le dossier"
+                                                                style={{
+                                                                    display: 'inline-flex', alignItems: 'center',
+                                                                    fontSize: '0.75rem', fontWeight: 700, color: 'var(--accent)',
+                                                                    textDecoration: 'none', padding: '0.25rem 0.45rem',
+                                                                    border: '1px solid var(--border)', borderRadius: '4px',
+                                                                    background: 'white',
+                                                                }}>
+                                                                <FileText size={14} />
+                                                            </Link>
+                                                            <button 
+                                                                onClick={() => handleDelete(row.id)}
+                                                                title="Supprimer le dossier"
+                                                                style={{
+                                                                    display: 'inline-flex', alignItems: 'center',
+                                                                    cursor: 'pointer',
+                                                                    fontSize: '0.75rem', color: '#dc2626',
+                                                                    padding: '0.25rem 0.45rem',
+                                                                    border: '1px solid #fee2e2', borderRadius: '4px',
+                                                                    background: 'white', transition: 'all 0.2s'
+                                                                }}
+                                                                onMouseEnter={e => e.currentTarget.style.background = '#fef2f2'}
+                                                                onMouseLeave={e => e.currentTarget.style.background = 'white'}
+                                                            >
+                                                                <Trash2 size={14} />
+                                                            </button>
+                                                        </div>
                                                     </td>
                                                 </tr>
                                             );
