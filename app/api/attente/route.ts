@@ -64,9 +64,7 @@ export async function GET(request: NextRequest) {
 
         // Dossier clôturé avec chèque ou en cours de paiement
         const isChequeEmis = (d: typeof allDossiers[0]) =>
-            !!(d.date_cheque?.trim()) || 
-            !!(d.date_transmission_compta?.trim()) || 
-            !!(d.date_piece_caisse?.trim());
+            !!(d.date_cheque?.trim());
 
         // Dossier clôturé manuellement
         const isClotureManuel = (d: typeof allDossiers[0]) =>

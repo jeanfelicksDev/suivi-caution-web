@@ -84,14 +84,6 @@ export async function GET(request: Request) {
                 ...(armateur && { armateur: armateur }),
                 ...etapeWhere,
                 ...dateReceptionWhere,
-                ...(!hasFilters && { 
-                    AND: [
-                        { OR: [{ date_cloture: null }, { date_cloture: '' }] },
-                        { OR: [{ date_cheque: null }, { date_cheque: '' }] },
-                        { OR: [{ date_transmission_compta: null }, { date_transmission_compta: '' }] },
-                        { OR: [{ date_piece_caisse: null }, { date_piece_caisse: '' }] }
-                    ]
-                }),
             },
             select: {
                 id: true,

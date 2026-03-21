@@ -265,19 +265,14 @@ export async function GET(request: Request) {
 
         // Calculs pour les 4 cartes (StatCards) du haut
         const totalDossiers = dossiers.length;
-        const actifs = dossiers.filter((d: any) => 
-            !d.date_cloture && 
-            !d.date_cheque && 
-            !d.date_transmission_compta && 
-            !d.date_piece_caisse
-        ).length;
+        const actifs = dossiers.filter((d: any) => !d.date_cloture && !d.date_cheque).length;
 
         const clientsUniques = new Set();
         let dosCaches = 0;
         dossiers.forEach((d: any) => {
             if (d.client_nom) clientsUniques.add(d.client_nom);
             // Dossier est considéré "traité" (pour le taux de retour) s'il a atteint l'un des stades de paiement/clôture
-            if (d.date_cheque || d.date_cloture || d.date_transmission_compta || d.date_piece_caisse) dosCaches++;
+            if (d.date_cheque || d.date_cloture) dosCaches++;
         });
         const tauxRetour = totalDossiers > 0 ? Math.round((dosCaches / totalDossiers) * 100) : 0;
 
