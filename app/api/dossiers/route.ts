@@ -13,7 +13,7 @@ const ETAPE_FIELDS = [
     'date_trans_sce_detention',// Mise en Litige Service détention
     'date_mise_avoir',         // Traitement de l’avoir
     'date_trans_rec',          // Contrôle Sce recouvrement
-    'date_suspendu',           // Demande suspendue
+    'date_suspendu',           // Remboursement suspendue
     'date_1er_signature',      // Transmission pour signature
     'date_2e_signature',       // Transmission pour 2ème signature
     'date_piece_caisse',       // Pièce de caisse établie

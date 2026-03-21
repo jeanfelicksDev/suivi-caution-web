@@ -45,7 +45,7 @@ const ETAPES = [
     { value: 'date_trans_sce_detention', label: 'Mise en Litige Service détention' },
     { value: 'date_mise_avoir', label: 'Traitement de l’avoir' },
     { value: 'date_trans_rec', label: 'Contrôle Sce recouvrement' },
-    { value: 'date_suspendu', label: 'Demande suspendue' },
+    { value: 'date_suspendu', label: 'Remboursement suspendue' },
     { value: 'date_1er_signature', label: 'Transmission pour 1ère signature' },
     { value: 'date_2e_signature', label: 'Transmission pour 2ème signature' },
     { value: 'date_piece_caisse', label: 'Pièce de caisse établie' },

@@ -11,7 +11,7 @@ const TYPES_CONFIG: Record<string, { dateDebut: string; dateFin: string; label: 
     detention: { dateDebut: 'date_trans_sce_detention', dateFin: 'date_1er_signature', label: 'Sce Détention' },
     avoir: { dateDebut: 'date_mise_avoir', dateFin: 'date_fin_avoir', label: 'Traitement Avoirs' },
     recouvrement: { dateDebut: 'date_trans_rec', dateFin: 'date_ret_rec', label: 'Sce Recouvrement' },
-    suspension: { dateDebut: 'date_suspendu', dateFin: 'date_fin_suspension', label: 'Suspension' },
+    suspension: { dateDebut: 'date_suspendu', dateFin: 'date_fin_suspension', label: 'Remboursement suspendue' },
     signature1: { dateDebut: 'date_1er_signature', dateFin: 'date_retour_1er_signature', label: '1ère Signature' },
     signature2: { dateDebut: 'date_2e_signature', dateFin: 'date_retour_2e_signature', label: '2ème Signature' },
     caisse: { dateDebut: 'date_piece_caisse', dateFin: 'date_transmission_compta', label: 'Pièce de Caisse' },
