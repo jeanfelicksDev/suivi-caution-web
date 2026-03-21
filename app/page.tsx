@@ -75,6 +75,7 @@ interface Dossier {
 const emptyDossier: Dossier = {
   transitaire_actif: 0,
   client_actif: 0,
+  type_remboursement: 'CAUTION',
 };
 
 /* ═══════════ MODAL SIMPLIFIÉ ═══════════ */
@@ -714,7 +715,10 @@ function HomePageInternal() {
                     </Fieldset>
 
                     <Fieldset title="RECOUVREMENT" accentColor="#7c3aed" bgTint="rgba(124, 58, 237, 0.02)">
-                        <div className="grid grid-cols-4">
+                        <div className="grid grid-cols-5">
+                            <Field label="Date Début Suspension">
+                                <input type={formData.date_suspendu ? "date" : "text"} name="date_suspendu" value={formData.date_suspendu || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_suspendu && (e.target.type = "text")} />
+                            </Field>
                             <Field label="Date Trans Rec">
                                 <input type={formData.date_trans_rec ? "date" : "text"} name="date_trans_rec" value={formData.date_trans_rec || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_trans_rec && (e.target.type = "text")} />
                             </Field>
@@ -729,7 +733,7 @@ function HomePageInternal() {
                                     <FileText size={18} /> Recouvrements {searchResult?.counts?.recouvrements !== undefined && `(${searchResult.counts.recouvrements})`}
                                 </button>
                             </Field>
-                            <div style={{ gridColumn: 'span 4' }}>
+                            <div style={{ gridColumn: 'span 5' }}>
                                 <Field label="Observations Rec.">
                                     <textarea name="observ_rec" value={formData.observ_rec || ''} onChange={handleChange} placeholder="..." style={{ minHeight: '60px' }} />
                                 </Field>

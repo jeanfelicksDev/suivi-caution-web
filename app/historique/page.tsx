@@ -468,7 +468,7 @@ export default function HistoriquePage() {
                                                                 border: '1px solid var(--border)', borderRadius: '4px',
                                                                 background: 'white',
                                                             }}>
-                                                            <FileText size={12} /> Ouvrir
+                                                            <FileText size={14} />
                                                         </Link>
                                                     </td>
                                                 </tr>

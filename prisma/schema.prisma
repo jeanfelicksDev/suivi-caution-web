@@ -17,7 +17,7 @@ model clients {
 
 model dossiers_caution {
   id                        Int       @id @default(autoincrement())
-  type_remboursement        String?   @map("type_rembt")
+  type_remboursement        String?   @default("CAUTION") @map("type_rembt")
   nature_rembt              String?
   num_facture_caution       String?
   montant_caution           Float?
