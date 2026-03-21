@@ -16,7 +16,8 @@ const PERMISSIONS = [
     { id: 'READ_ONLY', label: 'Lecture (Dashboards, Historique)', color: 'text-slate-600' },
     { id: 'CREATE_DOSSIER', label: 'Création & Édition de Dossier', color: 'text-blue-600' },
     { id: 'VALIDATION_COMPTA', label: 'Validation Compta & Clôture', color: 'text-amber-600' },
-    { id: 'IMPORT_CHEQUES', label: 'Gestion & Import Chèques', color: 'text-emerald-600' }
+    { id: 'IMPORT_CHEQUES', label: 'Gestion & Import Chèques', color: 'text-emerald-600' },
+    { id: 'CONSULTATION_CLIENT', label: 'Consultation Client', color: 'text-purple-600' }
 ];
 
 export default function UsersPermissionsPage() {
