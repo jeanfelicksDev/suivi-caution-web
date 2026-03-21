@@ -59,8 +59,8 @@ export async function GET(request: Request) {
             to, 
             grouped 
         });
-    } catch (error) {
+    } catch (error: any) {
         console.error('Error generating report data:', error);
-        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+        return NextResponse.json({ error: error.message || String(error) }, { status: 500 });
     }
 }

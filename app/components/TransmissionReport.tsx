@@ -40,7 +40,10 @@ export default function TransmissionReport({ from, to, type, onClose }: Props) {
             setLoading(true);
             try {
                 const res = await fetch(`/api/reports/transmission?from=${from}&to=${to}&type=${type || 'reception'}`);
-                if (!res.ok) throw new Error('Erreur lors du chargement des données');
+                if (!res.ok) {
+                    const errPayload = await res.json().catch(() => null);
+                    throw new Error(errPayload?.error || 'Erreur lors du chargement des données');
+                }
                 const json = await res.json();
                 setData(json);
             } catch (err: any) {

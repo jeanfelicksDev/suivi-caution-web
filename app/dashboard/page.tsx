@@ -35,7 +35,7 @@ export default function Dashboard() {
             const data = await res.json();
             setStats(data);
         }
-    }, [startDate, endDate]);
+    }, [startDate, endDate, armateur]);
 
     React.useEffect(() => {
         fetchStats();
