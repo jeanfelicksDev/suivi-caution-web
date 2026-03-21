@@ -89,9 +89,9 @@ export default function ConsultationPage() {
 
       {/* Search Box */}
       <section style={{ maxWidth: '800px', margin: '0 auto', background: 'white', padding: '1.5rem', borderRadius: '16px', borderTop: '4px solid #4f46e5', boxShadow: '0 4px 20px rgba(0,0,0,0.08)', marginBottom: '2rem' }}>
-        <form onSubmit={doSearch} className="search-form" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-          <div style={{ flex: 1, position: 'relative' }}>
-            <Search size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+        <form onSubmit={doSearch} className="search-form" style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          <div style={{ position: 'relative' }}>
+            <Search size={22} style={{ position: 'absolute', left: '1.2rem', top: '50%', transform: 'translateY(-50%)', color: '#6366f1' }} />
             <input
               type="text"
               placeholder="N° de facture (ex: FI41601906)..."
@@ -99,27 +99,48 @@ export default function ConsultationPage() {
               onChange={e => setNumFacture(e.target.value.toUpperCase())}
               style={{
                 width: '100%',
-                padding: '0.75rem 1rem 0.75rem 2.8rem',
-                fontSize: '1.1rem',
+                padding: '1rem 1rem 1rem 3.5rem',
+                fontSize: '1.25rem',
                 fontFamily: 'inherit',
-                fontWeight: 600,
+                fontWeight: 800,
                 letterSpacing: '0.05em',
-                color: '#0f172a',
-                border: '1px solid #e2e8f0',
-                borderRadius: '8px',
+                color: '#1e293b',
+                border: '2px solid #e2e8f0',
+                borderRadius: '12px',
                 outline: 'none',
                 textTransform: 'uppercase',
-                boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.02)'
+                boxShadow: '0 2px 4px rgba(0,0,0,0.02)',
+                transition: 'all 0.2s'
               }}
-              onFocus={e => e.target.style.borderColor = '#4f46e5'}
-              onBlur={e => e.target.style.borderColor = '#e2e8f0'}
+              onFocus={e => {
+                e.target.style.borderColor = '#6366f1';
+                e.target.style.boxShadow = '0 0 0 4px rgba(99, 102, 241, 0.1)';
+              }}
+              onBlur={e => {
+                e.target.style.borderColor = '#e2e8f0';
+                e.target.style.boxShadow = 'none';
+              }}
               required
             />
           </div>
           <button type="submit" disabled={loading} className="btn-consulter" style={{
-            background: '#4f46e5', color: 'white', border: 'none', borderRadius: '8px', padding: '0.75rem 1.5rem', fontSize: '1rem', fontWeight: 600, cursor: loading ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', transition: 'background 0.2s', whiteSpace: 'nowrap'
+            background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
+            color: 'white',
+            border: 'none',
+            borderRadius: '12px',
+            padding: '1rem',
+            fontSize: '1.1rem',
+            fontWeight: 800,
+            cursor: loading ? 'not-allowed' : 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '0.75rem',
+            transition: 'transform 0.2s, box-shadow 0.2s',
+            boxShadow: '0 4px 12px rgba(99, 102, 241, 0.3)',
+            width: '100%'
           }}>
-            {loading ? <RefreshCw size={18} style={{ animation: 'spin 1s linear infinite' }} /> : <Search size={18} />}
+            {loading ? <RefreshCw size={22} style={{ animation: 'spin 1.s linear infinite' }} /> : <Search size={22} />}
             Consulter
           </button>
         </form>
