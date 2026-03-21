@@ -518,12 +518,14 @@ function HomePageInternal() {
             <h1 style={{ fontSize: '2.5rem', marginBottom: '2rem', color: 'var(--primary)' }}>Gestion des Cautions</h1>
             <div style={{ maxWidth: '600px', margin: '0 auto' }} className="card">
               <p style={{ marginBottom: '1.5rem', color: 'var(--text-muted)' }}>Entrez un numéro de facture pour commencer</p>
-              <div style={{ display: 'flex', gap: '0.75rem' }}>
-                <div style={{ flex: 1, position: 'relative' }}>
-                  <Search size={18} style={{ position: 'absolute', left: '0.8rem', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
-                  <input type="text" placeholder="N° FACTURE" value={numFacture} onChange={e => setNumFacture(e.target.value.toUpperCase())} style={{ paddingLeft: '2.5rem' }} onKeyDown={(e) => e.key === 'Enter' && doSearch()} />
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <div style={{ position: 'relative' }}>
+                  <Search size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+                  <input type="text" placeholder="N° FACTURE" value={numFacture} onChange={e => setNumFacture(e.target.value.toUpperCase())} style={{ paddingLeft: '2.85rem', height: '50px', fontSize: '1.1rem', fontWeight: 800 }} onKeyDown={(e) => e.key === 'Enter' && doSearch()} />
                 </div>
-                <button onClick={() => doSearch()} className="btn btn-primary">RECHERCHER</button>
+                <button onClick={() => doSearch()} className="btn btn-primary" style={{ height: '50px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', fontWeight: 800 }}>
+                  <Search size={20} /> Consulter
+                </button>
               </div>
             </div>
           </div>
