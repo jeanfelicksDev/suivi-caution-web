@@ -76,7 +76,7 @@ export default function ConsultationPage() {
       
       {/* Header & Stats */}
       <div style={{ maxWidth: '800px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', gap: '1rem', flexWrap: 'wrap' }}>
-        <h1 style={{ fontSize: '1.5rem', margin: 0, color: '#1e293b', fontWeight: 800 }}>Suivi Client</h1>
+        <h1 style={{ fontSize: '1.5rem', margin: 0, color: '#1e293b', fontWeight: 800 }}>Suivre mon remboursement</h1>
         
         <div style={{ display: 'flex', gap: '1rem', background: 'white', padding: '0.5rem 1rem', borderRadius: '12px', boxShadow: '0 2px 10px rgba(0,0,0,0.05)', alignItems: 'center' }}>
           <Eye size={18} color="#64748b" />
@@ -89,7 +89,7 @@ export default function ConsultationPage() {
 
       {/* Search Box */}
       <section style={{ maxWidth: '800px', margin: '0 auto', background: 'white', padding: '1.5rem', borderRadius: '16px', borderTop: '4px solid #4f46e5', boxShadow: '0 4px 20px rgba(0,0,0,0.08)', marginBottom: '2rem' }}>
-        <form onSubmit={doSearch} className="search-form" style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+        <form onSubmit={doSearch} className="search-form" style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', maxWidth: '50%', margin: '0 auto' }}>
           <div style={{ position: 'relative' }}>
             <Search size={22} style={{ position: 'absolute', left: '1.2rem', top: '50%', transform: 'translateY(-50%)', color: '#6366f1' }} />
             <input
@@ -160,7 +160,7 @@ export default function ConsultationPage() {
               Cher client,
             </h2>
             <p style={{ fontSize: '1.1rem', color: '#475569', margin: 0, lineHeight: 1.5 }}>
-              votre dossier <strong>{searchResult.data.num_facture_caution}</strong> est en ce moment <strong style={{ color: '#4f46e5', backgroundColor: '#eef2ff', padding: '0.2rem 0.5rem', borderRadius: '4px' }}>{searchResult.statut_text}</strong>.
+              Votre dossier <strong>{searchResult.data.num_facture_caution}</strong> est en ce moment <strong style={{ color: '#4f46e5', backgroundColor: '#eef2ff', padding: '0.2rem 0.5rem', borderRadius: '4px' }}>{searchResult.statut_text}</strong>.
             </p>
           </div>
 
@@ -253,6 +253,9 @@ export default function ConsultationPage() {
           .btn-consulter {
             width: 100%;
             justify-content: center;
+          }
+          .search-form {
+            max-width: 100% !important;
           }
           .timeline-container {
             flex-direction: column !important;

@@ -20,6 +20,34 @@ const TYPES_CONFIG: Record<string, { dateDebut: string; dateFin: string; label: 
     cloture_manuel: { dateDebut: 'date_cloture', dateFin: '__none__', label: 'Clôturé sans chèque', readOnly: true },
 };
 
+// Ordre logique du workflow pour le filtrage "progressif"
+const WORKFLOW_SEQUENCE = [
+    'date_reception',
+    'date_transmission_ligne',
+    'date_retour_ligne',
+    'date_bad',
+    'date_sortie',
+    'date_retour',
+    'date_mise_litige',
+    'date_fin_litige',
+    'date_trans_sce_detention',
+    'date_mise_avoir',
+    'date_fin_avoir',
+    'date_trans_rec',
+    'date_ret_rec',
+    'date_suspendu',
+    'date_fin_suspension',
+    'date_1er_signature',
+    'date_retour_1er_signature',
+    'date_2e_signature',
+    'date_retour_2e_signature',
+    'date_piece_caisse',
+    'date_transmission_compta',
+    'date_retour_compta',
+    'date_cheque',
+    'date_cloture'
+];
+
 // GET /api/attente?type=armateur
 // Retourne les dossiers où dateDebut est renseigné et dateFin est null/vide
 export async function GET(request: NextRequest) {
@@ -92,10 +120,25 @@ export async function GET(request: NextRequest) {
         // Filtrer : dateDebut renseigné ET dateFin vide/null
         // Exclusion : dossier clôturé avec chèque émis OU clôture manuelle
         const filtered = allDossiers.filter((d) => {
-
             const debut = (d as Record<string, unknown>)[config.dateDebut] as string | null;
             const fin = (d as Record<string, unknown>)[config.dateFin] as string | null;
-            return debut && debut.trim() !== '' && (!fin || fin.trim() === '');
+
+            // 1. Condition de base : debut rempli et fin vide
+            const isMatch = debut && debut.trim() !== '' && (!fin || fin.trim() === '');
+            if (!isMatch) return false;
+
+            // 2. Vérification "progressivité" : si une date POSTÉRIEURE dans le workflow est remplie,
+            // on considère que le dossier est déjà passé à l'étape suivante.
+            const finIndex = WORKFLOW_SEQUENCE.indexOf(config.dateFin);
+            if (finIndex !== -1) {
+                for (let i = finIndex + 1; i < WORKFLOW_SEQUENCE.length; i++) {
+                    const field = WORKFLOW_SEQUENCE[i];
+                    const val = (d as Record<string, any>)[field];
+                    if (val && val.trim() !== '') return false; // Étape ultérieure déjà entamée/finie
+                }
+            }
+
+            return true;
         });
 
         const result = filtered.map((d) => ({

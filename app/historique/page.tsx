@@ -536,7 +536,13 @@ export default function HistoriquePage() {
                                 {((filters.etape === 'date_reception' || filters.etape === 'date_1er_signature' || filters.etape === 'date_2e_signature' || !filters.etape)) && (
                                     <button 
                                         type="button" 
-                                        onClick={() => setShowTransmissionReport(true)}
+                                        onClick={() => {
+                                            if (!filters.dateFrom || !filters.dateTo) {
+                                                alert("Veuillez renseigner une période (De / Au) pour générer le rapport PDF.");
+                                                return;
+                                            }
+                                            setShowTransmissionReport(true);
+                                        }}
                                         className="btn btn-secondary"
                                         style={{ 
                                             background: '#1e293b', color: 'white', border: 'none',
