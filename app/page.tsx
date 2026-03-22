@@ -211,6 +211,7 @@ function NewDossierModal({
                 <ArmateurSelect
                   value={form.armateur || ''}
                   onChange={(val) => setForm(prev => ({ ...prev, armateur: val }))}
+                  required
                 />
               </Field>
               <Field label="Date de Réception *">
@@ -232,7 +233,7 @@ function NewDossierModal({
                   onManage={(id) => setPartenaireModal({ open: true, id })}
                   placeholder="Rechercher transitaire..."
                   formData={form}
-                  required={form.transitaire_actif === 1}
+                  required
                 />
               </Field>
               <Field label={
@@ -249,7 +250,7 @@ function NewDossierModal({
                   onManage={(id) => setPartenaireModal({ open: true, id })}
                   placeholder="Rechercher client..."
                   formData={form}
-                  required={form.client_actif === 1}
+                  required
                 />
               </Field>
               <Field label="Mandataire *">

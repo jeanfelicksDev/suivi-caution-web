@@ -9,9 +9,10 @@ interface ArmateurSelectProps {
     name?: string;
     style?: React.CSSProperties;
     hideAdd?: boolean;
+    required?: boolean;
 }
 
-export default function ArmateurSelect({ value, onChange, name = 'armateur', style, hideAdd = false }: ArmateurSelectProps) {
+export default function ArmateurSelect({ value, onChange, name = 'armateur', style, hideAdd = false, required = false }: ArmateurSelectProps) {
     const [armateurs, setArmateurs] = useState<{ id: number; nom: string }[]>([]);
     const [showAdd, setShowAdd] = useState(false);
     const [newNom, setNewNom] = useState('');
@@ -70,6 +71,7 @@ export default function ArmateurSelect({ value, onChange, name = 'armateur', sty
                     onChange={(e) => onChange(e.target.value)}
                     className={value ? 'has-value' : ''}
                     style={{ flex: 1, minWidth: 0, ...style }} // minWidth: 0 is key for flex children
+                    required={required}
                 >
                     <option value="">—</option>
                     {armateurs.map((a) => (
