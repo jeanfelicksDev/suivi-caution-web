@@ -591,7 +591,7 @@ function HomePageInternal() {
                             <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.85rem' }}>Modification du dossier existant</p>
                         </div>
                     </div>
-                    {user?.role === 'ADMIN' && (
+                    {(user?.role === 'ADMIN' || user?.permissions?.length === 5) && (
                         <button type="button" onClick={doDelete} disabled={deleting} style={{ 
                             background: '#fef2f2', color: '#ef4444', border: '1px solid #fca5a5', 
                             padding: '0.5rem 1rem', borderRadius: '8px', display: 'flex', 
