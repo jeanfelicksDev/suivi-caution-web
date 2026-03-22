@@ -515,7 +515,7 @@ function HomePageInternal() {
       <main style={{ flex: 1, padding: isExisting ? '1rem 2rem' : '0' }}>
         {!isExisting && (
           <div style={{ padding: '6rem 2rem 2rem 2rem', textAlign: 'center' }}>
-            <h1 style={{ fontSize: '2.5rem', marginBottom: '2rem', color: 'var(--primary)' }}>Gestion des Cautions</h1>
+            <h1 style={{ fontSize: '2.5rem', marginBottom: '2rem', color: 'var(--primary)' }}>Consulter ou Créer un nouveau dossier</h1>
             <div style={{ maxWidth: '600px', margin: '0 auto' }} className="card">
               <p style={{ marginBottom: '1.5rem', color: 'var(--text-muted)' }}>Entrez un numéro de facture pour commencer</p>
               <div style={{ display: 'flex', gap: '0.75rem' }}>
