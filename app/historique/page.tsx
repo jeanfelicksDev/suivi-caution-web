@@ -547,7 +547,7 @@ export default function HistoriquePage() {
                 <TransmissionReport 
                     from={filters.dateFrom}
                     to={filters.dateTo}
-                    type={filters.etape === 'date_1er_signature' ? 'sig1' : filters.etape === 'date_2e_signature' ? 'sig2' : 'reception'}
+                    type={filters.etape === 'date_1er_signature' ? 'sig1' : filters.etape === 'date_2e_signature' ? 'sig2' : (filters.etape === 'date_reception' ? 'reception' : 'all')}
                     onClose={() => setShowTransmissionReport(false)}
                 />
             )}

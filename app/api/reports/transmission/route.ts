@@ -5,7 +5,7 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const from = searchParams.get('from');
     const to = searchParams.get('to');
-    const type = searchParams.get('type') || 'reception'; // reception, sig1, sig2
+    const type = searchParams.get('type') || 'all'; // all, reception, sig1, sig2
 
     if (!from || !to) {
         return NextResponse.json({ error: 'Dates manquantes' }, { status: 400 });
@@ -33,6 +33,7 @@ export async function GET(request: Request) {
     } else if (type === 'sig2') {
         where.date_piece_caisse = null;
     }
+    // Si type === 'all', on ne rajoute aucune condition d'exclusion sur where
 
     try {
         const dossiers = await prisma.dossiers_caution.findMany({

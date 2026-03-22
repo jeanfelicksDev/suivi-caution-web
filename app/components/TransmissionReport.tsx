@@ -17,7 +17,7 @@ interface ReportData {
 interface Props {
     from: string;
     to: string;
-    type?: 'reception' | 'sig1' | 'sig2';
+    type?: 'reception' | 'sig1' | 'sig2' | 'all';
     onClose: () => void;
 }
 
