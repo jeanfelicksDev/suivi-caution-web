@@ -119,7 +119,7 @@ export default function Dashboard() {
                 <StatCard label="Nbre de Dossiers Reçus" value={stats?.statsCards?.totalDossiers ?? "..."} period={periodText} trend="" trendUp={true} icon={<LayoutDashboard color="var(--accent)" />} valueColor="#4f46e5" />
                 <StatCard label="Dossiers en traitement" value={stats?.statsCards?.actifs ?? "..."} period={periodText} trend="" trendUp={false} icon={<Clock color="#f59e0b" />} valueColor="#f97316" />
                 <StatCard label="Clients/Transitaires" value={stats?.statsCards?.clientsUniques ?? "..."} period={periodText} trend="" trendUp={true} icon={<Users color="#3b82f6" />} valueColor="#3b82f6" />
-                <StatCard label="Dossiers reçus et traités" value={(stats?.statsCards?.tauxRetour ?? "...") + "%"} period={periodText} trend="" trendUp={true} icon={<TrendingUp color="#10b981" />} valueColor="#ec4899" />
+                <StatCard label="Dossiers traités sur dossiers reçus" value={(stats?.statsCards?.tauxRetour ?? "...") + "%"} period={periodText} trend="" trendUp={true} icon={<TrendingUp color="#10b981" />} valueColor="#ec4899" />
             </div>
 
             {/*  Section Durées Moyennes */}
