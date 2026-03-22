@@ -42,26 +42,44 @@ export async function GET(request: Request) {
         const etapeWhere: Record<string, any> = {};
 
         if (etape && (ETAPE_FIELDS as readonly string[]).includes(etape)) {
-            const idx = ETAPE_FIELDS.indexOf(etape as EtapeField);
-            
-            // Le dossier est à cette étape si :
-            // 1. La date de l'étape sélectionnée est remplie (pas null, pas vide)
-            // 2. TOUTES les étapes suivantes sont vides (null ou vide)
-            
-            const conditions: any[] = [
-                { [etape]: { not: null } },
-                { [etape]: { not: '' } }
-            ];
+            if (etape === 'date_cheque') {
+                etapeWhere['AND'] = [
+                    { num_cheque: { not: null } },
+                    { num_cheque: { not: '' } }
+                ];
+            } else if (etape === 'date_cloture') {
+                etapeWhere['AND'] = [
+                    { date_cloture: { not: null } },
+                    { date_cloture: { not: '' } },
+                    { OR: [{ num_cheque: null }, { num_cheque: '' }] }
+                ];
+            } else {
+                const idx = ETAPE_FIELDS.indexOf(etape as EtapeField);
+                
+                const conditions: any[] = [
+                    { [etape]: { not: null } },
+                    { [etape]: { not: '' } }
+                ];
 
-            for (let j = idx + 1; j < ETAPE_FIELDS.length; j++) {
+                for (let j = idx + 1; j < ETAPE_FIELDS.length; j++) {
+                    conditions.push({
+                        OR: [
+                            { [ETAPE_FIELDS[j]]: null },
+                            { [ETAPE_FIELDS[j]]: '' }
+                        ]
+                    });
+                }
+                
+                // Exclure les dossiers qui ont déjà leur chèque émis
                 conditions.push({
                     OR: [
-                        { [ETAPE_FIELDS[j]]: null },
-                        { [ETAPE_FIELDS[j]]: '' }
+                        { num_cheque: null },
+                        { num_cheque: '' }
                     ]
                 });
+                
+                etapeWhere['AND'] = conditions;
             }
-            etapeWhere['AND'] = conditions;
         }
 
         // 1. Détermination du champ de date pour le filtrage par période
@@ -115,6 +133,7 @@ export async function GET(request: Request) {
                 date_cloture: true,
                 date_transmission_compta: true,
                 date_cheque: true,
+                num_cheque: true,
             },
             orderBy: [{ date_reception: 'desc' }, { created_at: 'desc' }],
         });

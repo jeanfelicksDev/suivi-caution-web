@@ -34,6 +34,7 @@ interface DossierRow {
     date_trans_sce_detention: string | null;
     date_mise_avoir: string | null;
     date_trans_rec: string | null;
+    num_cheque: string | null;
 }
 
 /* ── Définition des étapes ─────────────────────────────────────────── */
@@ -96,6 +97,14 @@ function getEtapeCourante(row: DossierRow): { value: string; label: string } {
             if (found) current = { value: found.value, label: found.label };
         }
     }
+    
+    // Règle stricte: Si num_cheque est non vide, c'est l'étape "Chèque émis"
+    if (row.num_cheque) {
+        current = { value: 'date_cheque', label: 'Chèque émis' };
+    } else if (row.date_cloture && !row.num_cheque) {
+        current = { value: 'date_cloture', label: 'Clôturé sans chèque' };
+    }
+
     return current;
 }
 
