@@ -33,7 +33,7 @@ const Sidebar = () => {
         <aside className="sidebar">
             <div className="sidebar-logo" style={{ fontSize: '1.4rem', lineHeight: '1.2', padding: '0.5rem 0.25rem 2rem 0.25rem', textAlign: 'left' }}>
                 Suivi-Caution-DSM
-                <div style={{ fontSize: '0.8rem', color: '#fbbf24', fontWeight: 600, marginTop: '0.5rem' }}>
+                <div style={{ fontSize: '0.8rem', color: 'yellow', fontWeight: 600, marginTop: '0.5rem' }}>
                     {user.username} <span style={{ opacity: 0.7 }}>({user.role})</span>
                 </div>
             </div>
