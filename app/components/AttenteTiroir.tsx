@@ -502,22 +502,18 @@ export default function AttenteTiroir() {
         <>
             {/* Bouton d'ouverture du tiroir */}
             <button
+                className="nav-item"
                 onClick={() => setIsOpen((v) => !v)}
                 style={{
-                    display: 'flex', alignItems: 'center', gap: '0.5rem',
-                    width: '100%', padding: '0.6rem 1rem',
+                    width: '100%',
+                    border: 'none',
+                    cursor: 'pointer',
+                    fontFamily: 'inherit',
                     background: isOpen ? 'rgba(255,255,255,0.12)' : 'transparent',
-                    border: 'none', borderRadius: '8px',
-                    color: 'var(--sidebar-text, #e2e8f0)',
-                    cursor: 'pointer', fontSize: '0.9rem', fontWeight: 600,
-                    transition: 'background 0.2s',
-                    textAlign: 'left',
                 }}
-                onMouseEnter={(e) => { if (!isOpen) e.currentTarget.style.background = 'rgba(255,255,255,0.07)'; }}
-                onMouseLeave={(e) => { if (!isOpen) e.currentTarget.style.background = 'transparent'; }}
             >
                 <Clock size={20} />
-                <span style={{ flex: 1 }}>Dossiers en Attente</span>
+                <span style={{ flex: 1, textAlign: 'left' }}>Dossiers en Attente</span>
                 <ChevronRight
                     size={16}
                     style={{
