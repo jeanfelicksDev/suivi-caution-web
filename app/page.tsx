@@ -521,10 +521,10 @@ function HomePageInternal() {
               <p style={{ marginBottom: '1.5rem', color: 'var(--text-muted)' }}>Entrez un numéro de facture pour commencer</p>
               <div style={{ display: 'flex', gap: '0.75rem' }}>
                 <div style={{ flex: 1, position: 'relative' }}>
-                  <Search size={18} style={{ position: 'absolute', left: '0.8rem', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
-                  <input type="text" placeholder="N° FACTURE" value={numFacture} onChange={e => setNumFacture(e.target.value.toUpperCase())} style={{ paddingLeft: '2.5rem' }} onKeyDown={(e) => e.key === 'Enter' && doSearch()} />
+                  <Search size={24} style={{ position: 'absolute', left: '1.2rem', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+                  <input type="text" placeholder="N° FACTURE" value={numFacture} onChange={e => setNumFacture(e.target.value.toUpperCase())} style={{ paddingLeft: '3.5rem', fontSize: '1.9rem' }} onKeyDown={(e) => e.key === 'Enter' && doSearch()} />
                 </div>
-                <button onClick={() => doSearch()} className="btn btn-primary">CONSULTER</button>
+                <button onClick={() => doSearch()} className="btn btn-primary" style={{ padding: '0 2rem', fontSize: '1.1rem', fontWeight: 800 }}>CONSULTER</button>
               </div>
             </div>
           </div>
