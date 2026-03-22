@@ -146,10 +146,8 @@ export default function TransmissionReport({ from, to, type, onClose }: Props) {
                 <div style={{ flex: 1, overflowY: 'auto', padding: '2rem', background: '#f1f5f9' }}>
                     <div ref={printRef} style={{ background: 'white', padding: '15mm', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)', minHeight: '297mm', margin: '0 auto', maxWidth: '210mm' }}>
                         
-                        <div style={{ position: 'relative' }}>
-                            <div style={{ position: 'absolute', top: -30, right: 0, fontSize: '9px', color: '#666', textAlign: 'right', fontWeight: 400, textTransform: 'none' }}>
-                                Suivi-caution-Dsm est une application web entierement dévéloppé par Jean-Félix ZIAGOUE (Agent GSL/DSM-OOCL)
-                            </div>
+                        <div style={{ textAlign: 'right', fontSize: '9px', color: '#666', marginBottom: '8px', fontWeight: 400 }}>
+                            Suivi-caution-Dsm est une application web entierement dévéloppé par Jean-Félix ZIAGOUE (Agent GSL/DSM-OOCL)
                         </div>
 
                         <div style={{ border: '2px solid #000', padding: '10px', textAlign: 'center', fontWeight: 800, fontSize: '18px', marginBottom: '10px', textTransform: 'uppercase' }}>
