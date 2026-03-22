@@ -150,10 +150,10 @@ export default function PartenaireModal({
 
                     <div style={{ marginBottom: '1rem' }}>
                         <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 800, marginBottom: '0.25rem', textTransform: 'uppercase' }}>
-                            Numéro FNE <span style={{ color: '#ef4444' }}>*</span>
+                            Numéro FNE
                         </label>
                         <input type="text" value={form.num_fne || ''} onChange={e => setForm({ ...form, num_fne: e.target.value.toUpperCase() })}
-                            style={{ width: '100%' }} placeholder="Ex: FNE-001" required />
+                            style={{ width: '100%' }} placeholder="Ex: FNE-001" />
                     </div>
 
                     <div style={{ marginBottom: '1.5rem' }}>
