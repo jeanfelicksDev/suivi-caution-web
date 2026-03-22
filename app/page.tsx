@@ -123,6 +123,13 @@ function NewDossierModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    
+    // Vérification qu'au moins un Actif (Transitaire ou Client) est coché
+    if (form.transitaire_actif !== 1 && form.client_actif !== 1) {
+      setError('Vous devez cocher "Nom Transitaire" ou "Nom Client" (la petite case à côté du libellé) pour indiquer le bénéficiaire principal avant de créer le dossier.');
+      return;
+    }
+
     setSaving(true);
     try {
       const res = await fetch('/api/dossier', {
