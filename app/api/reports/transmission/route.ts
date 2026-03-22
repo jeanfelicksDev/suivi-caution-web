@@ -16,14 +16,27 @@ export async function GET(request: Request) {
     if (type === 'sig1') filterField = 'date_1er_signature';
     if (type === 'sig2') filterField = 'date_2e_signature';
 
+    // Construction de la clause WHERE
+    const where: any = {
+        [filterField]: {
+            gte: from,
+            lte: to
+        }
+    };
+
+    // Pour que le rapport corresponde au tableau de bord, on filtre par l'étape courante.
+    if (type === 'reception') {
+        where.date_1er_signature = null;
+        where.date_transmission_ligne = null;
+    } else if (type === 'sig1') {
+        where.date_2e_signature = null;
+    } else if (type === 'sig2') {
+        where.date_piece_caisse = null;
+    }
+
     try {
         const dossiers = await prisma.dossiers_caution.findMany({
-            where: {
-                [filterField]: {
-                    gte: from,
-                    lte: to
-                }
-            },
+            where,
             select: {
                 armateur: true,
                 num_bl: true,
