@@ -182,7 +182,10 @@ export default function FicheAvoir({ dossier, onClose }: Props) {
 
                 {/* Contenu scrollable */}
                 <div style={{ flex: 1, overflowY: 'auto', padding: '1rem' }}>
-                    <div ref={printRef} style={{ fontFamily: 'Arial, sans-serif', fontSize: 11, color: '#000', maxWidth: 680, margin: '0 auto' }}>
+                    <div ref={printRef} style={{ fontFamily: 'Arial, sans-serif', fontSize: 11, color: '#000', maxWidth: 680, margin: '0 auto', position: 'relative' }}>
+                        <div style={{ position: 'absolute', top: -15, right: 0, fontSize: '8px', color: '#666', textAlign: 'right', fontWeight: 400 }}>
+                            Suivi-caution-Dsm est une application web entierement dévéloppé par Jean-Félix ZIAGOUE (Agent GSL/DSM-OOCL)
+                        </div>
 
                         {/* ── EN-TÊTE ── */}
                         <table style={{ width: '100%', borderCollapse: 'collapse', border: '2px solid #333', marginBottom: 4 }}>

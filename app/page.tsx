@@ -98,6 +98,7 @@ function NewDossierModal({
   const [notificationEmail, setNotificationEmail] = useState('');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [animateError, setAnimateError] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
@@ -126,7 +127,9 @@ function NewDossierModal({
     
     // Vérification qu'au moins un Actif (Transitaire ou Client) est coché
     if (form.transitaire_actif !== 1 && form.client_actif !== 1) {
-      setError('Vous devez cocher "Nom Transitaire" ou "Nom Client" (la petite case à côté du libellé) pour indiquer le bénéficiaire principal avant de créer le dossier.');
+      setError('Le client ou le Transitaire doit etre coché');
+      setAnimateError(true);
+      setTimeout(() => setAnimateError(false), 2000);
       return;
     }
 
@@ -235,7 +238,9 @@ function NewDossierModal({
               <Field label={
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                   Nom Transitaire *
-                  <input type="checkbox" name="transitaire_actif" title="transitaire actif" checked={form.transitaire_actif === 1} onChange={handleCheck} style={{ cursor: 'pointer', margin: 0, width: '13px', height: '13px' }} />
+                  <input type="checkbox" name="transitaire_actif" title="transitaire actif" checked={form.transitaire_actif === 1} onChange={handleCheck} 
+                    style={{ cursor: 'pointer', margin: 0, width: '13px', height: '13px' }} 
+                    className={animateError ? 'highlight-error' : ''} />
                 </div>
               }>
                 <PartenaireCombobox
@@ -252,7 +257,9 @@ function NewDossierModal({
               <Field label={
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                   Nom Client *
-                  <input type="checkbox" name="client_actif" title="client actif" checked={form.client_actif === 1} onChange={handleCheck} style={{ cursor: 'pointer', margin: 0, width: '13px', height: '13px' }} />
+                  <input type="checkbox" name="client_actif" title="client actif" checked={form.client_actif === 1} onChange={handleCheck} 
+                    style={{ cursor: 'pointer', margin: 0, width: '13px', height: '13px' }} 
+                    className={animateError ? 'highlight-error-delayed' : ''} />
                 </div>
               }>
                 <PartenaireCombobox
