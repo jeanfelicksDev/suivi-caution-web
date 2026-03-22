@@ -159,13 +159,18 @@ export async function PATCH(
             return NextResponse.json({ error: 'Dossier non trouvé' }, { status: 404 });
         }
 
+        // Nettoyer le body des champs calculés ou immuables
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { id, counts, num_fne, created_at, ...updateData } = body;
+
         const updatedDossier = await prisma.dossiers_caution.update({
             where: { id: dossier.id },
             data: {
-                ...body,
+                ...updateData,
                 updated_at: new Date()
             }
         });
+
 
         return NextResponse.json(updatedDossier);
     } catch (error) {
