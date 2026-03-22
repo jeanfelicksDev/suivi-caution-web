@@ -25,7 +25,7 @@ export default function ConsultationPage() {
 
   // Tracer la visite au chargement (uniquement pour les visiteurs sans compte)
   useEffect(() => {
-    const isLoggedIn = !!localStorage.getItem('caution_user');
+    const isLoggedIn = !!sessionStorage.getItem('caution_user');
     const method = isLoggedIn ? 'GET' : 'POST';
     fetch('/api/visits', { method })
       .then(res => res.json())

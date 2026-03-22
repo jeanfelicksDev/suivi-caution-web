@@ -116,7 +116,7 @@ select {
   color: #000000 !important;
 }
 
-/* Chrome/Webkit specific for date inputs */
+/* Chrome/Webkit specific for date inputs when they HAVE a value */
 input[type="date"].has-value::-webkit-datetime-edit,
 input[type="date"].has-value::-webkit-datetime-edit-fields-wrapper,
 input[type="date"].has-value::-webkit-datetime-edit-text,
@@ -124,6 +124,8 @@ input[type="date"].has-value::-webkit-datetime-edit-month-field,
 input[type="date"].has-value::-webkit-datetime-edit-day-field,
 input[type="date"].has-value::-webkit-datetime-edit-year-field {
   color: #000000 !important;
+  font-weight: 800 !important;
+  font-size: 0.95rem;
 }
 
 input[type="email"],
@@ -149,11 +151,11 @@ textarea::placeholder {
   font-weight: 300;
 }
 
-/* Native Date Input Placeholders/Masks */
-input[type="date"]::-webkit-datetime-edit-text,
-input[type="date"]::-webkit-datetime-edit-month-field,
-input[type="date"]::-webkit-datetime-edit-day-field,
-input[type="date"]::-webkit-datetime-edit-year-field {
+/* Native Date Input Placeholders/Masks ONLY when NO value */
+input[type="date"]:not(.has-value)::-webkit-datetime-edit-text,
+input[type="date"]:not(.has-value)::-webkit-datetime-edit-month-field,
+input[type="date"]:not(.has-value)::-webkit-datetime-edit-day-field,
+input[type="date"]:not(.has-value)::-webkit-datetime-edit-year-field {
   color: #cbd5e1;
   font-size: 0.82rem;
   font-weight: 300;

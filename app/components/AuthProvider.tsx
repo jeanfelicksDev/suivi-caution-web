@@ -37,7 +37,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     const isPublicRoute = PUBLIC_ROUTES.some(r => pathname.startsWith(r));
 
     useEffect(() => {
-        const storedUser = localStorage.getItem('caution_user');
+        const storedUser = sessionStorage.getItem('caution_user');
         let parsedUser = null;
         if (storedUser) {
             try { parsedUser = JSON.parse(storedUser); } catch { }
@@ -55,13 +55,13 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
 
     const login = (u: UserSession) => {
         setUser(u);
-        localStorage.setItem('caution_user', JSON.stringify(u));
+        sessionStorage.setItem('caution_user', JSON.stringify(u));
         router.push('/');
     };
 
     const logout = () => {
         setUser(null);
-        localStorage.removeItem('caution_user');
+        sessionStorage.removeItem('caution_user');
         router.push('/login');
     };
 

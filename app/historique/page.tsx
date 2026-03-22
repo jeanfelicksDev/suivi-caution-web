@@ -15,6 +15,7 @@ interface DossierRow {
     num_facture_caution: string | null;
     num_bl: string | null;
     montant_caution: number | null;
+    montant_final: number | null;
     armateur: string | null;
     client_nom: string | null;
     transitaire_nom: string | null;
@@ -221,6 +222,7 @@ export default function HistoriquePage() {
                 'N° Facture': row.num_facture_caution || '',
                 'N° BL': row.num_bl || '',
                 'Montant Caution': row.montant_caution || 0,
+                'Montant Final': row.montant_final || 0,
                 'Armateur': row.armateur || '',
                 'Client': row.client_nom || '',
                 'Transitaire': row.transitaire_nom || '',

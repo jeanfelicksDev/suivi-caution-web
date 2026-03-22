@@ -90,6 +90,7 @@ export async function GET(request: Request) {
                 num_facture_caution: true,
                 num_bl: true,
                 montant_caution: true,
+                montant_final: true,
                 armateur: true,
                 client_nom: true,
                 transitaire_nom: true,
