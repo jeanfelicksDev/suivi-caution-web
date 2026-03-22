@@ -530,7 +530,7 @@ label {
 }
 
 /* Filled Fields (Success states) */
-.filled-field:not(:read-only):not(:disabled) {
+.filled-field {
   background-color: #f0fdf4 !important;
   border-color: #86efac !important;
   color: #166534 !important;

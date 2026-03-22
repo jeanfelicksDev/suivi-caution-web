@@ -741,7 +741,7 @@ function HomePageInternal() {
                         </div>
                     </Fieldset>
 
-                    <Fieldset title="RECOUVREMENT" accentColor="#7c3aed" bgTint="rgba(124, 58, 237, 0.02)">
+                    <Fieldset title="RECOUVREMENT" accentColor="#ea580c" bgTint="rgba(234, 88, 12, 0.02)">
                         <div className="grid grid-cols-5">
                             <Field label="Date Trans Rec">
                                 <input type={formData.date_trans_rec ? "date" : "text"} name="date_trans_rec" value={formData.date_trans_rec || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_trans_rec && (e.target.type = "text")} />
@@ -756,7 +756,7 @@ function HomePageInternal() {
                                 <input type={formData.date_fin_suspension ? "date" : "text"} name="date_fin_suspension" value={formData.date_fin_suspension || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_fin_suspension && (e.target.type = "text")} />
                             </Field>
                             <Field label="Recouvrement" labelStyle={{ justifyContent: 'center' }}>
-                                <button onClick={() => setShowRecouvrementModal(true)} className="btn btn-primary" style={{ width: '100%', gap: '0.5rem', background: '#6d28d9' }}>
+                                <button onClick={() => setShowRecouvrementModal(true)} className="btn btn-primary" style={{ width: '100%', gap: '0.5rem', background: '#ea580c', borderColor: '#ea580c' }}>
                                     <FileText size={18} /> Recouvrements {searchResult?.counts?.recouvrements !== undefined && `(${searchResult.counts.recouvrements})`}
                                 </button>
                             </Field>
@@ -821,13 +821,13 @@ function HomePageInternal() {
                                     onChange={(e) => setFormData(prev => ({ ...prev, cloture_sans_cheque: e.target.checked }))} 
                                     style={{ width: '16px', height: '16px', cursor: 'pointer', accentColor: '#0369a1' }}
                                 />
-                                Clôture sans chèque
+                                Clôturé sans chèque
                             </label>
                             
                             {formData.cloture_sans_cheque && (
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: '#f0f9ff', padding: '0.5rem 0.8rem', borderRadius: '6px', border: '1px solid #bae6fd' }}>
                                     <span style={{ fontSize: '0.76rem', fontWeight: 800, color: '#0369a1', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                                        Dossier clotué à la date du
+                                        Dossier clôturé à la date du
                                     </span>
                                     <input 
                                         type="date" 

@@ -23,42 +23,49 @@ async function main() {
     let updatedCount = 0;
     let errorCount = 0;
 
-    // 2. Iterate and update dossiers_caution
-    for (const row of details) {
-        try {
-            if (row.num_fact_caution) {
-                const fmtDate = (d) => {
-                    if (!d) return null;
-                    if (typeof d === 'string') return d.split('T')[0];
-                    if (d instanceof Date) return d.toISOString().split('T')[0];
-                    return null;
-                };
+    const chunkSize = 20;
+    for (let i = 0; i < details.length; i += chunkSize) {
+        const batch = details.slice(i, i + chunkSize);
+        await Promise.all(batch.map(async row => {
+            try {
+                if (row.num_fact_caution) {
+                    const fmtDate = (d) => {
+                        if (!d) return null;
+                        if (typeof d === 'string') return d.split('T')[0];
+                        if (d instanceof Date) return d.toISOString().split('T')[0];
+                        return null;
+                    };
 
-                const dateCheque = fmtDate(row.date_cheque);
-                const dateCloture = fmtDate(row.date_cloture) || dateCheque;
+                    const dateCheque = fmtDate(row.date_cheque);
+                    const dateCloture = fmtDate(row.date_cloture) || dateCheque;
 
-                const res = await prisma.dossiers_caution.updateMany({
-                    where: { num_facture_caution: row.num_fact_caution },
-                    data: {
-                        num_cheque: row.num_cheque || undefined,
-                        banque: row.banque || undefined,
-                        date_cheque: dateCheque || undefined,
-                        montant_final: row.montant_cheque != null ? parseFloat(String(row.montant_cheque)) : undefined,
-                        date_cloture: dateCloture || undefined,
-                        date_retour_compta: dateCheque || undefined,
-                        updated_at: new Date()
+                    const res = await prisma.dossiers_caution.updateMany({
+                        where: { 
+                            OR: [
+                                { num_facture_caution: row.num_fact_caution },
+                                { num_avoir: row.num_fact_caution }
+                            ]
+                        },
+                        data: {
+                            num_cheque: row.num_cheque || undefined,
+                            banque: row.banque || undefined,
+                            date_cheque: dateCheque || undefined,
+                            montant_final: row.montant_cheque != null ? parseFloat(String(row.montant_cheque)) : undefined,
+                            date_cloture: dateCloture || undefined,
+                            date_retour_compta: dateCheque || undefined,
+                            updated_at: new Date()
+                        }
+                    });
+                    
+                    if (res.count > 0) {
+                        updatedCount += res.count;
                     }
-                });
-                
-                if (res.count > 0) {
-                    updatedCount += res.count;
-                    if (updatedCount % 500 === 0) console.log(`Processed ${updatedCount} updates...`);
                 }
+            } catch (err) {
+                errorCount++;
             }
-        } catch (err) {
-            console.error(`Error updating dossier ${row.num_fact_caution}:`, err);
-            errorCount++;
-        }
+        }));
+        console.log(`Processed ${Math.min(i + chunkSize, details.length)} / ${details.length}...`);
     }
 
     console.log(`Synchronization finished.`);

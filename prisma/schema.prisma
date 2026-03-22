@@ -72,6 +72,7 @@ model dossiers_caution {
   updated_at                DateTime? @default(now())
 
   @@index([num_facture_caution])
+  @@index([num_avoir])
 }
 
 model cheques_emis {
