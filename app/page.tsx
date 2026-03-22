@@ -591,6 +591,16 @@ function HomePageInternal() {
                             <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.85rem' }}>Modification du dossier existant</p>
                         </div>
                     </div>
+                    {user?.role === 'ADMIN' && (
+                        <button type="button" onClick={doDelete} disabled={deleting} style={{ 
+                            background: '#fef2f2', color: '#ef4444', border: '1px solid #fca5a5', 
+                            padding: '0.5rem 1rem', borderRadius: '8px', display: 'flex', 
+                            alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem', fontWeight: 700,
+                            cursor: 'pointer', transition: 'all 0.2s'
+                        }}>
+                            <Trash2 size={16} /> {deleting ? 'Suppression...' : 'Supprimer ce dossier'}
+                        </button>
+                    )}
                 </div>
 
                 <div className="grid grid-cols-1" style={{ gap: '1.5rem' }}>
