@@ -64,13 +64,19 @@ export async function GET(request: Request) {
             etapeWhere['AND'] = conditions;
         }
 
-        // Filtre période réception
+        // 1. Détermination du champ de date pour le filtrage par période
+        let dateFilterField = 'date_reception';
+        if (etape && (ETAPE_FIELDS as readonly string[]).includes(etape)) {
+            dateFilterField = etape;
+        }
+
+        // 2. Construction du filtre de période
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const dateReceptionWhere: Record<string, any> = {};
+        const periodWhere: Record<string, any> = {};
         if (dateFrom || dateTo) {
-            dateReceptionWhere['date_reception'] = {};
-            if (dateFrom) dateReceptionWhere['date_reception']['gte'] = dateFrom;
-            if (dateTo) dateReceptionWhere['date_reception']['lte'] = dateTo;
+            periodWhere[dateFilterField] = {};
+            if (dateFrom) periodWhere[dateFilterField]['gte'] = dateFrom;
+            if (dateTo) periodWhere[dateFilterField]['lte'] = dateTo;
         }
 
         const hasFilters = Boolean(numFacture || numBl || client || transitaire || armateur || etape || dateFrom || dateTo);
@@ -83,7 +89,7 @@ export async function GET(request: Request) {
                 ...(transitaire && { transitaire_nom: { contains: transitaire } }),
                 ...(armateur && { armateur: armateur }),
                 ...etapeWhere,
-                ...dateReceptionWhere,
+                ...periodWhere,
             },
             select: {
                 id: true,

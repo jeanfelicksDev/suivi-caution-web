@@ -296,7 +296,12 @@ export default function HistoriquePage() {
                         {/* Ligne 2 : Période + Armateur + Étape + boutons */}
                         <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-end', marginBottom: '0.75rem' }}>
                             <div>
-                                <label>Période De Réception Du :</label>
+                                <label>
+                                    {filters.etape 
+                                        ? `Période de ${ETAPES.find(e => e.value === filters.etape)?.label || 'Traitement'} Du :`
+                                        : 'Période De Réception Du :'
+                                    }
+                                </label>
                                 <input type={filters.dateFrom ? "date" : "text"} name="dateFrom" value={filters.dateFrom} onChange={handleChange}
                                     onFocus={(e) => (e.target.type = "date")}
                                     onBlur={(e) => !filters.dateFrom && (e.target.type = "text")}

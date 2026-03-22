@@ -198,11 +198,7 @@ function NewDossierModal({
           <ModalSection title="PRISE EN COMPTE DE LA DEMANDE DE REMBOURSEMENT" accentColor="#0284c7">
             <div className="grid grid-cols-2">
               <Field label="Type Remboursement *">
-                <select name="type_remboursement" value={form.type_remboursement || ''} onChange={handleChange} className={form.type_remboursement ? "has-value" : ""} required>
-                  <option value="">—</option>
-                  <option value="CAUTION">CAUTION</option>
-                  <option value="TROP_PERCU">TROP PERÇU</option>
-                </select>
+                <input type="text" name="type_remboursement" value="CAUTION" readOnly style={{ fontWeight: 700, background: '#f1f5f9' }} />
               </Field>
               <Field label="N° Facture Caution">
                 <input type="text" name="num_facture_caution" value={form.num_facture_caution || ''} onChange={handleChange} style={{ fontWeight: 700, background: '#f1f5f9' }} readOnly />
@@ -614,11 +610,7 @@ function HomePageInternal() {
                     <Fieldset title="PRISE EN COMPTE DE LA DEMANDE DE REMBOURSEMENT" accentColor="#0284c7" bgTint="rgba(2, 132, 199, 0.02)">
                         <div className="grid grid-cols-4">
                             <Field label="Type Remboursement">
-                                <select name="type_remboursement" value={formData.type_remboursement || ''} onChange={handleChange}>
-                                    <option value="">—</option>
-                                    <option value="CAUTION">CAUTION</option>
-                                    <option value="TROP_PERCU">TROP PERÇU</option>
-                                </select>
+                                <input type="text" name="type_remboursement" value="CAUTION" readOnly style={{ fontWeight: 700, background: '#f8fafc' }} />
                             </Field>
                             <Field label="N° Facture Caution">
                                 <input type="text" value={formData.num_facture_caution || ''} style={{ fontWeight: 800, background: '#f8fafc' }} readOnly />
