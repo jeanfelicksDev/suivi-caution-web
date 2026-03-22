@@ -184,7 +184,7 @@ export default function FicheAvoir({ dossier, onClose }: Props) {
                 <div style={{ flex: 1, overflowY: 'auto', padding: '1rem' }}>
                     <div ref={printRef} style={{ fontFamily: 'Arial, sans-serif', fontSize: 11, color: '#000', maxWidth: 680, margin: '0 auto' }}>
                         <div style={{ textAlign: 'right', fontSize: '8px', color: '#666', marginBottom: '4px', fontWeight: 400 }}>
-                            Suivi-caution-Dsm est une application web entierement dévéloppé par Jean-Félix ZIAGOUE (Agent GSL/DSM-OOCL)
+                            Suivi-caution-Dsm 2.0 est une application web entierement dévéloppé par Jean-Félix ZIAGOUE (Agent AGL-OOCL/DSM)
                         </div>
 
                         {/* ── EN-TÊTE ── */}
