@@ -196,18 +196,6 @@ export default function HistoriquePage() {
     const fmt = (v: number | null) =>
         v != null ? v.toLocaleString('fr-FR') + ' FCFA' : '—';
 
-    const handleDelete = async (id: number) => {
-        if (!window.confirm('Voulez-vous vraiment supprimer ce dossier ?')) return;
-
-        try {
-            const res = await fetch(`/api/dossiers/${id}`, { method: 'DELETE' });
-            if (!res.ok) throw new Error('Erreur lors de la suppression');
-            setRows(prev => prev.filter(r => r.id !== id));
-        } catch (err) {
-            console.error(err);
-            alert('Erreur lors de la suppression du dossier.');
-        }
-    };
 
     const etapeLabel = ETAPES.find(e => e.value === filters.etape)?.label || '';
 
@@ -483,22 +471,7 @@ export default function HistoriquePage() {
                                                                 }}>
                                                                 <FileText size={14} />
                                                             </Link>
-                                                            <button 
-                                                                onClick={() => handleDelete(row.id)}
-                                                                title="Supprimer le dossier"
-                                                                style={{
-                                                                    display: 'inline-flex', alignItems: 'center',
-                                                                    cursor: 'pointer',
-                                                                    fontSize: '0.75rem', color: '#dc2626',
-                                                                    padding: '0.25rem 0.45rem',
-                                                                    border: '1px solid #fee2e2', borderRadius: '4px',
-                                                                    background: 'white', transition: 'all 0.2s'
-                                                                }}
-                                                                onMouseEnter={e => e.currentTarget.style.background = '#fef2f2'}
-                                                                onMouseLeave={e => e.currentTarget.style.background = 'white'}
-                                                            >
-                                                                <Trash2 size={14} />
-                                                            </button>
+
                                                         </div>
                                                     </td>
                                                 </tr>
