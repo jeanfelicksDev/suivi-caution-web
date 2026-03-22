@@ -116,10 +116,10 @@ export default function Dashboard() {
             </header>
 
             <div className="stat-grid" style={{ marginBottom: '2.5rem' }}>
-                <StatCard label="Total Dossiers Reçus" value={stats?.statsCards?.totalDossiers ?? "..."} period={periodText} trend="" trendUp={true} icon={<LayoutDashboard color="var(--accent)" />} valueColor="#4f46e5" />
-                <StatCard label="Dossiers Actifs" value={stats?.statsCards?.actifs ?? "..."} period={periodText} trend="" trendUp={false} icon={<Clock color="#f59e0b" />} valueColor="#f97316" />
-                <StatCard label="Clients" value={stats?.statsCards?.clientsUniques ?? "..."} period={periodText} trend="" trendUp={true} icon={<Users color="#3b82f6" />} valueColor="#3b82f6" />
-                <StatCard label="Taux de dossier clôturé (chèque)" value={(stats?.statsCards?.tauxRetour ?? "...") + "%"} period={periodText} trend="" trendUp={true} icon={<TrendingUp color="#10b981" />} valueColor="#ec4899" />
+                <StatCard label="Nbre de Dossiers Reçus" value={stats?.statsCards?.totalDossiers ?? "..."} period={periodText} trend="" trendUp={true} icon={<LayoutDashboard color="var(--accent)" />} valueColor="#4f46e5" />
+                <StatCard label="Dossiers en traitement" value={stats?.statsCards?.actifs ?? "..."} period={periodText} trend="" trendUp={false} icon={<Clock color="#f59e0b" />} valueColor="#f97316" />
+                <StatCard label="Clients/Transitaires" value={stats?.statsCards?.clientsUniques ?? "..."} period={periodText} trend="" trendUp={true} icon={<Users color="#3b82f6" />} valueColor="#3b82f6" />
+                <StatCard label="Dossiers reçus et traités" value={(stats?.statsCards?.tauxRetour ?? "...") + "%"} period={periodText} trend="" trendUp={true} icon={<TrendingUp color="#10b981" />} valueColor="#ec4899" />
             </div>
 
             {/*  Section Durées Moyennes */}
@@ -133,7 +133,7 @@ export default function Dashboard() {
                                     <Clock size={28} color="var(--accent)" />
                                 </div>
                                 <div>
-                                    <h3 style={{ margin: 0, fontSize: '1rem', color: 'var(--text-muted)' }}>Durée Moyen traitement du Dossier</h3>
+                                    <h3 style={{ margin: 0, fontSize: '1rem', color: 'var(--text-muted)' }}>Nbre de jour Calendaire pour traiter un dossier</h3>
                                     <p style={{ fontSize: '0.75rem', color: '#94a3b8', margin: 0 }}>Date de Réception → Date de Chèque (7j/7)</p>
                                     <p style={{ fontSize: '0.75rem', color: '#94a3b8', margin: '0.1rem 0 0 0' }}>Le temps d'attente du client avant de recevoir son chèque (jour fériés et week-end inclus)</p>
                                 </div>
@@ -149,7 +149,7 @@ export default function Dashboard() {
                                     <TrendingUp size={28} color="#10b981" />
                                 </div>
                                 <div>
-                                    <h3 style={{ margin: 0, fontSize: '1rem', color: 'var(--text-muted)' }}>Durée moyenne Nette du dossier</h3>
+                                    <h3 style={{ margin: 0, fontSize: '1rem', color: 'var(--text-muted)' }}>Nbre de jour Ouvrable pour traiter un dossier</h3>
                                     <p style={{ fontSize: '0.75rem', color: '#94a3b8', margin: 0 }}>Réception → Compta (Hors Fériés, WE, Suspendus...)</p>
                                     <p style={{ fontSize: '0.75rem', color: '#94a3b8', margin: '0.1rem 0 0 0' }}>sans week-end, jour férié, ...</p>
                                 </div>
@@ -163,7 +163,7 @@ export default function Dashboard() {
                     <div className="card">
                         <h3 style={{ marginBottom: '1.25rem', fontSize: '1.1rem', color: 'var(--primary)', borderBottom: '1px solid var(--border)', paddingBottom: '0.75rem' }}>
                             <Clock size={16} style={{ display: 'inline', marginRight: '0.5rem', transform: 'translateY(-2px)' }} />
-                            Temps Moyen mis (En Jours Ouvrés) :
+                            Temps moyen de traitement mis lors des étapes ci-dessous :
                         </h3>
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
                             {stats.stepAverages.map((avg: number, index: number) => (
