@@ -18,6 +18,41 @@ export async function GET(
             return NextResponse.json({ found: false });
         }
 
+        // Récupérer le numéro FNE du partenaire actif
+        let num_fne = null;
+        let nomPrincipal = dossier.transitaire_nom || dossier.client_nom;
+        if (dossier.transitaire_actif === 1 && dossier.transitaire_nom) {
+            nomPrincipal = dossier.transitaire_nom;
+        } else if (dossier.client_actif === 1 && dossier.client_nom) {
+            nomPrincipal = dossier.client_nom;
+        }
+        
+        if (nomPrincipal) {
+            const partenaire = await prisma.partenaires.findFirst({
+                where: { nom_partenaire: nomPrincipal }
+            });
+            if (partenaire && partenaire.num_fne) {
+                num_fne = partenaire.num_fne;
+            } else {
+                // Fallback pour les anciennes tables
+                const client = await prisma.clients.findFirst({
+                    where: { nom_client: nomPrincipal }
+                });
+                if (client && client.num_fne) {
+                    num_fne = client.num_fne;
+                } else {
+                    const transitaire = await prisma.transitaires.findFirst({
+                        where: { nom_transitaire: nomPrincipal }
+                    });
+                    if (transitaire && transitaire.num_fne_transitaire) {
+                        num_fne = transitaire.num_fne_transitaire;
+                    }
+                }
+            }
+        }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (dossier as any).num_fne = num_fne;
+
         // Vérifier si le chèque est dans la table Excel ou Access
         // On effectue la recherche sur le numéro de facture OU le numéro d'Avoir (si défini)
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

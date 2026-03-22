@@ -23,6 +23,7 @@ interface Dossier {
     type_rembt?: string | null;
     armateur?: string | null;
     num_bl?: string | null;
+    num_fne?: string | null;
 }
 
 interface Props {
@@ -226,7 +227,7 @@ export default function FicheAvoir({ dossier, onClose }: Props) {
                                 </tr>
                                 <tr>
                                     <td colSpan={2} style={{ ...cellStyle }}>
-                                        NUMERO DE COMPTE :
+                                        NUMERO DE COMPTE / FNE : <strong>{dossier.num_fne || '—'}</strong>
                                     </td>
                                 </tr>
                             </tbody>
