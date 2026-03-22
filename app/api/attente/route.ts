@@ -127,11 +127,14 @@ export async function GET(request: NextRequest) {
             const isMatch = debut && debut.trim() !== '' && (!fin || fin.trim() === '');
             if (!isMatch) return false;
 
-            // 2. Vérification "progressivité" : si une date POSTÉRIEURE dans le workflow est remplie,
-            // on considère que le dossier est déjà passé à l'étape suivante.
-            const finIndex = WORKFLOW_SEQUENCE.indexOf(config.dateFin);
-            if (finIndex !== -1) {
-                for (let i = finIndex + 1; i < WORKFLOW_SEQUENCE.length; i++) {
+            // 2. Vérification "progressivité" : si une date POSTÉRIEURE à dateDebut dans le
+            // workflow est remplie, on considère que le dossier a avancé dans le workflow.
+            // On part de debutIndex+1 (et non finIndex+1) pour aussi exclure les dossiers
+            // qui ont pris une autre branche (avoir, recouvrement, signature...) sans
+            // nécessairement remplir dateFin.
+            const debutIndex = WORKFLOW_SEQUENCE.indexOf(config.dateDebut);
+            if (debutIndex !== -1) {
+                for (let i = debutIndex + 1; i < WORKFLOW_SEQUENCE.length; i++) {
                     const field = WORKFLOW_SEQUENCE[i];
                     const val = (d as Record<string, any>)[field];
                     if (val && val.trim() !== '') return false; // Étape ultérieure déjà entamée/finie
@@ -140,6 +143,7 @@ export async function GET(request: NextRequest) {
 
             return true;
         });
+
 
         const result = filtered.map((d) => ({
             id: d.id,
