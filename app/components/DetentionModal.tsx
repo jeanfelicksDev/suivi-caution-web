@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { Plus, Trash2, Save, X, RefreshCw, FileText, AlertCircle, CheckCircle2 } from 'lucide-react';
+import FormattedNumberInput from './FormattedNumberInput';
 
 interface DetentionRow {
     id?: number;
@@ -200,10 +201,12 @@ export default function DetentionModal({ numFacture, onClose }: Props) {
                                                 style={{ width: '140px', padding: '0.4rem 0.5rem', border: '1px solid var(--border)', borderRadius: '6px', fontSize: '0.875rem' }} />
                                         </td>
                                         <td style={{ padding: '0.4rem 0.5rem' }}>
-                                            <input type="number" value={row.montant_facture ?? ''}
-                                                onChange={e => handleChange(idx, 'montant_facture', e.target.value ? parseFloat(e.target.value) : null)}
+                                            <FormattedNumberInput
+                                                value={row.montant_facture ?? null}
+                                                onChange={(val: number | null) => handleChange(idx, 'montant_facture', val)}
                                                 placeholder="0"
-                                                style={{ width: '130px', padding: '0.4rem 0.5rem', border: '1px solid var(--border)', borderRadius: '6px', fontSize: '0.875rem', textAlign: 'right' }} />
+                                                style={{ width: '130px', padding: '0.4rem 0.5rem', border: '1px solid var(--border)', borderRadius: '6px', fontSize: '0.875rem', textAlign: 'right' }} 
+                                            />
                                         </td>
                                         <td style={{ padding: '0.4rem 0.5rem' }}>
                                             <input type="text" value={row.commentaire || ''}

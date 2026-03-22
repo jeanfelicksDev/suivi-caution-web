@@ -15,6 +15,7 @@ import FicheAvoir from '@/app/components/FicheAvoir';
 import ArmateurSelect from '@/app/components/ArmateurSelect';
 import PartenaireCombobox from '@/app/components/PartenaireCombobox';
 import PartenaireModal from '@/app/components/PartenaireModal';
+import FormattedNumberInput from '@/app/components/FormattedNumberInput';
 import { useAuth } from '@/app/components/AuthProvider';
 
 interface Dossier {
@@ -202,7 +203,12 @@ function NewDossierModal({
                   placeholder="JJ/MM/AAAA" className={form.date_facture ? 'has-value' : ''} required />
               </Field>
               <Field label="Montant Caution (FCFA) *">
-                <input type="number" name="montant_caution" value={form.montant_caution ?? ''} onChange={handleChange} required />
+                <FormattedNumberInput
+                  name="montant_caution"
+                  value={form.montant_caution ?? null}
+                  onChange={(val: number | null) => setForm(prev => ({ ...prev, montant_caution: val }))}
+                  required
+                />
               </Field>
               <Field label="Numéro du BL *">
                 <input type="text" name="num_bl" value={form.num_bl || ''} onChange={handleChange} placeholder="—" required />
@@ -597,7 +603,11 @@ function HomePageInternal() {
                                 <input type={formData.date_facture ? "date" : "text"} name="date_facture" value={formData.date_facture || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_facture && (e.target.type = "text")} />
                             </Field>
                             <Field label="Montant Caution (Fcfa)">
-                                <input type="number" name="montant_caution" value={formData.montant_caution ?? ''} onChange={handleChange} />
+                                <FormattedNumberInput
+                                    name="montant_caution"
+                                    value={formData.montant_caution ?? null}
+                                    onChange={(val: number | null) => setFormData(prev => ({ ...prev, montant_caution: val }))}
+                                />
                             </Field>
                             <Field label="Numéro Du Bl">
                                 <input type="text" name="num_bl" value={formData.num_bl || ''} onChange={handleChange} />
@@ -761,7 +771,7 @@ function HomePageInternal() {
                                 <input type={formData.date_piece_caisse ? "date" : "text"} name="date_piece_caisse" value={formData.date_piece_caisse || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_piece_caisse && (e.target.type = "text")} />
                             </Field>
                             <Field label="Montant Final (FCFA)">
-                                <input type="number" name="montant_final" value={formData.montant_final ?? 0} readOnly 
+                                <input type="text" name="montant_final" value={formData.montant_final != null ? new Intl.NumberFormat('fr-FR').format(formData.montant_final) : '0'} readOnly 
                                     style={{ background: '#f8fafc', color: '#1e293b', fontWeight: 800, border: '1px solid #cbd5e1' }}
                                     title="Calculé automatiquement : Caution - (Détentions + Recouvrements)" />
                             </Field>
