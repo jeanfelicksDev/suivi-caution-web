@@ -44,11 +44,19 @@ export default function PartenaireCombobox({
         const handleClickOutside = (event: MouseEvent) => {
             if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
                 setOpen(false);
+                if (query !== value) {
+                    const exactMatch = options.find(p => p.nom_partenaire === query);
+                    if (exactMatch) {
+                        onChange(exactMatch.nom_partenaire);
+                    } else {
+                        setQuery(value || '');
+                    }
+                }
             }
         };
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
+    }, [query, value, options, onChange]);
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -91,7 +99,9 @@ export default function PartenaireCombobox({
                     onChange={(e) => {
                         const val = e.target.value.toUpperCase();
                         setQuery(val);
-                        onChange(val);
+                        if (val === '') {
+                            onChange('');
+                        }
                         setOpen(true);
                     }}
                     onFocus={() => setOpen(true)}
