@@ -110,7 +110,7 @@ model partenaires {
   nom_partenaire    String
   est_client        Int       @default(0) // Case à cocher (0 ou 1)
   est_transitaire   Int       @default(0) // Case à cocher (0 ou 1)
-  num_fne           String?   @unique
+  num_fne           String?
   telephone         String?
   email             String?
   created_at        DateTime? @default(now())
