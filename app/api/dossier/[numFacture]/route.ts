@@ -10,7 +10,10 @@ export async function GET(
     try {
         const dossier = await prisma.dossiers_caution.findFirst({
             where: {
-                num_facture_caution: numFacture
+                num_facture_caution: {
+                    equals: numFacture,
+                    mode: 'insensitive'
+                }
             }
         });
 
@@ -152,8 +155,14 @@ export async function PATCH(
 
         // Find the dossier first
         const dossier = await prisma.dossiers_caution.findFirst({
-            where: { num_facture_caution: numFacture }
+            where: {
+                num_facture_caution: {
+                    equals: numFacture,
+                    mode: 'insensitive'
+                }
+            }
         });
+
 
         if (!dossier) {
             return NextResponse.json({ error: 'Dossier non trouvé' }, { status: 404 });
@@ -186,8 +195,14 @@ export async function DELETE(
     const { numFacture } = await params;
     try {
         const dossier = await prisma.dossiers_caution.findFirst({
-            where: { num_facture_caution: numFacture }
+            where: {
+                num_facture_caution: {
+                    equals: numFacture,
+                    mode: 'insensitive'
+                }
+            }
         });
+
 
         if (!dossier) {
             return NextResponse.json({ error: 'Dossier non trouvé' }, { status: 404 });
