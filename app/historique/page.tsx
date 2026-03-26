@@ -8,6 +8,7 @@ import TransmissionReport from '@/app/components/TransmissionReport';
 import PartenaireCombobox from '@/app/components/PartenaireCombobox';
 import PartenaireSelect from '@/app/components/PartenaireSelect';
 import PartenaireModal from '@/app/components/PartenaireModal';
+import ComptaReport from '@/app/components/ComptaReport';
 import * as XLSX from 'xlsx';
 
 interface DossierRow {
@@ -148,6 +149,7 @@ export default function HistoriquePage() {
     const [searched, setSearched] = useState(initSearched);
     const [error, setError] = useState<string | null>(null);
     const [showTransmissionReport, setShowTransmissionReport] = useState(false);
+    const [showComptaReport, setShowComptaReport] = useState(false);
     const [partenaireModal, setPartenaireModal] = useState<{ open: boolean; id?: number }>({ open: false });
 
     // Sauvegarde automatique dans sessionStorage à chaque changement
@@ -518,6 +520,32 @@ export default function HistoriquePage() {
                                     <Download size={18} /> Exporter en Excel
                                 </button>
 
+                                {/* Rapport Transmission Compta (PDF) - Apparaît UNIQUEMENT si l'étape correspondante est sélectionnée */}
+                                {filters.etape === 'date_transmission_compta' && (
+                                    <button 
+                                        type="button" 
+                                        onClick={() => {
+                                            if (!filters.dateFrom || !filters.dateTo) {
+                                                alert("Veuillez renseigner une période (De / Au) pour générer le rapport PDF.");
+                                                return;
+                                            }
+                                            setShowComptaReport(true);
+                                        }}
+                                        className="btn btn-secondary"
+                                        style={{ 
+                                            background: '#f97316', color: 'white', border: 'none',
+                                            display: 'flex', alignItems: 'center', gap: '0.6rem',
+                                            padding: '0.75rem 2rem', borderRadius: '8px', fontWeight: 800,
+                                            boxShadow: '0 4px 12px rgba(249, 115, 22, 0.2)',
+                                            transition: 'transform 0.2s', margin: '0 5px'
+                                        }}
+                                        onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+                                        onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+                                    >
+                                        <Printer size={18} /> Bordereau Transmission Compta (PDF)
+                                    </button>
+                                )}
+
                                 {/* Rapport Dossier Ligne (Conditionnel) */}
                                 {((filters.etape === 'date_reception' || filters.etape === 'date_1er_signature' || filters.etape === 'date_2e_signature' || !filters.etape)) && (
                                     <button 
@@ -563,6 +591,14 @@ export default function HistoriquePage() {
                     to={filters.dateTo}
                     type={filters.etape === 'date_1er_signature' ? 'sig1' : filters.etape === 'date_2e_signature' ? 'sig2' : (filters.etape === 'date_reception' ? 'reception' : 'all')}
                     onClose={() => setShowTransmissionReport(false)}
+                />
+            )}
+
+            {showComptaReport && (
+                <ComptaReport 
+                    from={filters.dateFrom}
+                    to={filters.dateTo}
+                    onClose={() => setShowComptaReport(false)}
                 />
             )}
 

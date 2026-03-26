@@ -60,3 +60,4 @@ diag_dates.js
 clear_users.js
 
 .vercel
+.env*.local

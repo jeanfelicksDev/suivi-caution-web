@@ -32,7 +32,6 @@ const COLS: { key: keyof ChequeRow; label: string }[] = [
     { key: 'date_cheque', label: 'Date Chèque' },
     { key: 'date_rex', label: 'MANDATAIRE' },
     { key: 'beneficiaire', label: 'Bénéficiaire' },
-    { key: 'commentaire', label: 'Commentaire' },
 ];
 
 /* ── Page ────────────────────────────────────────────────── */
@@ -52,23 +51,67 @@ export default function ChequesPage() {
     const [selectedListLabel, setSelectedListLabel] = useState<string | null>(null);
     const [loadingListe, setLoadingListe] = useState(false);
 
+    /* Synchronisation de la date des lignes avec la date de la liste sélectionnée */
+    useEffect(() => {
+        if (!selectedListId && rows.length > 0 && dateListeRecu) {
+            setRows(prev => prev.map(r => ({
+                ...r,
+                date_cheque: dateListeRecu,
+                date_liste_recu: dateListeRecu
+            })));
+        }
+    }, [dateListeRecu, selectedListId]);
+
     /* Chargement de la liste des dates au montage */
     useEffect(() => { fetchListes(); }, []);
 
     const fetchListes = async () => {
         try {
             const res = await fetch('/api/cheques/listes');
-            if (res.ok) setListes(await res.json());
-        } catch { /* silencieux */ }
+            if (res.ok) {
+                const data = await res.json();
+                console.log('Fetched listes:', data);
+                setListes(data);
+            } else {
+                console.error('Fetch listes failed:', res.status, await res.text());
+            }
+        } catch (err) {
+            console.error('Fetch listes error:', err);
+        }
     };
 
     /* Parsing Excel (client-side) */
-    const parseFile = useCallback((file: File) => {
+    const parseFile = useCallback(async (file: File) => {
         setFileName(file.name);
         setResult(null);
         setImportError(null);
         setSelectedListId(null);
         setSelectedListLabel(null);
+
+        // Si PDF, on passe par l'API de parsing
+        if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
+            const formData = new FormData();
+            formData.append('file', file);
+            try {
+                const res = await fetch('/api/cheques/parse-pdf', {
+                    method: 'POST',
+                    body: formData,
+                });
+                if (!res.ok) throw new Error(await res.text());
+                const data = await res.json();
+                const chequesWithDate = (data.cheques || []).map((c: any) => ({
+                    ...c,
+                    date_cheque: dateListeRecu || '',
+                    date_liste_recu: dateListeRecu || ''
+                }));
+                setRows(chequesWithDate);
+            } catch (err) {
+                setImportError(`Erreur lors du parsing PDF: ${String(err)}`);
+            }
+            return;
+        }
+
+        // Sinon (Excel/CSV), on garde la logique client
         const reader = new FileReader();
         reader.onload = (e) => {
             const data = new Uint8Array(e.target!.result as ArrayBuffer);
@@ -97,8 +140,8 @@ export default function ChequesPage() {
                     num_cheque: String(flat['numcheque'] ?? flat['cheque'] ?? '').trim(),
                     montant: flat['montant'] != null ? parseFloat(String(flat['montant'])) || null : null,
                     banque: String(flat['banque'] ?? '').trim(),
-                    date_cheque: dateVal('datecheque') || dateVal('datecheque'),
-                    date_rex: dateVal('daterex') || dateVal('daterecep') || dateVal('daterception'),
+                    date_cheque: dateVal('datecheque') || dateListeRecu || '',
+                    date_rex: String(flat['mandataire'] ?? flat['nommandataire'] ?? flat['daterex'] ?? '').trim(),
                     beneficiaire: String(flat['beneficiaire'] ?? flat['bénéficiaire'] ?? '').trim(),
                     commentaire: String(flat['commentaire'] ?? flat['observation'] ?? '').trim(),
                 };
@@ -133,7 +176,28 @@ export default function ChequesPage() {
                 body: JSON.stringify(payload),
             });
             if (!res.ok) throw new Error(await res.text());
-            setResult(await res.json());
+            const data = await res.json();
+            setResult(data);
+
+            // Gérer les rejets (lignes dont la facture n'existe pas)
+            if (data.rejected && data.rejected.length > 0) {
+                const header = `RAPPORT D'IMPORTATION DES CHEQUES DU ${new Date().toLocaleDateString()}\n`;
+                const subHeader = `Chèques ignorés car le dossier n'existe pas dans la base de données :\n`;
+                const content = data.rejected.map((r: any) => 
+                    `- Facture: ${r.num_facture} | Chèque: ${r.num_cheque ?? 'N/A'} | Montant: ${r.montant ?? 'N/A'} | Motif: ${r.motif}`
+                ).join('\n');
+                
+                const blob = new Blob([header + subHeader + content], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `chèques_rejetés_${dateListeRecu || 'import'}.txt`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+
             fetchListes(); // rafraîchir le panneau droit
         } catch (err) {
             setImportError(String(err));
@@ -167,22 +231,35 @@ export default function ChequesPage() {
         if (fileRef.current) fileRef.current.value = '';
     };
 
+    const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+
     /* Suppression d'une liste entière */
     const handleDeleteList = async (e: React.MouseEvent, list: ListeInfo) => {
-        e.stopPropagation(); // Éviter de sélectionner la liste
-        if (!confirm(`Voulez-vous vraiment supprimer toute la liste "${list.label}" ?\nCette action est irréversible.`)) return;
+        e.stopPropagation();
+        
+        if (deleteConfirmId !== list.id) {
+            setDeleteConfirmId(list.id);
+            // Auto-reset après 3 secondes si pas de confirmation
+            setTimeout(() => setDeleteConfirmId(null), 3000);
+            return;
+        }
+
+        setDeleteConfirmId(null);
         
         try {
             const res = await fetch(`/api/cheques/listes?listId=${encodeURIComponent(list.id)}`, { method: 'DELETE' });
             if (res.ok) {
+                // Mise à jour optimiste de l'interface
+                setListes(prev => prev.filter(l => l.id !== list.id));
+                
                 if (selectedListId === list.id) {
                     setSelectedListId(null);
                     setSelectedListLabel(null);
                     setRows([]);
                 }
-                fetchListes();
             } else {
-                alert('Erreur lors de la suppression.');
+                const errData = await res.json();
+                alert(`Erreur lors de la suppression : ${errData.error || 'Erreur inconnue'}`);
             }
         } catch {
             alert('Erreur réseau.');
@@ -237,7 +314,7 @@ export default function ChequesPage() {
                     Chèques Émis
                 </h1>
                 <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>
-                    Chargez la liste Excel des chèques émis par la comptabilité et déversez-la dans la base de données.
+                    Chargez la liste PDF ou Excel des chèques émis par la comptabilité et déversez-la dans la base de données.
                 </p>
             </header>
 
@@ -282,7 +359,7 @@ export default function ChequesPage() {
                                 <FileSpreadsheet size={22} color="var(--accent)" />
                                 <div style={{ flex: 1 }}>
                                     <div style={{ fontWeight: 700, fontSize: '0.85rem' }}>
-                                        {fileName || 'Glissez le fichier Excel ici ou cliquez pour choisir'}
+                                        {fileName || 'Glissez le fichier PDF ou Excel ici ou cliquez pour choisir'}
                                     </div>
                                     {fileName && (
                                         <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
@@ -291,7 +368,7 @@ export default function ChequesPage() {
                                     )}
                                 </div>
                                 <Upload size={18} color="var(--text-muted)" />
-                                <input ref={fileRef} type="file" accept=".xlsx,.xls,.csv" style={{ display: 'none' }} onChange={handleFile} />
+                                <input ref={fileRef} type="file" accept=".pdf,.xlsx,.xls,.csv" style={{ display: 'none' }} onChange={handleFile} />
                             </div>
                         </div>
 
@@ -304,8 +381,18 @@ export default function ChequesPage() {
                                 </button>
                             )}
                             {rows.length > 0 && !selectedListId && (
-                                <button className="btn btn-primary" onClick={doImport} disabled={importing}
-                                    style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem', padding: '0.4rem 1.2rem' }}>
+                                <button 
+                                    className="btn btn-primary" 
+                                    onClick={doImport} 
+                                    disabled={importing || !dateListeRecu}
+                                    style={{ 
+                                        display: 'flex', alignItems: 'center', gap: '0.4rem', 
+                                        fontSize: '0.85rem', padding: '0.4rem 1.2rem',
+                                        opacity: (!dateListeRecu || importing) ? 0.5 : 1,
+                                        cursor: (!dateListeRecu || importing) ? 'not-allowed' : 'pointer'
+                                    }}
+                                    title={!dateListeRecu ? "Veuillez renseigner la Date Liste Reçu avant de déverser dans la base" : ""}
+                                >
                                     {importing
                                         ? <><RefreshCw size={14} style={{ animation: 'spin 1s linear infinite' }} /> Import en cours...</>
                                         : <><Send size={14} /> Déverser dans la base ({rows.length} lignes)</>
@@ -338,14 +425,14 @@ export default function ChequesPage() {
                         )}
                     </section>
 
-                    {/* Tableau de prévisualisation / consultation */}
-                    {rows.length > 0 && (
+                    {/* Tableau uniquement si consultation (selectedListId) ou après import réussi (result) */}
+                    {(selectedListId || (result && rows.length > 0)) && (
                         <section className="card" style={{ padding: 0, overflow: 'hidden' }}>
                             <div style={{ padding: '0.65rem 1rem', background: 'var(--primary-light)', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                 <span style={{ fontWeight: 700, fontSize: '0.82rem', color: 'var(--text-muted)' }}>
                                     {selectedListId
                                         ? <>Import : <strong>{selectedListLabel}</strong> — {rows.length} ligne{rows.length > 1 ? 's' : ''}</>
-                                        : <>{rows.length} ligne{rows.length > 1 ? 's' : ''} — <em>Aperçu avant import</em></>
+                                        : <>{rows.length} ligne{rows.length > 1 ? 's' : ''} — <em>Données importées</em></>
                                     }
                                 </span>
                             </div>
@@ -393,11 +480,22 @@ export default function ChequesPage() {
 
                 {/* ── COLONNE DROITE : historique des listes ─────── */}
                 <aside className="card" style={{ padding: 0, overflow: 'hidden', position: 'sticky', top: '1rem' }}>
-                    <div style={{ padding: '0.75rem 1rem', background: 'var(--primary)', color: 'white', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <List size={16} />
-                        <span style={{ fontWeight: 700, fontSize: '0.82rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                            Chèques Disponibles
-                        </span>
+                    <div style={{ padding: '0.75rem 1rem', background: 'var(--primary)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            <List size={16} />
+                            <span style={{ fontWeight: 700, fontSize: '0.82rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                                Chèques Disponibles
+                            </span>
+                        </div>
+                        <button 
+                            onClick={() => fetchListes()} 
+                            style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer', opacity: 0.8 }}
+                            onMouseEnter={e => e.currentTarget.style.opacity = '1'}
+                            onMouseLeave={e => e.currentTarget.style.opacity = '0.8'}
+                            title="Actualiser la liste"
+                        >
+                            <RefreshCw size={14} />
+                        </button>
                     </div>
 
                     {listes.length === 0 ? (
@@ -410,26 +508,31 @@ export default function ChequesPage() {
                             {listes.map((l) => {
                                 const isActive = selectedListId === l.id;
                                 return (
-                                    <button
+                                    <div
                                         key={l.id}
-                                        onClick={() => handleSelectList(l)}
                                         style={{
-                                            width: '100%', textAlign: 'left', border: 'none', cursor: 'pointer',
-                                            padding: '0.65rem 1rem',
-                                            borderBottom: '1px solid var(--border)',
+                                            width: '100%', borderBottom: '1px solid var(--border)',
                                             background: isActive ? 'var(--accent)' : 'transparent',
-                                            color: isActive ? 'white' : 'var(--text-main)',
                                             transition: 'background 0.15s',
-                                            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                                            display: 'flex', alignItems: 'center',
                                             position: 'relative'
                                         }}
                                         onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = 'var(--primary-light)'; }}
                                         onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = 'transparent'; }}
                                     >
-                                        <div style={{ flex: 1, marginRight: '0.5rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                            <div style={{ fontWeight: 700, fontSize: '0.83rem' }}>{l.label}</div>
-                                        </div>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                        <button
+                                            onClick={() => handleSelectList(l)}
+                                            style={{
+                                                flex: 1, textAlign: 'left', border: 'none', cursor: 'pointer',
+                                                padding: '0.65rem 0.5rem 0.65rem 1rem',
+                                                background: 'transparent',
+                                                color: isActive ? 'white' : 'var(--text-main)',
+                                                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                                            }}
+                                        >
+                                            <div style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                                <div style={{ fontWeight: 700, fontSize: '0.83rem' }}>{l.label}</div>
+                                            </div>
                                             <span style={{
                                                 fontSize: '0.72rem', fontWeight: 700,
                                                 background: isActive ? 'rgba(255,255,255,0.25)' : 'var(--primary-light)',
@@ -438,20 +541,36 @@ export default function ChequesPage() {
                                             }}>
                                                 {l.count}
                                             </span>
-                                            <button 
-                                                onClick={(e) => handleDeleteList(e, l)}
-                                                style={{ 
-                                                    background: 'none', border: 'none', cursor: 'pointer', 
-                                                    color: isActive ? 'white' : '#ef4444', 
-                                                    padding: '0.2rem', display: 'flex', alignItems: 'center',
-                                                    opacity: 0.6
-                                                }}
-                                                title="Supprimer toute la liste"
-                                            >
-                                                <Trash2 size={14} />
-                                            </button>
-                                        </div>
-                                    </button>
+                                        </button>
+
+                                        <button 
+                                            onClick={(e) => handleDeleteList(e, l)}
+                                            style={{ 
+                                                background: 'none', border: 'none', cursor: 'pointer', 
+                                                color: isActive ? 'white' : '#ef4444', 
+                                                padding: '0.65rem 0.75rem', 
+                                                display: 'flex', alignItems: 'center',
+                                                opacity: 0.8,
+                                                transition: 'all 0.2s',
+                                                zIndex: 10
+                                            }}
+                                            onMouseEnter={e => {
+                                                e.currentTarget.style.opacity = '1';
+                                                e.currentTarget.style.transform = 'scale(1.2)';
+                                            }}
+                                            onMouseLeave={e => {
+                                                e.currentTarget.style.opacity = '0.8';
+                                                e.currentTarget.style.transform = 'scale(1)';
+                                            }}
+                                            title="Supprimer toute la liste"
+                                        >
+                                            {deleteConfirmId === l.id ? (
+                                                <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#f87171' }}>Confirmer ?</span>
+                                            ) : (
+                                                <Trash2 size={16} />
+                                            )}
+                                        </button>
+                                    </div>
                                 );
                             })}
                         </div>

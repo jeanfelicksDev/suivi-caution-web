@@ -185,7 +185,7 @@ export default function FicheAvoir({ dossier, onClose }: Props) {
                 <div style={{ flex: 1, overflowY: 'auto', padding: '1rem' }}>
                     <div ref={printRef} style={{ fontFamily: 'Arial, sans-serif', fontSize: 11, color: '#000', maxWidth: 680, margin: '0 auto' }}>
                         <div style={{ textAlign: 'right', fontSize: '8px', color: '#666', marginBottom: '4px', fontWeight: 400 }}>
-                            Suivi-caution-Dsm 2.0 est une application web entierement dévéloppé par Jean-Félix ZIAGOUE (Agent AGL-OOCL/DSM)
+                            Suivi-Caution-Web 2.0 Dévéloppé par Jean-Félix ZIAGOUE de AGL/DSM
                         </div>
 
                         {/* ── EN-TÊTE ── */}
@@ -227,7 +227,7 @@ export default function FicheAvoir({ dossier, onClose }: Props) {
                                 </tr>
                                 <tr>
                                     <td colSpan={2} style={{ ...cellStyle }}>
-                                        NUMERO DE COMPTE / FNE : <strong>{dossier.num_fne || '—'}</strong>
+                                        NUMERO DE COMPTE / FNE : <strong>{(!dossier.num_fne || dossier.num_fne === 'VIDE-176' || dossier.num_fne.startsWith('VIDE-')) ? '—' : dossier.num_fne}</strong>
                                     </td>
                                 </tr>
                             </tbody>
@@ -260,7 +260,7 @@ export default function FicheAvoir({ dossier, onClose }: Props) {
                                 <tr>
                                     <td style={{ ...cellStyle }}>
                                         <CB checked={motif === 'autre'} /> AUTRE (précisez) :{' '}
-                                        {motif === 'autre' ? <em>{dossier.commentaire_validation || ''}</em> : ''}
+                                        <em>{dossier.commentaire_validation || 'ANNULATION DE LA CAUTION'}</em>
                                     </td>
                                 </tr>
                             </tbody>
@@ -290,7 +290,7 @@ export default function FicheAvoir({ dossier, onClose }: Props) {
                                         <div style={{ marginTop: 6 }}>IMPACT SUR MARGE:</div>
                                         <div style={{ marginTop: 6 }}>Proposée par : <strong>{dossier.propose_par || '—'}</strong></div>
                                         <div style={{ marginTop: 6 }}>
-                                            Commentaires : <em>{dossier.commentaire_validation || '—'}</em>
+                                            Commentaires : <em>{dossier.commentaire_validation || 'ANNULATION DE LA CAUTION'}</em>
                                         </div>
                                     </td>
                                     <td style={{ ...cellStyle, textAlign: 'right', verticalAlign: 'top' }}>

@@ -30,10 +30,16 @@ export default function Dashboard() {
         if (armateur) params.append('armateur', armateur);
         if (params.toString()) url += `?${params.toString()}`;
 
-        const res = await fetch(url);
-        if (res.ok) {
-            const data = await res.json();
-            setStats(data);
+        try {
+            const res = await fetch(url);
+            if (res.ok) {
+                const data = await res.json();
+                setStats(data);
+            } else {
+                console.error('Stats API error:', res.status, await res.text());
+            }
+        } catch (error) {
+            console.error('Stats fetch failed:', error);
         }
     }, [startDate, endDate, armateur]);
 

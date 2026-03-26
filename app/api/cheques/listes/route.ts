@@ -12,6 +12,7 @@ export async function GET(request: Request) {
     try {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const p = prisma as any;
+        console.log('GET /api/cheques/listes called, listId:', listId);
 
         if (listId) {
             if (listId.startsWith('excel_')) {
@@ -46,6 +47,7 @@ export async function GET(request: Request) {
                 return NextResponse.json(rows.map((r: any) => {
                     const dInfo = r.num_fact_caution ? dossierMap.get(r.num_fact_caution) : null;
                     return {
+                        id: r.id,
                         num_facture_caution: r.num_fact_caution,
                         num_cheque: r.num_cheque,
                         montant: r.montant_cheque,
@@ -64,6 +66,9 @@ export async function GET(request: Request) {
         const groupedExcel = await p.cheques_emis.groupBy({
             by: ['date_liste_recu'],
             _count: { id: true },
+            where: {
+                date_liste_recu: { not: null }
+            }
         });
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -72,7 +77,7 @@ export async function GET(request: Request) {
             label: `Liste du ${g.date_liste_recu}`,
             count: g._count.id,
             sortDate: new Date(g.date_liste_recu || '1970-01-01').getTime()
-        }));
+        })).filter((l: any) => l.count > 0);
 
         // Listes Access
         const dispos = await p.cheque_disponible.findMany({
@@ -101,7 +106,7 @@ export async function GET(request: Request) {
                 count: accessCounts[d.num_dispo_cheque] || 0,
                 sortDate: d.date_cheqq ? d.date_cheqq.getTime() : 0
             };
-        });
+        }).filter((l: any) => l.count > 0);
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const allLists = [...excelLists, ...accessLists].sort((a: any, b: any) => b.sortDate - a.sortDate);
@@ -129,12 +134,60 @@ export async function DELETE(request: Request) {
         if (listId) {
             if (listId.startsWith('excel_')) {
                 const date = listId.replace('excel_', '');
+                
+                // 1. Récupérer les factures concernées avant de supprimer
+                const impactedCheques = await p.cheques_emis.findMany({
+                    where: { date_liste_recu: date },
+                    select: { num_facture_caution: true }
+                });
+                const factures = impactedCheques.map((c: any) => c.num_facture_caution).filter(Boolean);
+
+                // 2. Nettoyer les dossiers correspondants
+                if (factures.length > 0) {
+                    await prisma.dossiers_caution.updateMany({
+                        where: { num_facture_caution: { in: factures } },
+                        data: {
+                            num_cheque: null,
+                            banque: null,
+                            date_cheque: null,
+                            montant_final: null,
+                            date_retour_compta: null,
+                            date_cloture: null,
+                            updated_at: new Date()
+                        }
+                    });
+                }
+
+                // 3. Supprimer les chèques
                 await p.cheques_emis.deleteMany({
                     where: { date_liste_recu: date }
                 });
                 return NextResponse.json({ success: true, message: `Liste Excel du ${date} supprimée.` });
             } else if (listId.startsWith('access_')) {
                 const numDispo = parseInt(listId.replace('access_', ''), 10);
+
+                // Même chose pour Access
+                const impactedDetails = await p.cheque_details.findMany({
+                    where: { num_dispo_cheque: numDispo },
+                    select: { num_facture_caution: true }
+                });
+                const factures = impactedDetails.map((c: any) => c.num_facture_caution).filter(Boolean);
+
+                if (factures.length > 0) {
+                    await prisma.dossiers_caution.updateMany({
+                        where: { num_facture_caution: { in: factures } },
+                        data: {
+                            num_cheque: null,
+                            banque: null,
+                            date_cheque: null,
+                            montant_final: null,
+                            date_retour_compta: null,
+                            date_cloture: null,
+                            updated_at: new Date()
+                        }
+                    });
+                }
+
                 // Supprimer les détails d'abord
                 await p.cheque_details.deleteMany({
                     where: { num_dispo_cheque: numDispo }

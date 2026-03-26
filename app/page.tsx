@@ -413,7 +413,9 @@ function HomePageInternal() {
       const data = await res.json();
       setSearchResult(data);
       if (data.found) {
-        setFormData(data.dossier);
+        const dossier = data.dossier;
+        if (!dossier.commentaire_avoir) dossier.commentaire_avoir = 'ANNULATION DE LA CAUTION';
+        setFormData(dossier);
       } else {
         setShowModal(true);
       }
@@ -735,7 +737,13 @@ function HomePageInternal() {
                             </Field>
                             <div style={{ gridColumn: 'span 4' }}>
                                 <Field label="Commentaire Avoir">
-                                    <textarea name="commentaire_avoir" value={formData.commentaire_avoir || ''} onChange={handleChange} placeholder="..." style={{ minHeight: '40px' }} />
+                                    <textarea 
+                                        name="commentaire_avoir" 
+                                        value={formData.commentaire_avoir || 'ANNULATION DE LA CAUTION'} 
+                                        onChange={handleChange} 
+                                        placeholder="..." 
+                                        style={{ minHeight: '40px' }} 
+                                    />
                                 </Field>
                             </div>
                         </div>
