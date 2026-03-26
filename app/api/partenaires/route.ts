@@ -14,7 +14,6 @@ export async function GET(request: Request) {
                 ...(type === 'transitaire' ? { est_transitaire: 1 } : {}),
             },
             orderBy: { nom_partenaire: 'asc' },
-            take: 50
         });
         return NextResponse.json(parts);
     } catch (error) {

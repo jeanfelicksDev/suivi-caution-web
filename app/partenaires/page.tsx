@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Search, Plus, Edit2, ShieldCheck, User, Building } from 'lucide-react';
+import { Search, Plus, Edit2, ShieldCheck, User, Building, Trash2 } from 'lucide-react';
 import PartenaireModal from '../components/PartenaireModal';
 
 interface Partenaire {
@@ -21,6 +21,8 @@ export default function PartenairesPage() {
 
     const [modalOpen, setModalOpen] = useState(false);
     const [selectedId, setSelectedId] = useState<number | undefined>(undefined);
+    const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null);
+    const [deleting, setDeleting] = useState(false);
 
     const loadPartenaires = async () => {
         setLoading(true);
@@ -55,8 +57,23 @@ export default function PartenairesPage() {
         setModalOpen(true);
     };
 
-    const handleModalSuccess = () => {
-        loadPartenaires();
+    const handleModalSuccess = () => { loadPartenaires(); };
+
+    const handleDelete = async (id: number) => {
+        if (deleteConfirmId !== id) {
+            setDeleteConfirmId(id);
+            setTimeout(() => setDeleteConfirmId(null), 3000);
+            return;
+        }
+        setDeleteConfirmId(null);
+        setDeleting(true);
+        try {
+            const res = await fetch(`/api/partenaires/${id}`, { method: 'DELETE' });
+            if (res.ok) {
+                setPartenaires(prev => prev.filter(p => p.id_partenaire !== id));
+            }
+        } catch (e) { console.error(e); }
+        finally { setDeleting(false); }
     };
 
     return (
@@ -66,6 +83,11 @@ export default function PartenairesPage() {
                     <h1 style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '1.75rem', fontWeight: 800, margin: 0, color: 'var(--primary)' }}>
                         <ShieldCheck size={28} color="var(--accent)" />
                         Gestion des Partenaires
+                        {!loading && (
+                            <span style={{ fontSize: '0.85rem', fontWeight: 700, background: 'var(--accent)', color: 'white', borderRadius: '20px', padding: '0.2rem 0.75rem', marginLeft: '0.25rem' }}>
+                                {partenaires.length} partenaire{partenaires.length > 1 ? 's' : ''}
+                            </span>
+                        )}
                     </h1>
                     <p style={{ color: 'var(--text-muted)', margin: '0.25rem 0 0 0' }}>Gérez la liste de vos clients et transitaires</p>
                 </div>
@@ -98,10 +120,11 @@ export default function PartenairesPage() {
             </div>
 
             <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
-                <div style={{ overflowX: 'auto' }}>
+                <div style={{ overflowX: 'auto', overflowY: 'auto', maxHeight: 'calc(100vh - 260px)' }}>
                     <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                        <thead>
+                        <thead style={{ position: 'sticky', top: 0, zIndex: 10 }}>
                             <tr style={{ background: '#f8fafc', borderBottom: '2px solid #e2e8f0' }}>
+                                <th style={{ padding: '0.75rem 0.5rem 0.75rem 1rem', fontSize: '0.7rem', textTransform: 'uppercase', color: '#94a3b8', width: 48, textAlign: 'center' }}>#</th>
                                 <th style={{ padding: '1rem', fontSize: '0.75rem', textTransform: 'uppercase', color: '#64748b' }}>Nom Partenaire</th>
                                 <th style={{ padding: '1rem', fontSize: '0.75rem', textTransform: 'uppercase', color: '#64748b' }}>Type</th>
                                 <th style={{ padding: '1rem', fontSize: '0.75rem', textTransform: 'uppercase', color: '#64748b' }}>Numéro FNE</th>
@@ -119,8 +142,9 @@ export default function PartenairesPage() {
                                     <td colSpan={5} style={{ padding: '2rem', textAlign: 'center', color: '#94a3b8' }}>Aucun partenaire trouvé.</td>
                                 </tr>
                             ) : (
-                                partenaires.map((p) => (
+                                partenaires.map((p, index) => (
                                     <tr key={p.id_partenaire} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                                        <td style={{ padding: '0.75rem 0.5rem', textAlign: 'center', color: '#94a3b8', fontSize: '0.75rem', fontWeight: 600 }}>{index + 1}</td>
                                         <td style={{ padding: '1rem', fontWeight: 600 }}>{p.nom_partenaire}</td>
                                         <td style={{ padding: '1rem' }}>
                                             <div style={{ display: 'flex', gap: '0.4rem' }}>
@@ -140,15 +164,34 @@ export default function PartenairesPage() {
                                         <td style={{ padding: '1rem', fontSize: '0.8rem', color: '#64748b' }}>
                                             {p.telephone ? <div>📞 {p.telephone}</div> : '—'}
                                         </td>
-                                        <td style={{ padding: '1rem', textAlign: 'right' }}>
-                                            <button
-                                                onClick={() => handleEdit(p.id_partenaire)}
-                                                className="btn btn-secondary"
-                                                style={{ padding: '0.4rem', display: 'inline-flex' }}
-                                                title="Modifier"
-                                            >
-                                                <Edit2 size={16} color="var(--accent)" />
-                                            </button>
+                                        <td style={{ padding: '0.75rem', textAlign: 'right' }}>
+                                            <div style={{ display: 'flex', gap: '0.4rem', justifyContent: 'flex-end' }}>
+                                                <button
+                                                    onClick={() => handleEdit(p.id_partenaire)}
+                                                    className="btn btn-secondary"
+                                                    style={{ padding: '0.4rem', display: 'inline-flex' }}
+                                                    title="Modifier"
+                                                >
+                                                    <Edit2 size={15} color="var(--accent)" />
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDelete(p.id_partenaire)}
+                                                    disabled={deleting}
+                                                    style={{
+                                                        padding: deleteConfirmId === p.id_partenaire ? '0.4rem 0.6rem' : '0.4rem',
+                                                        display: 'inline-flex', alignItems: 'center', gap: '0.3rem',
+                                                        borderRadius: '6px', border: '1px solid #fca5a5', cursor: 'pointer',
+                                                        background: deleteConfirmId === p.id_partenaire ? '#dc2626' : '#fee2e2',
+                                                        color: deleteConfirmId === p.id_partenaire ? 'white' : '#b91c1c',
+                                                        fontWeight: 700, fontSize: '0.72rem',
+                                                        transition: 'all 0.2s', whiteSpace: 'nowrap'
+                                                    }}
+                                                    title="Supprimer"
+                                                >
+                                                    <Trash2 size={14} />
+                                                    {deleteConfirmId === p.id_partenaire && <span>Confirmer ?</span>}
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 ))

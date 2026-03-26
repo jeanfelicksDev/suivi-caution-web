@@ -24,3 +24,19 @@ export async function PATCH(
     });
     return NextResponse.json(updated);
 }
+
+export async function DELETE(
+    request: Request,
+    { params }: { params: Promise<{ id: string }> }
+) {
+    const { id } = await params;
+    try {
+        await prisma.partenaires.delete({
+            where: { id_partenaire: parseInt(id) }
+        });
+        return NextResponse.json({ success: true });
+    } catch (error: unknown) {
+        const msg = error instanceof Error ? error.message : String(error);
+        return NextResponse.json({ error: msg }, { status: 500 });
+    }
+}
