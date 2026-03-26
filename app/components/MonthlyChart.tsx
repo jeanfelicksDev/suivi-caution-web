@@ -69,7 +69,7 @@ export default function MonthlyChart({ armateur = '', startDate = '', endDate = 
         </div>
     );
 
-    const max = Math.max(...data.reçus, ...data.chèques, 1);
+    const max = Math.max(...(data.reçus || [0]), ...(data.chèques || [0]), 1);
     const gridLines = 5;
     const chartH = H - PAD.top - PAD.bottom;
     const chartW = W - PAD.left - PAD.right;

@@ -46,20 +46,22 @@ export async function GET(request: Request) {
         const chèques: number[] = [];
 
         for (const m of months) {
-            const start = new Date(m.year, m.month - 1, 1);
-            const end = new Date(m.year, m.month, 1);
+            const startStr = `${m.year}-${String(m.month).padStart(2, '0')}-01`;
+            const endMonth = m.month === 12 ? 1 : m.month + 1;
+            const endYear = m.month === 12 ? m.year + 1 : m.year;
+            const endStr = `${endYear}-${String(endMonth).padStart(2, '0')}-01`;
 
             const totalRecu = await prisma.dossiers_caution.count({
                 where: {
                     ...armateurFilter,
-                    date_reception: { gte: start, lt: end }
+                    date_reception: { gte: startStr, lt: endStr }
                 }
             });
 
             const totalCheque = await prisma.dossiers_caution.count({
                 where: {
                     ...armateurFilter,
-                    date_cheque: { gte: start, lt: end }
+                    date_cheque: { gte: startStr, lt: endStr }
                 }
             });
 
