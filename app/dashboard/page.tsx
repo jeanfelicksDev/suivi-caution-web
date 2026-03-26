@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { LayoutDashboard, TrendingUp, Users, Clock, ArrowUpRight, ArrowDownRight, RotateCcw } from 'lucide-react';
 import ArmateurSelect from '@/app/components/ArmateurSelect';
+import MonthlyChart from '@/app/components/MonthlyChart';
 
 interface StatsData {
     avgGlobal: number;
@@ -21,6 +22,7 @@ export default function Dashboard() {
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
     const [armateur, setArmateur] = useState('');
+    const [appliedFilters, setAppliedFilters] = useState({ armateur: '', startDate: '', endDate: '' });
 
     const fetchStats = React.useCallback(async () => {
         let url = '/api/dashboard/stats';
@@ -35,6 +37,7 @@ export default function Dashboard() {
             if (res.ok) {
                 const data = await res.json();
                 setStats(data);
+                setAppliedFilters({ armateur, startDate, endDate });
             } else {
                 console.error('Stats API error:', res.status, await res.text());
             }
@@ -188,6 +191,15 @@ export default function Dashboard() {
                                 </div>
                             ))}
                         </div>
+                    </div>
+
+                    {/* Graphique 12 mois */}
+                    <div className="card" style={{ marginTop: '1.5rem' }}>
+                        <h3 style={{ marginBottom: '1.25rem', fontSize: '1.1rem', color: 'var(--primary)', borderBottom: '1px solid var(--border)', paddingBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            <TrendingUp size={16} />
+                            Évolution mensuelle — 12 derniers mois
+                        </h3>
+                        <MonthlyChart armateur={appliedFilters.armateur} startDate={appliedFilters.startDate} endDate={appliedFilters.endDate} />
                     </div>
 
                 </div>
