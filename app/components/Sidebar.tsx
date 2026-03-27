@@ -16,16 +16,22 @@ const Sidebar = () => {
     const isAdmin = user.role === 'ADMIN';
     const perms = user.permissions || [];
 
-    const canRead = isAdmin || perms.includes('READ_ONLY');
-    const canManageCheques = isAdmin || perms.includes('IMPORT_CHEQUES');
+    const canReadAttente = isAdmin || perms.includes('ATTENTE');
+    const canReadDashboard = isAdmin || perms.includes('DASHBOARD');
+    const canReadDossier = isAdmin || perms.includes('DOSSIER_READ') || perms.includes('DOSSIER_WRITE');
+    const canReadHistorique = isAdmin || perms.includes('HISTORIQUE_READ') || perms.includes('HISTORIQUE_WRITE');
+    const canReadPartenaires = isAdmin || perms.includes('PARTENAIRE_READ') || perms.includes('PARTENAIRE_WRITE');
+    const canReadCheques = isAdmin || perms.includes('CHEQUE_READ') || perms.includes('CHEQUE_WRITE');
+    // S'il n'a aucune permission (aucune case cochée), il a accès à la consultation client par défaut
+    const canReadConsultation = isAdmin || perms.includes('CONSULTATION_CLIENT') || perms.length === 0;
 
     const menuItems = [
-        { name: 'Tableau de Bord', icon: <LayoutDashboard size={20} />, path: '/dashboard', show: canRead },
-        { name: 'Nouveau Dossier & Rech.', icon: <Search size={20} />, path: '/', show: true },
-        { name: 'Consultation Client', icon: <Eye size={20} />, path: '/consultation', show: true },
-        { name: 'Historique', icon: <Database size={20} />, path: '/historique', show: canRead },
-        { name: 'Partenaires', icon: <ShieldCheck size={20} />, path: '/partenaires', show: true },
-        { name: 'Chèques Émis', icon: <CreditCard size={20} />, path: '/cheques', show: canManageCheques },
+        { name: 'Tableau de Bord', icon: <LayoutDashboard size={20} />, path: '/dashboard', show: canReadDashboard },
+        { name: 'Nouveau Dossier & Rech.', icon: <Search size={20} />, path: '/', show: canReadDossier },
+        { name: 'Consultation Client', icon: <Eye size={20} />, path: '/consultation', show: canReadConsultation },
+        { name: 'Historique', icon: <Database size={20} />, path: '/historique', show: canReadHistorique },
+        { name: 'Partenaires', icon: <ShieldCheck size={20} />, path: '/partenaires', show: canReadPartenaires },
+        { name: 'Chèques Émis', icon: <CreditCard size={20} />, path: '/cheques', show: canReadCheques },
     ];
 
 
@@ -51,7 +57,7 @@ const Sidebar = () => {
                 ))}
 
                 {/* Tiroir En Attente */}
-                {canRead && (
+                {canReadAttente && (
                     <div style={{ marginTop: '0.5rem', borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '0.5rem' }}>
                         <AttenteTiroir />
                     </div>
