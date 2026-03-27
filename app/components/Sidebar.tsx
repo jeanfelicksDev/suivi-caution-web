@@ -14,7 +14,7 @@ const Sidebar = () => {
     if (!user) return null;
 
     const isAdmin = user.role === 'ADMIN';
-    const perms = user.permissions || [];
+    const perms = Array.isArray(user.permissions) ? user.permissions : [];
 
     const canReadAttente = isAdmin || perms.includes('ATTENTE');
     const canReadDashboard = isAdmin || perms.includes('DASHBOARD');
