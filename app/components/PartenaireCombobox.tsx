@@ -18,6 +18,7 @@ interface PartenaireComboboxProps {
     name: string;
     formData: any;
     required?: boolean;
+    disabled?: boolean;
 }
 
 export default function PartenaireCombobox({
@@ -27,7 +28,8 @@ export default function PartenaireCombobox({
     onManage,
     placeholder = "Sélectionner...",
     name,
-    required = false
+    required = false,
+    disabled = false
 }: PartenaireComboboxProps) {
     const [open, setOpen] = useState(false);
     const [query, setQuery] = useState(value || '');
@@ -104,53 +106,58 @@ export default function PartenaireCombobox({
                         }
                         setOpen(true);
                     }}
-                    onFocus={() => setOpen(true)}
+                    onFocus={() => !disabled && setOpen(true)}
                     placeholder={placeholder}
-                    style={{ width: '100%', paddingRight: '45px' }}
+                    style={{ width: '100%', paddingRight: '45px', cursor: disabled ? 'not-allowed' : 'text', background: disabled ? '#f8fafc' : 'white' }}
                     required={required}
+                    disabled={disabled}
                 />
                 <div style={{ position: 'absolute', right: '5px', display: 'flex', gap: '2px', alignItems: 'center' }}>
-                    <button
-                        type="button"
-                        onClick={() => setOpen(!open)}
-                        style={{ background: 'none', border: 'none', padding: '4px', cursor: 'pointer', color: '#94a3b8' }}
-                    >
-                        <ChevronDown size={14} style={{ transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
-                    </button>
-                    {onManage && (
-                        <button
-                            type="button"
-                            onClick={async () => {
-                                if (!query) {
-                                    onManage(undefined);
-                                    return;
-                                }
-                                const exactMatch = options.find(p => p.nom_partenaire === query);
-                                if (exactMatch) {
-                                    onManage(exactMatch.id_partenaire);
-                                } else {
-                                    setLoading(true);
-                                    try {
-                                        const res = await fetch(`/api/partenaires?type=${type}&query=${encodeURIComponent(query)}`);
-                                        if (res.ok) {
-                                            const data = await res.json();
-                                            const match = data.find((p: Partenaire) => p.nom_partenaire === query);
-                                            onManage(match ? match.id_partenaire : undefined);
-                                        } else {
+                    {!disabled && (
+                        <>
+                            <button
+                                type="button"
+                                onClick={() => setOpen(!open)}
+                                style={{ background: 'none', border: 'none', padding: '4px', cursor: 'pointer', color: '#94a3b8' }}
+                            >
+                                <ChevronDown size={14} style={{ transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
+                            </button>
+                            {onManage && (
+                                <button
+                                    type="button"
+                                    onClick={async () => {
+                                        if (!query) {
                                             onManage(undefined);
+                                            return;
                                         }
-                                    } catch {
-                                        onManage(undefined);
-                                    } finally {
-                                        setLoading(false);
-                                    }
-                                }
-                            }}
-                            style={{ background: 'none', border: 'none', padding: '4px', cursor: 'pointer', color: 'var(--accent)' }}
-                            title="Gérer partenaires"
-                        >
-                            <User size={14} />
-                        </button>
+                                        const exactMatch = options.find(p => p.nom_partenaire === query);
+                                        if (exactMatch) {
+                                            onManage(exactMatch.id_partenaire);
+                                        } else {
+                                            setLoading(true);
+                                            try {
+                                                const res = await fetch(`/api/partenaires?type=${type}&query=${encodeURIComponent(query)}`);
+                                                if (res.ok) {
+                                                    const data = await res.json();
+                                                    const match = data.find((p: Partenaire) => p.nom_partenaire === query);
+                                                    onManage(match ? match.id_partenaire : undefined);
+                                                } else {
+                                                    onManage(undefined);
+                                                }
+                                            } catch {
+                                                onManage(undefined);
+                                            } finally {
+                                                setLoading(false);
+                                            }
+                                        }
+                                    }}
+                                    style={{ background: 'none', border: 'none', padding: '4px', cursor: 'pointer', color: 'var(--accent)' }}
+                                    title="Gérer partenaires"
+                                >
+                                    <User size={14} />
+                                </button>
+                            )}
+                        </>
                     )}
                 </div>
             </div>

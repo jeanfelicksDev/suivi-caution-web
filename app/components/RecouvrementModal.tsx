@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { Plus, Trash2, Save, X, RefreshCw, FileText, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { useAuth } from './AuthProvider';
 
 interface RecouvrementRow {
     id?: number;
@@ -31,6 +32,8 @@ export default function RecouvrementModal({ numFacture, onClose }: Props) {
     const [saving, setSaving] = useState(false);
     const [hasSavedChanges, setHasSavedChanges] = useState(false);
     const [notification, setNotification] = useState<{ type: 'success' | 'error'; msg: string } | null>(null);
+    const { user } = useAuth();
+    const canWrite = user?.role === 'ADMIN' || (Array.isArray(user?.permissions) && user?.permissions.includes('DOSSIER_WRITE'));
 
     const showNotif = (type: 'success' | 'error', msg: string) => {
         setNotification({ type, msg });
@@ -40,7 +43,9 @@ export default function RecouvrementModal({ numFacture, onClose }: Props) {
     const fetchData = async () => {
         setLoading(true);
         try {
-            const res = await fetch(`/api/recouvrement?numFacture=${encodeURIComponent(numFacture)}`);
+            const res = await fetch(`/api/recouvrement?numFacture=${encodeURIComponent(numFacture)}`, {
+                headers: { 'x-user-id': user?.id.toString() || '' }
+            });
             const data = await res.json();
             setRows(data.map((r: RecouvrementRow) => ({ ...r, isNew: false, isDirty: false })));
         } catch {
@@ -67,7 +72,10 @@ export default function RecouvrementModal({ numFacture, onClose }: Props) {
         if (!row.isNew && row.id) {
             if (!confirm('Supprimer cette ligne ?')) return;
             try {
-                const res = await fetch(`/api/recouvrement?id=${row.id}`, { method: 'DELETE' });
+                const res = await fetch(`/api/recouvrement?id=${row.id}`, { 
+                    method: 'DELETE',
+                    headers: { 'x-user-id': user?.id.toString() || '' }
+                });
                 if (!res.ok) throw new Error();
                 showNotif('success', 'Ligne supprimée.');
                 await fetchData();
@@ -95,9 +103,23 @@ export default function RecouvrementModal({ numFacture, onClose }: Props) {
                     montant: row.montant,
                 };
                 if (row.isNew) {
-                    await fetch('/api/recouvrement', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                    await fetch('/api/recouvrement', { 
+                        method: 'POST', 
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'x-user-id': user?.id.toString() || ''
+                        }, 
+                        body: JSON.stringify(payload) 
+                    });
                 } else {
-                    await fetch('/api/recouvrement', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                    await fetch('/api/recouvrement', { 
+                        method: 'PUT', 
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'x-user-id': user?.id.toString() || ''
+                        }, 
+                        body: JSON.stringify(payload) 
+                    });
                 }
             }
             showNotif('success', `${dirtyOrNew.length} ligne(s) enregistrée(s) avec succès.`);
@@ -191,19 +213,23 @@ export default function RecouvrementModal({ numFacture, onClose }: Props) {
                                             <input type="text" value={row.libelle || ''}
                                                 onChange={e => handleChange(idx, 'libelle', e.target.value)}
                                                 placeholder="Ex: Frais de transport"
-                                                style={{ width: '100%', padding: '0.5rem', border: '1px solid var(--border)', borderRadius: '6px', fontSize: '0.875rem' }} />
+                                                disabled={!canWrite}
+                                                style={{ width: '100%', padding: '0.5rem', border: '1px solid var(--border)', borderRadius: '6px', fontSize: '0.875rem', background: !canWrite ? '#f8fafc' : 'white' }} />
                                         </td>
                                         <td style={{ padding: '0.6rem 0.5rem', width: '200px' }}>
                                             <input type="number" value={row.montant ?? ''}
                                                 onChange={e => handleChange(idx, 'montant', e.target.value ? parseFloat(e.target.value) : null)}
                                                 placeholder="0"
-                                                style={{ width: '100%', padding: '0.5rem', border: '1px solid var(--border)', borderRadius: '6px', fontSize: '0.875rem', textAlign: 'right' }} />
+                                                disabled={!canWrite}
+                                                style={{ width: '100%', padding: '0.5rem', border: '1px solid var(--border)', borderRadius: '6px', fontSize: '0.875rem', textAlign: 'right', background: !canWrite ? '#f8fafc' : 'white' }} />
                                         </td>
                                         <td style={{ padding: '0.6rem 0.5rem', width: '50px', textAlign: 'center' }}>
-                                            <button onClick={() => removeRow(idx)}
-                                                style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '0.3rem', borderRadius: '4px', display: 'inline-flex', alignItems: 'center' }}>
-                                                <Trash2 size={18} />
-                                            </button>
+                                            {canWrite && (
+                                                <button onClick={() => removeRow(idx)}
+                                                    style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '0.3rem', borderRadius: '4px', display: 'inline-flex', alignItems: 'center' }}>
+                                                    <Trash2 size={18} />
+                                                </button>
+                                            )}
                                         </td>
                                     </tr>
                                 ))}
@@ -230,20 +256,24 @@ export default function RecouvrementModal({ numFacture, onClose }: Props) {
                     display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                     background: '#f8fafc'
                 }}>
-                    <button onClick={addRow}
-                        style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', background: 'white', border: '1px solid var(--border)', borderRadius: '6px', padding: '0.5rem 1rem', cursor: 'pointer', fontWeight: 700, fontSize: '0.85rem' }}>
-                        <Plus size={16} /> Ajouter une ligne
-                    </button>
+                    {canWrite ? (
+                        <button onClick={addRow}
+                            style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', background: 'white', border: '1px solid var(--border)', borderRadius: '6px', padding: '0.5rem 1rem', cursor: 'pointer', fontWeight: 700, fontSize: '0.85rem' }}>
+                            <Plus size={16} /> Ajouter une ligne
+                        </button>
+                    ) : <div></div>}
                     <div style={{ display: 'flex', gap: '0.75rem' }}>
                         <button onClick={() => onClose(hasSavedChanges)}
                             style={{ background: 'white', border: '1px solid var(--border)', borderRadius: '6px', padding: '0.5rem 1rem', cursor: 'pointer', fontWeight: 700, fontSize: '0.85rem' }}>
-                            Fermer
+                            {canWrite ? 'Fermer' : 'Quitter'}
                         </button>
-                        <button onClick={saveAll} disabled={saving}
-                            style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', background: '#14b8a6', color: 'white', border: 'none', borderRadius: '6px', padding: '0.5rem 1.25rem', cursor: 'pointer', fontWeight: 800, fontSize: '0.85rem' }}>
-                            {saving ? <RefreshCw size={15} style={{ animation: 'spin 1s linear infinite' }} /> : <Save size={15} />}
-                            Enregistrer
-                        </button>
+                        {canWrite && (
+                            <button onClick={saveAll} disabled={saving}
+                                style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', background: '#14b8a6', color: 'white', border: 'none', borderRadius: '6px', padding: '0.5rem 1.25rem', cursor: 'pointer', fontWeight: 800, fontSize: '0.85rem' }}>
+                                {saving ? <RefreshCw size={15} style={{ animation: 'spin 1s linear infinite' }} /> : <Save size={15} />}
+                                Enregistrer
+                            </button>
+                        )}
                     </div>
                 </div>
             </div>

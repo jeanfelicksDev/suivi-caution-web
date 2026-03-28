@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { checkPermission } from '@/lib/auth-server';
 
 interface ChequeRow {
   date_liste_recu?: string;
@@ -16,6 +17,10 @@ interface ChequeRow {
 /** POST /api/cheques/import — Reçoit un tableau JSON parsé depuis Excel et l'insère */
 export async function POST(request: Request) {
   try {
+    const userId = request.headers.get('x-user-id') || undefined;
+    if (!await checkPermission(userId, 'CHEQUE_WRITE')) {
+        return NextResponse.json({ error: 'Permission refusée' }, { status: 403 });
+    }
     const body: ChequeRow[] = await request.json();
 
     if (!Array.isArray(body) || body.length === 0) {

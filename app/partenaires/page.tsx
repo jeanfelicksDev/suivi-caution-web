@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Search, Plus, Edit2, ShieldCheck, User, Building, Trash2 } from 'lucide-react';
+import { Search, Plus, Edit2, ShieldCheck, User, Building, Trash2, Eye } from 'lucide-react';
 import PartenaireModal from '../components/PartenaireModal';
+import { useAuth } from '../components/AuthProvider';
 
 interface Partenaire {
     id_partenaire: number;
@@ -23,6 +24,10 @@ export default function PartenairesPage() {
     const [selectedId, setSelectedId] = useState<number | undefined>(undefined);
     const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null);
     const [deleting, setDeleting] = useState(false);
+    const { user } = useAuth();
+    const perms = Array.isArray(user?.permissions) ? user?.permissions : [];
+    const isAdmin = user?.role === 'ADMIN';
+    const canWritePartenaire = isAdmin || perms.includes('PARTENAIRE_WRITE');
 
     const loadPartenaires = async () => {
         setLoading(true);
@@ -68,7 +73,10 @@ export default function PartenairesPage() {
         setDeleteConfirmId(null);
         setDeleting(true);
         try {
-            const res = await fetch(`/api/partenaires/${id}`, { method: 'DELETE' });
+            const res = await fetch(`/api/partenaires/${id}`, { 
+                method: 'DELETE',
+                headers: { 'x-user-id': user?.id.toString() || '' }
+            });
             if (res.ok) {
                 setPartenaires(prev => prev.filter(p => p.id_partenaire !== id));
             }
@@ -91,10 +99,12 @@ export default function PartenairesPage() {
                     </h1>
                     <p style={{ color: 'var(--text-muted)', margin: '0.25rem 0 0 0' }}>Gérez la liste de vos clients et transitaires</p>
                 </div>
-                <button onClick={handleCreate} className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <Plus size={18} />
-                    Nouveau Partenaire
-                </button>
+                {canWritePartenaire && (
+                    <button onClick={handleCreate} className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <Plus size={18} />
+                        Nouveau Partenaire
+                    </button>
+                )}
             </div>
 
             <div className="card" style={{ marginBottom: '1.5rem', padding: '1rem', display: 'flex', gap: '1rem', alignItems: 'center', background: 'white' }}>
@@ -170,27 +180,29 @@ export default function PartenairesPage() {
                                                     onClick={() => handleEdit(p.id_partenaire)}
                                                     className="btn btn-secondary"
                                                     style={{ padding: '0.4rem', display: 'inline-flex' }}
-                                                    title="Modifier"
+                                                    title={canWritePartenaire ? "Modifier" : "Consulter"}
                                                 >
-                                                    <Edit2 size={15} color="var(--accent)" />
+                                                    {canWritePartenaire ? <Edit2 size={15} color="var(--accent)" /> : <Eye size={15} color="#94a3b8" />}
                                                 </button>
-                                                <button
-                                                    onClick={() => handleDelete(p.id_partenaire)}
-                                                    disabled={deleting}
-                                                    style={{
-                                                        padding: deleteConfirmId === p.id_partenaire ? '0.4rem 0.6rem' : '0.4rem',
-                                                        display: 'inline-flex', alignItems: 'center', gap: '0.3rem',
-                                                        borderRadius: '6px', border: '1px solid #fca5a5', cursor: 'pointer',
-                                                        background: deleteConfirmId === p.id_partenaire ? '#dc2626' : '#fee2e2',
-                                                        color: deleteConfirmId === p.id_partenaire ? 'white' : '#b91c1c',
-                                                        fontWeight: 700, fontSize: '0.72rem',
-                                                        transition: 'all 0.2s', whiteSpace: 'nowrap'
-                                                    }}
-                                                    title="Supprimer"
-                                                >
-                                                    <Trash2 size={14} />
-                                                    {deleteConfirmId === p.id_partenaire && <span>Confirmer ?</span>}
-                                                </button>
+                                                {canWritePartenaire && (
+                                                    <button
+                                                        onClick={() => handleDelete(p.id_partenaire)}
+                                                        disabled={deleting}
+                                                        style={{
+                                                            padding: deleteConfirmId === p.id_partenaire ? '0.4rem 0.6rem' : '0.4rem',
+                                                            display: 'inline-flex', alignItems: 'center', gap: '0.3rem',
+                                                            borderRadius: '6px', border: '1px solid #fca5a5', cursor: 'pointer',
+                                                            background: deleteConfirmId === p.id_partenaire ? '#dc2626' : '#fee2e2',
+                                                            color: deleteConfirmId === p.id_partenaire ? 'white' : '#b91c1c',
+                                                            fontWeight: 700, fontSize: '0.72rem',
+                                                            transition: 'all 0.2s', whiteSpace: 'nowrap'
+                                                        }}
+                                                        title="Supprimer"
+                                                    >
+                                                        <Trash2 size={14} />
+                                                        {deleteConfirmId === p.id_partenaire && <span>Confirmer ?</span>}
+                                                    </button>
+                                                )}
                                             </div>
                                         </td>
                                     </tr>

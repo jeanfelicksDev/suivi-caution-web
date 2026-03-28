@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Upload, FileSpreadsheet, Send, RefreshCw, CheckCircle2, AlertTriangle, CalendarDays, List, X, Trash2 } from 'lucide-react';
 import * as XLSX from 'xlsx';
+import { useAuth } from '../components/AuthProvider';
 
 /* ── Types ───────────────────────────────────────────────── */
 interface ChequeRow {
@@ -50,6 +51,10 @@ export default function ChequesPage() {
     const [selectedListId, setSelectedListId] = useState<string | null>(null);
     const [selectedListLabel, setSelectedListLabel] = useState<string | null>(null);
     const [loadingListe, setLoadingListe] = useState(false);
+    const { user } = useAuth();
+    const perms = Array.isArray(user?.permissions) ? user?.permissions : [];
+    const isAdmin = user?.role === 'ADMIN';
+    const canWriteCheque = isAdmin || perms.includes('CHEQUE_WRITE');
 
     /* Synchronisation de la date des lignes avec la date de la liste sélectionnée */
     useEffect(() => {
@@ -172,7 +177,10 @@ export default function ChequesPage() {
             const payload = rows.map(r => ({ ...r, date_liste_recu: dateListeRecu }));
             const res = await fetch('/api/cheques/import', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'x-user-id': user?.id.toString() || ''
+                },
                 body: JSON.stringify(payload),
             });
             if (!res.ok) throw new Error(await res.text());
@@ -247,7 +255,10 @@ export default function ChequesPage() {
         setDeleteConfirmId(null);
         
         try {
-            const res = await fetch(`/api/cheques/listes?listId=${encodeURIComponent(list.id)}`, { method: 'DELETE' });
+            const res = await fetch(`/api/cheques/listes?listId=${encodeURIComponent(list.id)}`, { 
+                method: 'DELETE',
+                headers: { 'x-user-id': user?.id.toString() || '' }
+            });
             if (res.ok) {
                 // Mise à jour optimiste de l'interface
                 setListes(prev => prev.filter(l => l.id !== list.id));
@@ -288,7 +299,10 @@ export default function ChequesPage() {
                  return;
             }
 
-            const res = await fetch(`/api/cheques/listes?id=${id}`, { method: 'DELETE' });
+            const res = await fetch(`/api/cheques/listes?id=${id}`, { 
+                method: 'DELETE',
+                headers: { 'x-user-id': user?.id.toString() || '' }
+            });
             if (res.ok) {
                 const newRows = [...rows];
                 newRows.splice(index, 1);
@@ -342,64 +356,65 @@ export default function ChequesPage() {
                             </div>
 
                             {/* Zone drag & drop */}
-                            <div
-                                onClick={() => fileRef.current?.click()}
-                                onDragOver={e => { e.preventDefault(); setDragging(true); }}
-                                onDragLeave={() => setDragging(false)}
-                                onDrop={handleDrop}
-                                style={{
-                                    border: `2px dashed ${dragging ? 'var(--accent)' : 'var(--border)'}`,
-                                    borderRadius: '4px',
-                                    padding: '0.75rem 1rem',
-                                    cursor: 'pointer',
-                                    background: dragging ? '#f0f9ff' : 'var(--primary-light)',
-                                    display: 'flex', alignItems: 'center', gap: '0.75rem',
-                                    transition: 'all 0.2s',
-                                }}>
-                                <FileSpreadsheet size={22} color="var(--accent)" />
-                                <div style={{ flex: 1 }}>
-                                    <div style={{ fontWeight: 700, fontSize: '0.85rem' }}>
-                                        {fileName || 'Glissez le fichier PDF ou Excel ici ou cliquez pour choisir'}
-                                    </div>
-                                    {fileName && (
-                                        <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                                            {rows.length} ligne{rows.length > 1 ? 's' : ''} détectée{rows.length > 1 ? 's' : ''}
+                                <div
+                                    onClick={() => canWriteCheque && fileRef.current?.click()}
+                                    onDragOver={e => { e.preventDefault(); canWriteCheque && setDragging(true); }}
+                                    onDragLeave={() => setDragging(false)}
+                                    onDrop={handleDrop}
+                                    style={{
+                                        border: `2px dashed ${dragging ? 'var(--accent)' : 'var(--border)'}`,
+                                        borderRadius: '4px',
+                                        padding: '0.75rem 1rem',
+                                        cursor: canWriteCheque ? 'pointer' : 'not-allowed',
+                                        background: dragging ? '#f0f9ff' : 'var(--primary-light)',
+                                        display: 'flex', alignItems: 'center', gap: '0.75rem',
+                                        transition: 'all 0.2s',
+                                        opacity: canWriteCheque ? 1 : 0.6
+                                    }}>
+                                    <FileSpreadsheet size={22} color="var(--accent)" />
+                                    <div style={{ flex: 1 }}>
+                                        <div style={{ fontWeight: 700, fontSize: '0.85rem' }}>
+                                            {!canWriteCheque ? 'Lecture seule (Importation désactivée)' : (fileName || 'Glissez le fichier PDF ou Excel ici ou cliquez pour choisir')}
                                         </div>
-                                    )}
+                                        {fileName && (
+                                            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                                                {rows.length} ligne{rows.length > 1 ? 's' : ''} détectée{rows.length > 1 ? 's' : ''}
+                                            </div>
+                                        )}
+                                    </div>
+                                    <Upload size={18} color="var(--text-muted)" />
+                                    <input ref={fileRef} type="file" accept=".pdf,.xlsx,.xls,.csv" style={{ display: 'none' }} onChange={handleFile} disabled={!canWriteCheque} />
                                 </div>
-                                <Upload size={18} color="var(--text-muted)" />
-                                <input ref={fileRef} type="file" accept=".pdf,.xlsx,.xls,.csv" style={{ display: 'none' }} onChange={handleFile} />
                             </div>
-                        </div>
 
-                        {/* Boutons */}
-                        <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end', alignItems: 'center' }}>
-                            {(rows.length > 0 || result) && (
-                                <button className="btn btn-secondary" onClick={resetAll}
-                                    style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem', padding: '0.4rem 1rem' }}>
-                                    <X size={14} /> Réinitialiser
-                                </button>
-                            )}
-                            {rows.length > 0 && !selectedListId && (
-                                <button 
-                                    className="btn btn-primary" 
-                                    onClick={doImport} 
-                                    disabled={importing || !dateListeRecu}
-                                    style={{ 
-                                        display: 'flex', alignItems: 'center', gap: '0.4rem', 
-                                        fontSize: '0.85rem', padding: '0.4rem 1.2rem',
-                                        opacity: (!dateListeRecu || importing) ? 0.5 : 1,
-                                        cursor: (!dateListeRecu || importing) ? 'not-allowed' : 'pointer'
-                                    }}
-                                    title={!dateListeRecu ? "Veuillez renseigner la Date Liste Reçu avant de déverser dans la base" : ""}
-                                >
-                                    {importing
-                                        ? <><RefreshCw size={14} style={{ animation: 'spin 1s linear infinite' }} /> Import en cours...</>
-                                        : <><Send size={14} /> Déverser dans la base ({rows.length} lignes)</>
-                                    }
-                                </button>
-                            )}
-                        </div>
+                            {/* Boutons */}
+                            <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end', alignItems: 'center' }}>
+                                {(rows.length > 0 || result) && (
+                                    <button className="btn btn-secondary" onClick={resetAll}
+                                        style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem', padding: '0.4rem 1rem' }}>
+                                        <X size={14} /> {canWriteCheque ? 'Réinitialiser' : 'Fermer la vue'}
+                                    </button>
+                                )}
+                                {rows.length > 0 && !selectedListId && canWriteCheque && (
+                                    <button 
+                                        className="btn btn-primary" 
+                                        onClick={doImport} 
+                                        disabled={importing || !dateListeRecu}
+                                        style={{ 
+                                            display: 'flex', alignItems: 'center', gap: '0.4rem', 
+                                            fontSize: '0.85rem', padding: '0.4rem 1.2rem',
+                                            opacity: (!dateListeRecu || importing) ? 0.5 : 1,
+                                            cursor: (!dateListeRecu || importing) ? 'not-allowed' : 'pointer'
+                                        }}
+                                        title={!dateListeRecu ? "Veuillez renseigner la Date Liste Reçu avant de déverser dans la base" : ""}
+                                    >
+                                        {importing
+                                            ? <><RefreshCw size={14} style={{ animation: 'spin 1s linear infinite' }} /> Import en cours...</>
+                                            : <><Send size={14} /> Déverser dans la base ({rows.length} lignes)</>
+                                        }
+                                    </button>
+                                )}
+                            </div>
 
                         {/* Messages */}
                         {importError && (
@@ -446,7 +461,7 @@ export default function ChequesPage() {
                                                 </th>
                                             ))}
                                             <th style={{ padding: '0.6rem 0.8rem', textAlign: 'center', fontWeight: 700, fontSize: '0.72rem', textTransform: 'uppercase', width: 50 }}>
-                                                Actions
+                                                {canWriteCheque ? 'Actions' : ''}
                                             </th>
                                         </tr>
                                     </thead>
@@ -459,15 +474,17 @@ export default function ChequesPage() {
                                                     </td>
                                                 ))}
                                                 <td style={{ padding: '0.45rem 0.8rem', textAlign: 'center' }}>
-                                                    <button 
-                                                        onClick={() => handleDeleteRow(i)}
-                                                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#ef4444', opacity: 0.6, transition: 'opacity 0.2s' }}
-                                                        onMouseEnter={e => e.currentTarget.style.opacity = '1'}
-                                                        onMouseLeave={e => e.currentTarget.style.opacity = '0.6'}
-                                                        title="Supprimer la ligne"
-                                                    >
-                                                        <Trash2 size={14} />
-                                                    </button>
+                                                    {canWriteCheque && (
+                                                        <button 
+                                                            onClick={() => handleDeleteRow(i)}
+                                                            style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#ef4444', opacity: 0.6, transition: 'opacity 0.2s' }}
+                                                            onMouseEnter={e => e.currentTarget.style.opacity = '1'}
+                                                            onMouseLeave={e => e.currentTarget.style.opacity = '0.6'}
+                                                            title="Supprimer la ligne"
+                                                        >
+                                                            <Trash2 size={14} />
+                                                        </button>
+                                                    )}
                                                 </td>
                                             </tr>
                                         ))}
@@ -543,33 +560,35 @@ export default function ChequesPage() {
                                             </span>
                                         </button>
 
-                                        <button 
-                                            onClick={(e) => handleDeleteList(e, l)}
-                                            style={{ 
-                                                background: 'none', border: 'none', cursor: 'pointer', 
-                                                color: isActive ? 'white' : '#ef4444', 
-                                                padding: '0.65rem 0.75rem', 
-                                                display: 'flex', alignItems: 'center',
-                                                opacity: 0.8,
-                                                transition: 'all 0.2s',
-                                                zIndex: 10
-                                            }}
-                                            onMouseEnter={e => {
-                                                e.currentTarget.style.opacity = '1';
-                                                e.currentTarget.style.transform = 'scale(1.2)';
-                                            }}
-                                            onMouseLeave={e => {
-                                                e.currentTarget.style.opacity = '0.8';
-                                                e.currentTarget.style.transform = 'scale(1)';
-                                            }}
-                                            title="Supprimer toute la liste"
-                                        >
-                                            {deleteConfirmId === l.id ? (
-                                                <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#f87171' }}>Confirmer ?</span>
-                                            ) : (
-                                                <Trash2 size={16} />
+                                            {canWriteCheque && (
+                                                <button 
+                                                    onClick={(e) => handleDeleteList(e, l)}
+                                                    style={{ 
+                                                        background: 'none', border: 'none', cursor: 'pointer', 
+                                                        color: isActive ? 'white' : '#ef4444', 
+                                                        padding: '0.65rem 0.75rem', 
+                                                        display: 'flex', alignItems: 'center',
+                                                        opacity: 0.8,
+                                                        transition: 'all 0.2s',
+                                                        zIndex: 10
+                                                    }}
+                                                    onMouseEnter={e => {
+                                                        e.currentTarget.style.opacity = '1';
+                                                        e.currentTarget.style.transform = 'scale(1.2)';
+                                                    }}
+                                                    onMouseLeave={e => {
+                                                        e.currentTarget.style.opacity = '0.8';
+                                                        e.currentTarget.style.transform = 'scale(1)';
+                                                    }}
+                                                    title="Supprimer toute la liste"
+                                                >
+                                                    {deleteConfirmId === l.id ? (
+                                                        <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#f87171' }}>Confirmer ?</span>
+                                                    ) : (
+                                                        <Trash2 size={16} />
+                                                    )}
+                                                </button>
                                             )}
-                                        </button>
                                     </div>
                                 );
                             })}

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { X, Save, Phone, User, ShieldCheck } from 'lucide-react';
+import { useAuth } from './AuthProvider';
 
 interface Partenaire {
     id_partenaire?: number;
@@ -34,6 +35,10 @@ export default function PartenaireModal({
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const { user } = useAuth();
+    const perms = Array.isArray(user?.permissions) ? user?.permissions : [];
+    const isAdmin = user?.role === 'ADMIN';
+    const canWrite = isAdmin || perms.includes('PARTENAIRE_WRITE') || perms.includes('DOSSIER_WRITE');
 
     useEffect(() => {
         if (isOpen && partenaireId) {
@@ -65,7 +70,10 @@ export default function PartenaireModal({
             const url = partenaireId ? `/api/partenaires/${partenaireId}` : '/api/partenaires';
             const res = await fetch(url, {
                 method,
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'x-user-id': user?.id.toString() || ''
+                },
                 body: JSON.stringify(form)
             });
             if (!res.ok) throw new Error('Erreur lors de la sauvegarde');
@@ -120,10 +128,12 @@ export default function PartenaireModal({
                                     est_client: e.target.checked ? 1 : 0, 
                                     est_transitaire: e.target.checked ? 0 : form.est_transitaire 
                                 })} 
+                                disabled={!canWrite}
+                                style={{ cursor: !canWrite ? 'not-allowed' : 'pointer' }}
                             />
                             Client
                         </label>
-                        <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}>
+                        <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.875rem', fontWeight: 600, cursor: !canWrite ? 'not-allowed' : 'pointer' }}>
                             <input 
                                 type="checkbox" 
                                 checked={form.est_transitaire === 1} 
@@ -132,6 +142,8 @@ export default function PartenaireModal({
                                     est_transitaire: e.target.checked ? 1 : 0, 
                                     est_client: e.target.checked ? 0 : form.est_client 
                                 })} 
+                                disabled={!canWrite}
+                                style={{ cursor: !canWrite ? 'not-allowed' : 'pointer' }}
                             />
                             Transitaire
                         </label>
@@ -144,7 +156,8 @@ export default function PartenaireModal({
                         <div style={{ position: 'relative' }}>
                             <User size={16} style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
                             <input type="text" value={form.nom_partenaire} onChange={e => setForm({ ...form, nom_partenaire: e.target.value.toUpperCase() })}
-                                style={{ paddingLeft: '2.5rem', width: '100%' }} placeholder="—" required />
+                                style={{ paddingLeft: '2.5rem', width: '100%', cursor: !canWrite ? 'not-allowed' : 'text', background: !canWrite ? '#f8fafc' : 'white' }} 
+                                placeholder="—" required disabled={!canWrite} />
                         </div>
                     </div>
 
@@ -153,7 +166,8 @@ export default function PartenaireModal({
                             Numéro FNE
                         </label>
                         <input type="text" value={form.num_fne || ''} onChange={e => setForm({ ...form, num_fne: e.target.value.toUpperCase() })}
-                            style={{ width: '100%' }} placeholder="Ex: FNE-001" />
+                            style={{ width: '100%', cursor: !canWrite ? 'not-allowed' : 'text', background: !canWrite ? '#f8fafc' : 'white' }} 
+                            placeholder="Ex: FNE-001" disabled={!canWrite} />
                     </div>
 
                     <div style={{ marginBottom: '1.5rem' }}>
@@ -163,18 +177,21 @@ export default function PartenaireModal({
                         <div style={{ position: 'relative' }}>
                             <Phone size={16} style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
                             <input type="text" value={form.telephone || ''} onChange={e => setForm({ ...form, telephone: e.target.value.toUpperCase() })}
-                                style={{ paddingLeft: '2.5rem', width: '100%' }} placeholder="—" required />
+                                style={{ paddingLeft: '2.5rem', width: '100%', cursor: !canWrite ? 'not-allowed' : 'text', background: !canWrite ? '#f8fafc' : 'white' }} 
+                                placeholder="—" required disabled={!canWrite} />
                         </div>
                     </div>
 
 
 
                     <div style={{ display: 'flex', gap: '0.75rem' }}>
-                        <button type="button" onClick={onClose} className="btn btn-secondary" style={{ flex: 1 }}>Annuler</button>
-                        <button type="submit" className="btn btn-primary" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }} disabled={loading}>
-                            <Save size={16} />
-                            {loading ? 'Soumission...' : 'Enregistrer'}
-                        </button>
+                        <button type="button" onClick={onClose} className="btn btn-secondary" style={{ flex: 1 }}>{canWrite ? 'Annuler' : 'Fermer'}</button>
+                        {canWrite && (
+                            <button type="submit" className="btn btn-primary" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }} disabled={loading}>
+                                <Save size={16} />
+                                {loading ? 'Soumission...' : 'Enregistrer'}
+                            </button>
+                        )}
                     </div>
                 </form>
             </div>

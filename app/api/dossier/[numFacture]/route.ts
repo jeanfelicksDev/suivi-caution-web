@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { checkPermission } from '@/lib/auth-server';
 
 export async function GET(
     request: Request,
@@ -151,6 +152,10 @@ export async function PATCH(
 ) {
     const { numFacture } = await params;
     try {
+        const userId = request.headers.get('x-user-id') || undefined;
+        if (!await checkPermission(userId, 'DOSSIER_WRITE')) {
+            return NextResponse.json({ error: 'Permission refusée' }, { status: 403 });
+        }
         const body = await request.json();
 
         // Find the dossier first
@@ -194,6 +199,12 @@ export async function DELETE(
 ) {
     const { numFacture } = await params;
     try {
+        const userId = request.headers.get('x-user-id') || undefined;
+        // La suppression est réservée aux Administrateurs
+        const user = await prisma.users.findUnique({ where: { id: Number(userId) ? Number(userId) : 0 } });
+        if (!user || user.role !== 'ADMIN') {
+            return NextResponse.json({ error: 'Permission refusée (Admin requis)' }, { status: 403 });
+        }
         const dossier = await prisma.dossiers_caution.findFirst({
             where: {
                 num_facture_caution: {

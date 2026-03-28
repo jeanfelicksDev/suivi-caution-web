@@ -1,0 +1,46 @@
+[
+  {
+    "id": 13,
+    "username": "ebini constance",
+    "email": "Eba-constance.niamkey@aglgroup.com",
+    "password_hash": "621d110ffa607966ae335894a00ee93e:17b035c4c7032f099892ac5ca82187b83acf589a3306de6aad394ae21b399d8d26e90883b126f1c70cdfa1b0851e051ef1676aabe657a4699fe3c597fd33e39c",
+    "role": "USER",
+    "permissions": "[\"READ_ONLY\",\"IMPORT_CHEQUES\",\"DASHBOARD\",\"DOSSIER_READ\",\"CHEQUE_READ\",\"PARTENAIRE_READ\",\"HISTORIQUE_READ\",\"CONSULTATION_CLIENT\"]",
+    "reset_token": null,
+    "reset_expiry": null,
+    "created_at": "2026-03-26T12:54:06.123Z"
+  },
+  {
+    "id": 4,
+    "username": "ruth davila",
+    "email": "ruth-davila.yenon@aglgroup.com",
+    "password_hash": "5e414842fb19a9f98f8b1c6dd49c5279:60f5f1398245477f7485d3a71bb0faa00008a41619ea1a704d6c3b99a9d507ca5a6b2575f9ccffa37179833d306895d246eaa113e260835d6284f333eec48a13",
+    "role": "USER",
+    "permissions": "[\"READ_ONLY\",\"CREATE_DOSSIER\",\"VALIDATION_COMPTA\",\"IMPORT_CHEQUES\",\"DASHBOARD\",\"ATTENTE\",\"DOSSIER_WRITE\",\"DOSSIER_READ\",\"CHEQUE_READ\",\"CHEQUE_WRITE\",\"PARTENAIRE_READ\",\"PARTENAIRE_WRITE\",\"HISTORIQUE_READ\",\"HISTORIQUE_WRITE\"]",
+    "reset_token": null,
+    "reset_expiry": null,
+    "created_at": "2026-03-06T09:16:01.128Z"
+  },
+  {
+    "id": 1,
+    "username": "JEANFELICKS",
+    "email": "jeanfelicks11@gmail.com",
+    "password_hash": "75d5b635d02aa771bd225f2b238b13ab:c104a53a00bcfeea26c0c6cf7b57a027f08ecc8850bec198215028e2dd9a099c7aff1c4f572365cd7aac9a8005004d475535f5ebaa6c3e0d3e5bdbf791ea0e34",
+    "role": "ADMIN",
+    "permissions": "[\"READ_ONLY\",\"CREATE_DOSSIER\",\"VALIDATION_COMPTA\",\"IMPORT_CHEQUES\"]",
+    "reset_token": null,
+    "reset_expiry": null,
+    "created_at": "2026-03-05T21:13:56.458Z"
+  },
+  {
+    "id": 15,
+    "username": "fefe",
+    "email": "jeanfelicks@gmail.com",
+    "password_hash": "4479c4dc89df89b534f5a97f37c73884:7b366f4dd75a6140aae79c6131573bd2323c36d6347ac67bba7ac3cd797e445e8df00abf5d5487afcd1a63c5bdf3d73ab7fbd0fcc77523def53c31857b6fb172",
+    "role": "USER",
+    "permissions": "[\"DASHBOARD\",\"ATTENTE\",\"DOSSIER_READ\",\"CHEQUE_READ\",\"PARTENAIRE_READ\",\"HISTORIQUE_READ\",\"CONSULTATION_CLIENT\"]",
+    "reset_token": null,
+    "reset_expiry": null,
+    "created_at": "2026-03-26T23:49:56.500Z"
+  }
+]

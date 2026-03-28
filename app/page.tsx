@@ -99,6 +99,10 @@ function NewDossierModal({
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [animateError, setAnimateError] = useState(false);
+  const { user } = useAuth();
+  const perms = Array.isArray(user?.permissions) ? user?.permissions : [];
+  const isAdmin = user?.role === 'ADMIN';
+  const canWrite = isAdmin || perms.includes('DOSSIER_WRITE');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
@@ -137,7 +141,10 @@ function NewDossierModal({
     try {
       const res = await fetch('/api/dossier', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'x-user-id': user?.id.toString() || ''
+        },
         body: JSON.stringify({ ...form, notification_email: notificationEmail }),
       });
       if (!res.ok) throw new Error('Erreur lors de la création');
@@ -206,7 +213,7 @@ function NewDossierModal({
               <Field label="Date de Facture *">
                 <input type={form.date_facture ? "date" : "text"} name="date_facture" value={form.date_facture || ''} onChange={handleChange} 
                   onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !form.date_facture && (e.target.type = "text")} 
-                  placeholder="JJ/MM/AAAA" className={form.date_facture ? 'has-value' : ''} required />
+                  placeholder="JJ/MM/AAAA" className={form.date_facture ? 'has-value' : ''} required disabled={!canWrite} />
               </Field>
               <Field label="Montant Caution (FCFA) *">
                 <FormattedNumberInput
@@ -214,29 +221,31 @@ function NewDossierModal({
                   value={form.montant_caution ?? null}
                   onChange={(val: number | null) => setForm(prev => ({ ...prev, montant_caution: val }))}
                   required
+                  disabled={!canWrite}
                 />
               </Field>
               <Field label="Numéro du BL *">
-                <input type="text" name="num_bl" value={form.num_bl || ''} onChange={handleChange} placeholder="—" required />
+                <input type="text" name="num_bl" value={form.num_bl || ''} onChange={handleChange} placeholder="—" required disabled={!canWrite} />
               </Field>
               <Field label="Armateur *">
                 <ArmateurSelect
                   value={form.armateur || ''}
                   onChange={(val) => setForm(prev => ({ ...prev, armateur: val }))}
                   required
+                  disabled={!canWrite}
                 />
               </Field>
               <Field label="Date de Réception *">
                 <input type={form.date_reception ? "date" : "text"} name="date_reception" value={form.date_reception || ''} onChange={handleChange} 
                   onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !form.date_reception && (e.target.type = "text")} 
-                  placeholder="JJ/MM/AAAA" className={form.date_reception ? 'has-value' : ''} required />
+                  placeholder="JJ/MM/AAAA" className={form.date_reception ? 'has-value' : ''} required disabled={!canWrite} />
               </Field>
               <Field label={
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                   Nom Transitaire *
                   <input type="checkbox" name="transitaire_actif" title="transitaire actif" checked={form.transitaire_actif === 1} onChange={handleCheck} 
                     style={{ cursor: 'pointer', margin: 0, width: '13px', height: '13px' }} 
-                    className={animateError ? 'highlight-error' : ''} />
+                    className={animateError ? 'highlight-error' : ''} disabled={!canWrite} />
                 </div>
               }>
                 <PartenaireCombobox
@@ -248,6 +257,7 @@ function NewDossierModal({
                   placeholder="Rechercher transitaire..."
                   formData={form}
                   required
+                  disabled={!canWrite}
                 />
               </Field>
               <Field label={
@@ -255,7 +265,7 @@ function NewDossierModal({
                   Nom Client *
                   <input type="checkbox" name="client_actif" title="client actif" checked={form.client_actif === 1} onChange={handleCheck} 
                     style={{ cursor: 'pointer', margin: 0, width: '13px', height: '13px' }} 
-                    className={animateError ? 'highlight-error-delayed' : ''} />
+                    className={animateError ? 'highlight-error-delayed' : ''} disabled={!canWrite} />
                 </div>
               }>
                 <PartenaireCombobox
@@ -267,13 +277,14 @@ function NewDossierModal({
                   placeholder="Rechercher client..."
                   formData={form}
                   required
+                  disabled={!canWrite}
                 />
               </Field>
               <Field label="Mandataire *">
-                <input type="text" name="mandataire_nom" value={form.mandataire_nom || ''} onChange={handleChange} placeholder="—" required />
+                <input type="text" name="mandataire_nom" value={form.mandataire_nom || ''} onChange={handleChange} placeholder="—" required disabled={!canWrite} />
               </Field>
               <Field label="N° Pièce Mandataire *">
-                <input type="text" name="num_piece_mandataire" value={form.num_piece_mandataire || ''} onChange={handleChange} placeholder="—" required />
+                <input type="text" name="num_piece_mandataire" value={form.num_piece_mandataire || ''} onChange={handleChange} placeholder="—" required disabled={!canWrite} />
               </Field>
             </div>
           </ModalSection>
@@ -289,6 +300,7 @@ function NewDossierModal({
                   onChange={(e) => setNotificationEmail(e.target.value)}
                   placeholder="ex: client@email.com"
                   style={{ paddingLeft: '2.5rem' }}
+                  disabled={!canWrite}
                 />
               </div>
               <p style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '0.3rem' }}>
@@ -301,10 +313,12 @@ function NewDossierModal({
             <button type="button" className="btn btn-secondary" onClick={onClose} style={{ padding: '0.4rem 1rem', fontSize: '0.9rem' }}>
               <X size={15} style={{ marginRight: '0.4rem' }} /> Annuler
             </button>
-            <button type="submit" className="btn btn-primary" disabled={saving} style={{ padding: '0.4rem 1rem', fontSize: '0.9rem' }}>
-              <Save size={15} style={{ marginRight: '0.4rem' }} />
-              {saving ? 'Création...' : 'Créer le dossier'}
-            </button>
+            {canWrite && (
+              <button type="submit" className="btn btn-primary" disabled={saving} style={{ padding: '0.4rem 1rem', fontSize: '0.9rem' }}>
+                <Save size={15} style={{ marginRight: '0.4rem' }} />
+                {saving ? 'Création...' : 'Créer le dossier'}
+              </button>
+            )}
           </div>
         </form>
       </div>
@@ -316,6 +330,9 @@ function NewDossierModal({
 
 function HomePageInternal() {
   const { user } = useAuth();
+  const perms = Array.isArray(user?.permissions) ? user?.permissions : [];
+  const isAdmin = user?.role === 'ADMIN';
+  const canWrite = isAdmin || perms.includes('DOSSIER_WRITE');
   
   const initNumFacture = () => {
     if (typeof window === 'undefined') return '';
@@ -417,7 +434,12 @@ function HomePageInternal() {
         if (!dossier.commentaire_avoir) dossier.commentaire_avoir = 'ANNULATION DE LA CAUTION';
         setFormData(dossier);
       } else {
-        setShowModal(true);
+        if (canWrite) {
+          setShowModal(true);
+        } else {
+          setError(`Le dossier ${searchFacture} n'existe pas.`);
+          showNotif('error', `Le dossier ${searchFacture} n'existe pas et vous n'avez pas les droits de création.`);
+        }
       }
     } catch {
       setError('Impossible de contacter le serveur.');
@@ -469,7 +491,10 @@ function HomePageInternal() {
     try {
       const res = await fetch(`/api/dossier/${formData.num_facture_caution}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'x-user-id': user?.id.toString() || ''
+        },
         body: JSON.stringify(finalData),
       });
       if (res.ok) {
@@ -487,7 +512,10 @@ function HomePageInternal() {
     if (!confirm('Supprimer ce dossier définitivement ?')) return;
     setDeleting(true);
     try {
-      const res = await fetch(`/api/dossier/${formData.num_facture_caution}`, { method: 'DELETE' });
+      const res = await fetch(`/api/dossier/${formData.num_facture_caution}`, { 
+        method: 'DELETE',
+        headers: { 'x-user-id': user?.id.toString() || '' }
+      });
       if (!res.ok) throw new Error();
       showNotif('success', 'Dossier supprimé.');
       doReset();
@@ -567,9 +595,11 @@ function HomePageInternal() {
                   <button onClick={() => doSearch()} className="btn" style={{ background: '#6366f1', color: 'white', padding: '0 1.5rem', height: '48px', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     <Search size={18} /> Vérifier
                   </button>
-                  <button onClick={() => doSave()} disabled={saving} className="btn" style={{ background: '#10b981', color: 'white', padding: '0 1.5rem', height: '48px', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <Save size={18} /> {saving ? '...' : 'Mettre à jour'}
-                  </button>
+                  {canWrite && (
+                    <button onClick={() => doSave()} disabled={saving} className="btn" style={{ background: '#10b981', color: 'white', padding: '0 1.5rem', height: '48px', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <Save size={18} /> {saving ? '...' : 'Mettre à jour'}
+                    </button>
+                  )}
                   <button onClick={doReset} className="btn-secondary" style={{ width: '48px', height: '48px', padding: 0, borderRadius: '10px' }} title="Retour à l'accueil"><RotateCcw size={20} /></button>
                 </div>
                 <div style={{ background: '#f0fdf4', color: '#16a34a', padding: '0.4rem 1rem', borderRadius: '8px', fontSize: '0.85rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -596,7 +626,7 @@ function HomePageInternal() {
                             <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.85rem' }}>Modification du dossier existant</p>
                         </div>
                     </div>
-                    {(user?.role === 'ADMIN' || user?.permissions?.length === 5) && (
+                    {isAdmin && (
                         <button type="button" onClick={doDelete} disabled={deleting} style={{ 
                             background: '#fef2f2', color: '#ef4444', border: '1px solid #fca5a5', 
                             padding: '0.5rem 1rem', borderRadius: '8px', display: 'flex', 
@@ -618,45 +648,46 @@ function HomePageInternal() {
                                 <input type="text" value={formData.num_facture_caution || ''} style={{ fontWeight: 800, background: '#f8fafc' }} readOnly />
                             </Field>
                             <Field label="Date De Facture">
-                                <input type={formData.date_facture ? "date" : "text"} name="date_facture" value={formData.date_facture || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_facture && (e.target.type = "text")} />
+                                <input type={formData.date_facture ? "date" : "text"} name="date_facture" value={formData.date_facture || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_facture && (e.target.type = "text")} disabled={!canWrite} />
                             </Field>
                             <Field label="Montant Caution (Fcfa)">
                                 <FormattedNumberInput
                                     name="montant_caution"
                                     value={formData.montant_caution ?? null}
                                     onChange={(val: number | null) => setFormData(prev => ({ ...prev, montant_caution: val }))}
+                                    disabled={!canWrite}
                                 />
                             </Field>
                             <Field label="Numéro Du Bl">
-                                <input type="text" name="num_bl" value={formData.num_bl || ''} onChange={handleChange} />
+                                <input type="text" name="num_bl" value={formData.num_bl || ''} onChange={handleChange} disabled={!canWrite} />
                             </Field>
                             <Field label="Armateur">
-                                <ArmateurSelect value={formData.armateur || ''} onChange={(val) => setFormData(prev => ({ ...prev, armateur: val }))} />
+                                <ArmateurSelect value={formData.armateur || ''} onChange={(val) => setFormData(prev => ({ ...prev, armateur: val }))} disabled={!canWrite} />
                             </Field>
                             <Field label="Date De Réception">
-                                <input type={formData.date_reception ? "date" : "text"} name="date_reception" value={formData.date_reception || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_reception && (e.target.type = "text")} />
+                                <input type={formData.date_reception ? "date" : "text"} name="date_reception" value={formData.date_reception || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_reception && (e.target.type = "text")} disabled={!canWrite} />
                             </Field>
                             <Field label={
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                                     Nom Transitaire
-                                    <input type="checkbox" name="transitaire_actif" checked={formData.transitaire_actif === 1} onChange={handleCheck} style={{ width: '13px', height: '13px' }} />
+                                    <input type="checkbox" name="transitaire_actif" checked={formData.transitaire_actif === 1} onChange={handleCheck} style={{ width: '13px', height: '13px' }} disabled={!canWrite} />
                                 </div>
                             }>
-                                <PartenaireCombobox name="transitaire_nom" value={formData.transitaire_nom || ''} onChange={(v) => setFormData(prev => ({ ...prev, transitaire_nom: v }))} type="transitaire" onManage={(id) => setPartenaireModal({ open: true, id })} formData={formData} />
+                                <PartenaireCombobox name="transitaire_nom" value={formData.transitaire_nom || ''} onChange={(v) => setFormData(prev => ({ ...prev, transitaire_nom: v }))} type="transitaire" onManage={(id) => setPartenaireModal({ open: true, id })} formData={formData} disabled={!canWrite} />
                             </Field>
                             <Field label={
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                                     Nom Client
-                                    <input type="checkbox" name="client_actif" checked={formData.client_actif === 1} onChange={handleCheck} style={{ width: '13px', height: '13px' }} />
+                                    <input type="checkbox" name="client_actif" checked={formData.client_actif === 1} onChange={handleCheck} style={{ width: '13px', height: '13px' }} disabled={!canWrite} />
                                 </div>
                             }>
-                                <PartenaireCombobox name="client_nom" value={formData.client_nom || ''} onChange={(v) => setFormData(prev => ({ ...prev, client_nom: v }))} type="client" onManage={(id) => setPartenaireModal({ open: true, id })} formData={formData} />
+                                <PartenaireCombobox name="client_nom" value={formData.client_nom || ''} onChange={(v) => setFormData(prev => ({ ...prev, client_nom: v }))} type="client" onManage={(id) => setPartenaireModal({ open: true, id })} formData={formData} disabled={!canWrite} />
                             </Field>
                             <Field label="Mandataire">
-                                <input type="text" name="mandataire_nom" value={formData.mandataire_nom || ''} onChange={handleChange} />
+                                <input type="text" name="mandataire_nom" value={formData.mandataire_nom || ''} onChange={handleChange} disabled={!canWrite} />
                             </Field>
                             <Field label="N° Pièce Mandataire">
-                                <input type="text" name="num_piece_mandataire" value={formData.num_piece_mandataire || ''} onChange={handleChange} />
+                                <input type="text" name="num_piece_mandataire" value={formData.num_piece_mandataire || ''} onChange={handleChange} disabled={!canWrite} />
                             </Field>
                         </div>
                     </Fieldset>
@@ -664,10 +695,10 @@ function HomePageInternal() {
                     <Fieldset title="TRANSMISSION A LA LIGNE POUR TRAITEMENT" accentColor="#10b981" bgTint="rgba(16, 185, 129, 0.02)">
                         <div className="grid grid-cols-4">
                             <Field label="Date Trans. Ligne">
-                                <input type={formData.date_transmission_ligne ? "date" : "text"} name="date_transmission_ligne" value={formData.date_transmission_ligne || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_transmission_ligne && (e.target.type = "text")} />
+                                <input type={formData.date_transmission_ligne ? "date" : "text"} name="date_transmission_ligne" value={formData.date_transmission_ligne || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_transmission_ligne && (e.target.type = "text")} disabled={!canWrite} />
                             </Field>
                             <Field label="Date Retour Ligne">
-                                <input type={formData.date_retour_ligne ? "date" : "text"} name="date_retour_ligne" value={formData.date_retour_ligne || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_retour_ligne && (e.target.type = "text")} />
+                                <input type={formData.date_retour_ligne ? "date" : "text"} name="date_retour_ligne" value={formData.date_retour_ligne || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_retour_ligne && (e.target.type = "text")} disabled={!canWrite} />
                             </Field>
                         </div>
                     </Fieldset>
@@ -675,22 +706,22 @@ function HomePageInternal() {
                     <Fieldset title="FRANCHISE ET B.A.D" accentColor="#f59e0b" bgTint="rgba(245, 158, 11, 0.02)">
                         <div className="grid grid-cols-6">
                             <Field label="Jours Franchise">
-                                <input type="number" name="jours_franchise" value={formData.jours_franchise ?? ''} onChange={handleChange} />
+                                <input type="number" name="jours_franchise" value={formData.jours_franchise ?? ''} onChange={handleChange} disabled={!canWrite} />
                             </Field>
                             <Field label="Date Bad">
-                                <input type={formData.date_bad ? "date" : "text"} name="date_bad" value={formData.date_bad || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_bad && (e.target.type = "text")} />
+                                <input type={formData.date_bad ? "date" : "text"} name="date_bad" value={formData.date_bad || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_bad && (e.target.type = "text")} disabled={!canWrite} />
                             </Field>
                             <Field label="Date De Sortie">
-                                <input type={formData.date_sortie ? "date" : "text"} name="date_sortie" value={formData.date_sortie || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_sortie && (e.target.type = "text")} />
+                                <input type={formData.date_sortie ? "date" : "text"} name="date_sortie" value={formData.date_sortie || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_sortie && (e.target.type = "text")} disabled={!canWrite} />
                             </Field>
                             <Field label="Date De Retour">
-                                <input type={formData.date_retour ? "date" : "text"} name="date_retour" value={formData.date_retour || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_retour && (e.target.type = "text")} />
+                                <input type={formData.date_retour ? "date" : "text"} name="date_retour" value={formData.date_retour || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_retour && (e.target.type = "text")} disabled={!canWrite} />
                             </Field>
                             <Field label="Nbre 20'">
-                                <input type="number" name="nbre_20" value={formData.nbre_20 ?? ''} onChange={handleChange} />
+                                <input type="number" name="nbre_20" value={formData.nbre_20 ?? ''} onChange={handleChange} disabled={!canWrite} />
                             </Field>
                             <Field label="Nbre 40'">
-                                <input type="number" name="nbre_40" value={formData.nbre_40 ?? ''} onChange={handleChange} />
+                                <input type="number" name="nbre_40" value={formData.nbre_40 ?? ''} onChange={handleChange} disabled={!canWrite} />
                             </Field>
                         </div>
                     </Fieldset>
@@ -698,13 +729,13 @@ function HomePageInternal() {
                     <Fieldset title="MISE EN LITIGE (AVEC OU SANS DETENTION)" accentColor="#ef4444" bgTint="rgba(239, 68, 68, 0.02)">
                         <div className="grid grid-cols-4">
                             <Field label="Date Début Litige">
-                                <input type={formData.date_mise_litige ? "date" : "text"} name="date_mise_litige" value={formData.date_mise_litige || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_mise_litige && (e.target.type = "text")} />
+                                <input type={formData.date_mise_litige ? "date" : "text"} name="date_mise_litige" value={formData.date_mise_litige || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_mise_litige && (e.target.type = "text")} disabled={!canWrite} />
                             </Field>
                             <Field label="Date Fin Litige">
-                                <input type={formData.date_fin_litige ? "date" : "text"} name="date_fin_litige" value={formData.date_fin_litige || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_fin_litige && (e.target.type = "text")} />
+                                <input type={formData.date_fin_litige ? "date" : "text"} name="date_fin_litige" value={formData.date_fin_litige || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_fin_litige && (e.target.type = "text")} disabled={!canWrite} />
                             </Field>
                             <Field label="Date Trans Sce Détention">
-                                <input type={formData.date_trans_sce_detention ? "date" : "text"} name="date_trans_sce_detention" value={formData.date_trans_sce_detention || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_trans_sce_detention && (e.target.type = "text")} />
+                                <input type={formData.date_trans_sce_detention ? "date" : "text"} name="date_trans_sce_detention" value={formData.date_trans_sce_detention || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_trans_sce_detention && (e.target.type = "text")} disabled={!canWrite} />
                             </Field>
                             <Field label="Détentions (DMDT)" labelStyle={{ justifyContent: 'center' }}>
                                 <button onClick={() => setShowDetentionModal(true)} className="btn btn-primary" style={{ width: '100%', gap: '0.5rem', background: '#1e40af' }}>
@@ -713,7 +744,7 @@ function HomePageInternal() {
                             </Field>
                             <div style={{ gridColumn: 'span 4' }}>
                                 <Field label="Commentaire Sce Détention">
-                                    <textarea name="commentaire_sce_detention" value={formData.commentaire_sce_detention || ''} onChange={handleChange} placeholder="..." style={{ minHeight: '60px' }} />
+                                    <textarea name="commentaire_sce_detention" value={formData.commentaire_sce_detention || ''} onChange={handleChange} placeholder="..." style={{ minHeight: '60px' }} disabled={!canWrite} />
                                 </Field>
                             </div>
                         </div>
@@ -722,13 +753,13 @@ function HomePageInternal() {
                     <Fieldset title="PIECE COMPTABLE (AVOIR)" accentColor="#6366f1" bgTint="rgba(99, 102, 241, 0.02)">
                         <div className="grid grid-cols-4">
                             <Field label="Date Début Avoir">
-                                <input type={formData.date_mise_avoir ? "date" : "text"} name="date_mise_avoir" value={formData.date_mise_avoir || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_mise_avoir && (e.target.type = "text")} />
+                                <input type={formData.date_mise_avoir ? "date" : "text"} name="date_mise_avoir" value={formData.date_mise_avoir || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_mise_avoir && (e.target.type = "text")} disabled={!canWrite} />
                             </Field>
                             <Field label="Date Fin Avoir">
-                                <input type={formData.date_fin_avoir ? "date" : "text"} name="date_fin_avoir" value={formData.date_fin_avoir || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_fin_avoir && (e.target.type = "text")} />
+                                <input type={formData.date_fin_avoir ? "date" : "text"} name="date_fin_avoir" value={formData.date_fin_avoir || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_fin_avoir && (e.target.type = "text")} disabled={!canWrite} />
                             </Field>
                             <Field label="N° Pièce">
-                                <input type="text" name="num_avoir" value={formData.num_avoir || ''} onChange={handleChange} />
+                                <input type="text" name="num_avoir" value={formData.num_avoir || ''} onChange={handleChange} disabled={!canWrite} />
                             </Field>
                             <Field label="Fiche Avoir" labelStyle={{ justifyContent: 'center' }}>
                                 <button onClick={() => setShowFicheAvoir(true)} className="btn btn-secondary" style={{ width: '100%', gap: '0.5rem' }}>
@@ -743,6 +774,7 @@ function HomePageInternal() {
                                         onChange={handleChange} 
                                         placeholder="..." 
                                         style={{ minHeight: '40px' }} 
+                                        disabled={!canWrite}
                                     />
                                 </Field>
                             </div>
@@ -752,16 +784,16 @@ function HomePageInternal() {
                     <Fieldset title="RECOUVREMENT" accentColor="#ea580c" bgTint="rgba(234, 88, 12, 0.02)">
                         <div className="grid grid-cols-5">
                             <Field label="Date Trans Rec">
-                                <input type={formData.date_trans_rec ? "date" : "text"} name="date_trans_rec" value={formData.date_trans_rec || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_trans_rec && (e.target.type = "text")} />
+                                <input type={formData.date_trans_rec ? "date" : "text"} name="date_trans_rec" value={formData.date_trans_rec || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_trans_rec && (e.target.type = "text")} disabled={!canWrite} />
                             </Field>
                             <Field label="Date Ret Rec">
-                                <input type={formData.date_ret_rec ? "date" : "text"} name="date_ret_rec" value={formData.date_ret_rec || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_ret_rec && (e.target.type = "text")} />
+                                <input type={formData.date_ret_rec ? "date" : "text"} name="date_ret_rec" value={formData.date_ret_rec || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_ret_rec && (e.target.type = "text")} disabled={!canWrite} />
                             </Field>
                             <Field label="Date Début Suspension">
-                                <input type={formData.date_suspendu ? "date" : "text"} name="date_suspendu" value={formData.date_suspendu || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_suspendu && (e.target.type = "text")} />
+                                <input type={formData.date_suspendu ? "date" : "text"} name="date_suspendu" value={formData.date_suspendu || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_suspendu && (e.target.type = "text")} disabled={!canWrite} />
                             </Field>
                             <Field label="Date Fin Suspension">
-                                <input type={formData.date_fin_suspension ? "date" : "text"} name="date_fin_suspension" value={formData.date_fin_suspension || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_fin_suspension && (e.target.type = "text")} />
+                                <input type={formData.date_fin_suspension ? "date" : "text"} name="date_fin_suspension" value={formData.date_fin_suspension || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_fin_suspension && (e.target.type = "text")} disabled={!canWrite} />
                             </Field>
                             <Field label="Recouvrement" labelStyle={{ justifyContent: 'center' }}>
                                 <button onClick={() => setShowRecouvrementModal(true)} className="btn btn-primary" style={{ width: '100%', gap: '0.5rem', background: '#ea580c', borderColor: '#ea580c' }}>
@@ -770,7 +802,7 @@ function HomePageInternal() {
                             </Field>
                             <div style={{ gridColumn: 'span 5' }}>
                                 <Field label="Observations Rec.">
-                                    <textarea name="observ_rec" value={formData.observ_rec || ''} onChange={handleChange} placeholder="..." style={{ minHeight: '60px' }} />
+                                    <textarea name="observ_rec" value={formData.observ_rec || ''} onChange={handleChange} placeholder="..." style={{ minHeight: '60px' }} disabled={!canWrite} />
                                 </Field>
                             </div>
                         </div>
@@ -780,19 +812,19 @@ function HomePageInternal() {
                     <Fieldset title="SIGNATURE & PIECE DE CAISSE" accentColor="#4f46e5" bgTint="rgba(79, 70, 229, 0.02)">
                         <div className="grid grid-cols-3">
                             <Field label="Date 1ère Signature">
-                                <input type={formData.date_1er_signature ? "date" : "text"} name="date_1er_signature" value={formData.date_1er_signature || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_1er_signature && (e.target.type = "text")} />
+                                <input type={formData.date_1er_signature ? "date" : "text"} name="date_1er_signature" value={formData.date_1er_signature || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_1er_signature && (e.target.type = "text")} disabled={!canWrite} />
                             </Field>
                             <Field label="Date Retour 1ere Sig.">
-                                <input type={formData.date_retour_1er_signature ? "date" : "text"} name="date_retour_1er_signature" value={formData.date_retour_1er_signature || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_retour_1er_signature && (e.target.type = "text")} />
+                                <input type={formData.date_retour_1er_signature ? "date" : "text"} name="date_retour_1er_signature" value={formData.date_retour_1er_signature || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_retour_1er_signature && (e.target.type = "text")} disabled={!canWrite} />
                             </Field>
                             <Field label="Date 2ème Signature">
-                                <input type={formData.date_2e_signature ? "date" : "text"} name="date_2e_signature" value={formData.date_2e_signature || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_2e_signature && (e.target.type = "text")} />
+                                <input type={formData.date_2e_signature ? "date" : "text"} name="date_2e_signature" value={formData.date_2e_signature || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_2e_signature && (e.target.type = "text")} disabled={!canWrite} />
                             </Field>
                             <Field label="Date Retour 2e Sig.">
-                                <input type={formData.date_retour_2e_signature ? "date" : "text"} name="date_retour_2e_signature" value={formData.date_retour_2e_signature || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_retour_2e_signature && (e.target.type = "text")} />
+                                <input type={formData.date_retour_2e_signature ? "date" : "text"} name="date_retour_2e_signature" value={formData.date_retour_2e_signature || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_retour_2e_signature && (e.target.type = "text")} disabled={!canWrite} />
                             </Field>
                             <Field label="Date Pièce Caisse">
-                                <input type={formData.date_piece_caisse ? "date" : "text"} name="date_piece_caisse" value={formData.date_piece_caisse || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_piece_caisse && (e.target.type = "text")} />
+                                <input type={formData.date_piece_caisse ? "date" : "text"} name="date_piece_caisse" value={formData.date_piece_caisse || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_piece_caisse && (e.target.type = "text")} disabled={!canWrite} />
                             </Field>
                             <Field label="Montant Final (FCFA)">
                                 <input type="text" name="montant_final" value={formData.montant_final != null ? new Intl.NumberFormat('fr-FR').format(formData.montant_final) : '0'} readOnly 
@@ -805,19 +837,19 @@ function HomePageInternal() {
                     <Fieldset title="TRANSMISSION COMPTA / EMISSION DE CHEQUE & CLOTURE DE DOSSIER" accentColor="#0369a1" bgTint="rgba(3, 105, 161, 0.02)">
                         <div className="grid grid-cols-5">
                             <Field label="Date Trans. Compta">
-                                <input type={formData.date_transmission_compta ? "date" : "text"} name="date_transmission_compta" value={formData.date_transmission_compta || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_transmission_compta && (e.target.type = "text")} />
+                                <input type={formData.date_transmission_compta ? "date" : "text"} name="date_transmission_compta" value={formData.date_transmission_compta || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_transmission_compta && (e.target.type = "text")} disabled={!canWrite} />
                             </Field>
                             <Field label="Date Retour Compta">
-                                <input type={formData.date_retour_compta ? "date" : "text"} name="date_retour_compta" value={formData.date_retour_compta || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_retour_compta && (e.target.type = "text")} />
+                                <input type={formData.date_retour_compta ? "date" : "text"} name="date_retour_compta" value={formData.date_retour_compta || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_retour_compta && (e.target.type = "text")} disabled={!canWrite} />
                             </Field>
                             <Field label="Date Chèque">
-                                <input type={formData.date_cheque ? "date" : "text"} name="date_cheque" value={formData.date_cheque || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_cheque && (e.target.type = "text")} />
+                                <input type={formData.date_cheque ? "date" : "text"} name="date_cheque" value={formData.date_cheque || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_cheque && (e.target.type = "text")} disabled={!canWrite} />
                             </Field>
                             <Field label="Num. Chèque">
-                                <input type="text" name="num_cheque" value={formData.num_cheque || ''} onChange={handleChange} placeholder="..." />
+                                <input type="text" name="num_cheque" value={formData.num_cheque || ''} onChange={handleChange} placeholder="..." disabled={!canWrite} />
                             </Field>
                             <Field label="Date Clôture">
-                                <input type={formData.date_cloture ? "date" : "text"} name="date_cloture" value={formData.date_cloture || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_cloture && (e.target.type = "text")} />
+                                <input type={formData.date_cloture ? "date" : "text"} name="date_cloture" value={formData.date_cloture || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_cloture && (e.target.type = "text")} disabled={!canWrite} />
                             </Field>
                         </div>
                         <div style={{ marginTop: '1rem', borderTop: '1px solid rgba(3, 105, 161, 0.1)', paddingTop: '1rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
@@ -827,7 +859,8 @@ function HomePageInternal() {
                                     name="cloture_sans_cheque" 
                                     checked={formData.cloture_sans_cheque || false} 
                                     onChange={(e) => setFormData(prev => ({ ...prev, cloture_sans_cheque: e.target.checked }))} 
-                                    style={{ width: '16px', height: '16px', cursor: 'pointer', accentColor: '#0369a1' }}
+                                    style={{ width: '16px', height: '16px', cursor: !canWrite ? 'not-allowed' : 'pointer', accentColor: '#0369a1' }}
+                                    disabled={!canWrite}
                                 />
                                 Clôturé sans chèque
                             </label>
@@ -842,7 +875,8 @@ function HomePageInternal() {
                                         name="dateClotureSansCheque" 
                                         value={formData.dateClotureSansCheque || ''} 
                                         onChange={handleChange} 
-                                        style={{ border: '1px solid #7dd3fc', background: 'white', padding: '0.3rem 0.5rem', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 600, color: '#0c4a6e', outline: 'none' }}
+                                        style={{ border: '1px solid #7dd3fc', background: 'white', padding: '0.3rem 0.5rem', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 600, color: '#0c4a6e', outline: 'none', cursor: !canWrite ? 'not-allowed' : 'text' }}
+                                        disabled={!canWrite}
                                     />
                                 </div>
                             )}

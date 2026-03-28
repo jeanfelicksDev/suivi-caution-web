@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { checkPermission } from '@/lib/auth-server';
 
 export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
@@ -24,6 +25,11 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
     try {
+        const userId = request.headers.get('x-user-id') || undefined;
+        const canWrite = await checkPermission(userId, 'PARTENAIRE_WRITE') || await checkPermission(userId, 'DOSSIER_WRITE');
+        if (!canWrite) {
+            return NextResponse.json({ error: 'Permission refusée' }, { status: 403 });
+        }
         const body = await request.json();
         const part = await prisma.partenaires.create({
             data: {

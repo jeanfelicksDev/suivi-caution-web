@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { checkPermission } from '@/lib/auth-server';
 
 /** GET /api/cheques/listes
  *  - Sans paramètre : liste de tous les lots (Excel + Access)
@@ -128,6 +129,10 @@ export async function DELETE(request: Request) {
     const chequeId = searchParams.get('id')?.trim() || '';
 
     try {
+        const userId = request.headers.get('x-user-id') || undefined;
+        if (!await checkPermission(userId, 'CHEQUE_WRITE')) {
+            return NextResponse.json({ error: 'Permission refusée' }, { status: 403 });
+        }
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const p = prisma as any;
 

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { ShieldCheck, UserCheck, AlertCircle, Save, CheckCircle2, RefreshCw, Trash2 } from 'lucide-react';
+import { useAuth } from '../components/AuthProvider';
 
 interface User {
     id: number;
@@ -91,13 +92,16 @@ export default function UsersPermissionsPage() {
     const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null);
     const [successMsg, setSuccessMsg] = useState('');
     const [errorMsg, setErrorMsg] = useState('');
+    const { user: currentUser } = useAuth();
 
     useEffect(() => { fetchUsers(); }, []);
 
     const fetchUsers = async () => {
         setLoading(true);
         try {
-            const res = await fetch('/api/utilisateurs');
+            const res = await fetch('/api/utilisateurs', {
+                headers: { 'x-user-id': currentUser?.id.toString() || '' }
+            });
             if (res.ok) setUsers(await res.json());
             else setErrorMsg('Impossible de charger les utilisateurs.');
         } catch { setErrorMsg('Erreur réseau.'); }
@@ -124,7 +128,10 @@ export default function UsersPermissionsPage() {
         try {
             const res = await fetch('/api/utilisateurs', {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'x-user-id': currentUser?.id.toString() || ''
+                },
                 body: JSON.stringify({ id: user.id, role: user.role, permissions: user.permissions })
             });
             if (res.ok) { setSuccessMsg(`✓ Droits mis à jour pour ${user.username}.`); setTimeout(() => setSuccessMsg(''), 4000); }
@@ -142,7 +149,10 @@ export default function UsersPermissionsPage() {
         setDeleteConfirmId(null);
         setDeletingId(user.id);
         try {
-            const res = await fetch(`/api/utilisateurs?id=${user.id}`, { method: 'DELETE' });
+            const res = await fetch(`/api/utilisateurs?id=${user.id}`, { 
+                method: 'DELETE',
+                headers: { 'x-user-id': currentUser?.id.toString() || '' }
+            });
             if (res.ok) {
                 setSuccessMsg(`Compte supprimé : ${user.username}`);
                 setUsers(users.filter(u => u.id !== user.id));

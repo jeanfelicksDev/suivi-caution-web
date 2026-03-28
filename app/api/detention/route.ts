@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { checkPermission } from '@/lib/auth-server';
 
 // GET /api/detention?numFacture=xxx  → liste des détentions d'un dossier
 export async function GET(request: Request) {
@@ -20,6 +21,10 @@ export async function GET(request: Request) {
 
 // POST /api/detention  → créer une nouvelle ligne
 export async function POST(request: Request) {
+    const userId = request.headers.get('x-user-id') || undefined;
+    if (!await checkPermission(userId, 'DOSSIER_WRITE')) {
+        return NextResponse.json({ error: 'Permission refusée' }, { status: 403 });
+    }
     const body = await request.json();
     const { num_facture_caution, num_facture_dmdt, montant_facture, commentaire, date_dmdt } = body;
 
@@ -42,6 +47,10 @@ export async function POST(request: Request) {
 
 // PUT /api/detention  → mettre à jour une ligne existante
 export async function PUT(request: Request) {
+    const userId = request.headers.get('x-user-id') || undefined;
+    if (!await checkPermission(userId, 'DOSSIER_WRITE')) {
+        return NextResponse.json({ error: 'Permission refusée' }, { status: 403 });
+    }
     const body = await request.json();
     const { id, num_facture_dmdt, montant_facture, commentaire, date_dmdt } = body;
 
@@ -64,6 +73,10 @@ export async function PUT(request: Request) {
 
 // DELETE /api/detention?id=xxx
 export async function DELETE(request: Request) {
+    const userId = request.headers.get('x-user-id') || undefined;
+    if (!await checkPermission(userId, 'DOSSIER_WRITE')) {
+        return NextResponse.json({ error: 'Permission refusée' }, { status: 403 });
+    }
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
 

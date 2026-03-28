@@ -1,9 +1,14 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { checkPermission } from '@/lib/auth-server';
 import { sendNewDossierEmail } from '@/lib/mailer';
 
 export async function POST(request: Request) {
     try {
+        const userId = request.headers.get('x-user-id') || undefined;
+        if (!await checkPermission(userId, 'DOSSIER_WRITE')) {
+            return NextResponse.json({ error: 'Permission refusée' }, { status: 403 });
+        }
         const body = await request.json();
 
         // Basic validation
