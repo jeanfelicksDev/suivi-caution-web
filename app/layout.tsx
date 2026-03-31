@@ -10,7 +10,7 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: "Suivi des Cautions - Gestion Portuaire",
+  title: "Suivi_caution_Web 2.0",
   description: "Application de suivi et de gestion des cautions",
 };
 

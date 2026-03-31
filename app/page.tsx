@@ -762,7 +762,7 @@ function HomePageInternal() {
                                 <input type="text" name="num_avoir" value={formData.num_avoir || ''} onChange={handleChange} disabled={!canWrite} />
                             </Field>
                             <Field label="Fiche Avoir" labelStyle={{ justifyContent: 'center' }}>
-                                <button onClick={() => setShowFicheAvoir(true)} className="btn btn-secondary" style={{ width: '100%', gap: '0.5rem' }}>
+                                <button onClick={() => setShowFicheAvoir(true)} className="btn btn-secondary" style={{ width: '100%', gap: '0.5rem', backgroundColor: '#f1f5f9', color: '#334155', borderColor: '#cbd5e1' }}>
                                     <Printer size={18} /> Fiche Gestion Avoirs
                                 </button>
                             </Field>
