@@ -1,5 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+// Polyfill pour le moteur interne de pdf-parse (pdf.js) qui réclame des APIs web manquantes sur le serveur Vercel (Node.js)
+if (typeof global !== 'undefined' && !(global as any).DOMMatrix) {
+  (global as any).DOMMatrix = class DOMMatrix {
+      constructor() { return this; }
+  };
+}
+
 export async function POST(req: NextRequest) {
   try {
     // Utilisation d'un import classique statique pour obliger Vercel à inclure le module
