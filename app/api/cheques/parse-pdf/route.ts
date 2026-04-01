@@ -3,43 +3,135 @@ import path from 'path';
 
 export const runtime = 'nodejs';
 
-// Extraction du texte PDF via pdfjs-dist (ESM dynamique)
-// On évite pdf-parse qui accède à des fichiers de test inexistants sur Vercel
-async function extractTextFromPDF(buffer: Buffer): Promise<string> {
-  // Import dynamique ESM nécessaire pour pdfjs-dist v5+
+// ── Types ────────────────────────────────────────────────────
+interface PdfItem {
+  str: string;
+  x: number;
+  y: number;
+}
+
+interface ChequeRow {
+  num_cheque: string;
+  banque: string;
+  montant: number;
+  num_facture_caution: string;
+  beneficiaire: string;
+  date_rex: string;
+  date_cheque: string;
+}
+
+// ── Colonnes identifiées par plage X (mesurées dans le PDF) ──
+// DATE ~146 | N°CHEQUE ~241 | BANQUE ~278 | BENEFICIAIRE ~316
+// MONTANT ~411 | MANDATAIRE ~440 | FACTURE ~506
+const COLS = {
+  date:        { xMin: 130, xMax: 230 },
+  num_cheque:  { xMin: 230, xMax: 270 },
+  banque:      { xMin: 270, xMax: 310 },
+  beneficiaire:{ xMin: 310, xMax: 400 },
+  montant:     { xMin: 400, xMax: 440 },
+  mandataire:  { xMin: 440, xMax: 500 },
+  facture:     { xMin: 500, xMax: 560 },
+};
+
+function getCol(x: number): keyof typeof COLS | null {
+  for (const [col, range] of Object.entries(COLS)) {
+    if (x >= range.xMin && x < range.xMax) return col as keyof typeof COLS;
+  }
+  return null;
+}
+
+// ── Extraction des items positionnés depuis le PDF ───────────
+async function extractItemsFromPDF(buffer: Buffer): Promise<PdfItem[]> {
   const pdfjsLib = await import('pdfjs-dist/legacy/build/pdf.mjs' as any);
 
-  // On pointe vers le fichier worker inclus dans pdfjs-dist
-  // Sur Vercel, ce fichier est présent grâce à outputFileTracingIncludes
   const workerPath = path.join(
     process.cwd(),
-    'node_modules',
-    'pdfjs-dist',
-    'legacy',
-    'build',
-    'pdf.worker.mjs'
+    'node_modules', 'pdfjs-dist', 'legacy', 'build', 'pdf.worker.mjs'
   );
   pdfjsLib.GlobalWorkerOptions.workerSrc = `file://${workerPath}`;
 
-  const uint8Array = new Uint8Array(buffer);
-  const loadingTask = pdfjsLib.getDocument({ data: uint8Array });
+  const pdfDocument = await pdfjsLib.getDocument({ data: new Uint8Array(buffer) }).promise;
 
-  const pdfDocument = await loadingTask.promise;
-  const numPages = pdfDocument.numPages;
-
-  let fullText = '';
-  for (let pageNum = 1; pageNum <= numPages; pageNum++) {
+  const allItems: PdfItem[] = [];
+  for (let pageNum = 1; pageNum <= pdfDocument.numPages; pageNum++) {
     const page = await pdfDocument.getPage(pageNum);
     const textContent = await page.getTextContent();
-    const pageText = textContent.items
-      .map((item: any) => ('str' in item ? item.str : ''))
-      .join(' ');
-    fullText += pageText + '\n';
+
+    for (const item of textContent.items) {
+      if (!('str' in item) || !item.str.trim()) continue;
+      const x = Math.round(item.transform[4]);
+      const y = Math.round(item.transform[5]);
+      allItems.push({ str: item.str.trim(), x, y });
+    }
   }
 
-  return fullText;
+  return allItems;
 }
 
+// ── Regroupement par ligne (Y similaire) puis par colonne X ──
+function parseItemsToRows(items: PdfItem[]): ChequeRow[] {
+  // 1. Regrouper les items par valeur Y (tolérance ±2px)
+  const lineMap = new Map<number, PdfItem[]>();
+  for (const item of items) {
+    let matched = false;
+    for (const [key] of lineMap) {
+      if (Math.abs(item.y - key) <= 2) {
+        lineMap.get(key)!.push(item);
+        matched = true;
+        break;
+      }
+    }
+    if (!matched) lineMap.set(item.y, [item]);
+  }
+
+  // 2. Trier les lignes par Y décroissant (PDF: Y part du bas)
+  const sortedLines = Array.from(lineMap.entries())
+    .sort((a, b) => b[0] - a[0]);
+
+  const cheques: ChequeRow[] = [];
+
+  for (const [, lineItems] of sortedLines) {
+    // Trier les items de la ligne par X croissant
+    lineItems.sort((a, b) => a.x - b.x);
+
+    // Mapper chaque item vers sa colonne
+    const row: Record<string, string> = {};
+    for (const item of lineItems) {
+      const col = getCol(item.x);
+      if (col) {
+        // Concaténer si plusieurs items dans la même colonne (ex: "400 000")
+        row[col] = row[col] ? row[col] + ' ' + item.str : item.str;
+      }
+    }
+
+    // Valider que c'est bien une ligne de chèque (doit avoir FACTURE et N°CHEQUE)
+    const facture = row['facture']?.trim().toUpperCase() || '';
+    const numCheque = row['num_cheque']?.trim() || '';
+
+    if (!facture || !numCheque) continue;
+    // Ignorer les lignes d'en-tête
+    if (facture === 'FACTURE' || numCheque === 'N°CHEQUE' || numCheque.toUpperCase() === 'N°CHEQUE') continue;
+    // La facture doit commencer par FI ou être numérique long
+    if (!facture.startsWith('FI') && !/^\d{8,}$/.test(facture)) continue;
+
+    const montantStr = (row['montant'] || '').replace(/\s/g, '');
+    const montant = parseInt(montantStr) || 0;
+
+    cheques.push({
+      num_cheque: numCheque,
+      banque: row['banque']?.trim() || '',
+      montant,
+      num_facture_caution: facture,
+      beneficiaire: row['beneficiaire']?.trim() || '—',
+      date_rex: row['mandataire']?.trim() || '—',
+      date_cheque: '',
+    });
+  }
+
+  return cheques;
+}
+
+// ── Handler ──────────────────────────────────────────────────
 export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData();
@@ -51,9 +143,9 @@ export async function POST(req: NextRequest) {
 
     const buffer = Buffer.from(await file.arrayBuffer());
 
-    let text: string;
+    let items: PdfItem[];
     try {
-      text = await extractTextFromPDF(buffer);
+      items = await extractItemsFromPDF(buffer);
     } catch (pdfError: any) {
       console.error('Erreur extraction PDF:', pdfError);
       return NextResponse.json(
@@ -62,79 +154,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    console.log('PDF text length extracted:', text.length);
+    console.log(`PDF items extracted: ${items.length}`);
 
-    const lines = text
-      .split(/[\r\n]+/)
-      .map((l: string) => l.trim())
-      .filter(Boolean);
+    const cheques = parseItemsToRows(items);
 
-    const cheques: any[] = [];
-
-    // Format attendu : DATE N°CHEQUE BANQUE BENEFICIAIRE MONTANT MANDATAIRE FACTURE
-    // Ex: 26-mars 1643250 SGCI ISOLDE TRANSIT INTERNATIONALE 400 000 KOUILAN TCHEBLEI FI01511302
-
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i];
-      const parts = line.split(/\s+/);
-
-      let num_facture = '';
-      let factureIdx = -1;
-
-      for (let j = parts.length - 1; j >= 0; j--) {
-        const p = parts[j].toUpperCase();
-        if (p.startsWith('FI') || (p.length >= 8 && /^\d+$/.test(p))) {
-          num_facture = p;
-          factureIdx = j;
-          break;
-        }
-      }
-
-      if (!num_facture || parts.length < 4) continue;
-
-      const lineUntilFacture = parts.slice(0, factureIdx).join(' ');
-      const montantMatches = lineUntilFacture.match(/(\d{1,3}(?:\s\d{3})+|\d{4,})/g);
-
-      if (montantMatches && montantMatches.length > 0) {
-        let montantStr = '';
-        let montantVal = 0;
-        const numChequeHypothese = parts[1] || '';
-
-        for (let m = montantMatches.length - 1; m >= 0; m--) {
-          const mStr = montantMatches[m];
-          const mVal = parseInt(mStr.replace(/\s/g, ''));
-          if (mStr.replace(/\s/g, '') !== numChequeHypothese) {
-            montantStr = mStr;
-            montantVal = mVal;
-            break;
-          }
-        }
-
-        if (!montantStr) {
-          montantStr = montantMatches[montantMatches.length - 1];
-          montantVal = parseInt(montantStr.replace(/\s/g, ''));
-        }
-
-        const num_cheque = parts[1] || '';
-        const banque = parts[2] || '';
-        const montantPos = lineUntilFacture.lastIndexOf(montantStr);
-        const banqueIdx = lineUntilFacture.indexOf(banque);
-        const banqueEndPos = banqueIdx + banque.length;
-
-        const beneficiaire = lineUntilFacture.substring(banqueEndPos, montantPos).trim();
-        const mandataire = lineUntilFacture.substring(montantPos + montantStr.length).trim();
-
-        cheques.push({
-          num_cheque,
-          banque,
-          montant: montantVal,
-          num_facture_caution: num_facture,
-          beneficiaire: beneficiaire || '—',
-          date_rex: mandataire || '—',
-          date_cheque: '',
-        });
-      }
-    }
+    console.log(`Cheques parsed: ${cheques.length}`);
 
     return NextResponse.json({ cheques });
   } catch (error: any) {
