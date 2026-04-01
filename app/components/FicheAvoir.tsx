@@ -256,6 +256,15 @@ export default function FicheAvoir({ dossier, onClose }: Props) {
                         borderRadius: '2px',
                     }}>
 
+                        {/* ── Date d'impression ── */}
+                        <div style={{
+                            display: 'flex', justifyContent: 'flex-end',
+                            padding: '6px 4px 4px 4px',
+                            fontSize: '10px', color: '#555', fontStyle: 'italic',
+                        }}>
+                            Imprimé le : <strong style={{ marginLeft: 4, fontStyle: 'normal', color: '#222' }}>{today()}</strong>
+                        </div>
+
                         {/* ╔══════════ BLOC PRINCIPAL ══════════╗ */}
                         <div style={{ border: `3px solid ${BORDER}` }}>
 
