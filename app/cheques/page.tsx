@@ -395,18 +395,17 @@ export default function ChequesPage() {
                                         <X size={14} /> {canWriteCheque ? 'Réinitialiser' : 'Fermer la vue'}
                                     </button>
                                 )}
-                                {rows.length > 0 && !selectedListId && canWriteCheque && (
+                                {rows.length > 0 && !selectedListId && canWriteCheque && dateListeRecu && (
                                     <button 
                                         className="btn btn-primary" 
                                         onClick={doImport} 
-                                        disabled={importing || !dateListeRecu}
+                                        disabled={importing}
                                         style={{ 
                                             display: 'flex', alignItems: 'center', gap: '0.4rem', 
                                             fontSize: '0.85rem', padding: '0.4rem 1.2rem',
-                                            opacity: (!dateListeRecu || importing) ? 0.5 : 1,
-                                            cursor: (!dateListeRecu || importing) ? 'not-allowed' : 'pointer'
+                                            opacity: importing ? 0.5 : 1,
+                                            cursor: importing ? 'not-allowed' : 'pointer'
                                         }}
-                                        title={!dateListeRecu ? "Veuillez renseigner la Date Liste Reçu avant de déverser dans la base" : ""}
                                     >
                                         {importing
                                             ? <><RefreshCw size={14} style={{ animation: 'spin 1s linear infinite' }} /> Import en cours...</>

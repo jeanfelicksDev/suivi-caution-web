@@ -853,25 +853,25 @@ function HomePageInternal() {
 
                     <Fieldset title="SIGNATURE & PIECE DE CAISSE" accentColor="#4f46e5" bgTint="rgba(79, 70, 229, 0.02)">
                         <div className="grid grid-cols-3">
+                            <Field label="Date Pièce Caisse">
+                                <input type={formData.date_piece_caisse ? "date" : "text"} name="date_piece_caisse" value={formData.date_piece_caisse || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_piece_caisse && (e.target.type = "text")} disabled={!canWrite} />
+                            </Field>
                             <Field label="Date 1ère Signature">
                                 <input type={formData.date_1er_signature ? "date" : "text"} name="date_1er_signature" value={formData.date_1er_signature || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_1er_signature && (e.target.type = "text")} disabled={!canWrite} />
                             </Field>
-                            <Field label="Date Retour 1ere Sig.">
-                                <input type={formData.date_retour_1er_signature ? "date" : "text"} name="date_retour_1er_signature" value={formData.date_retour_1er_signature || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_retour_1er_signature && (e.target.type = "text")} disabled={!canWrite} />
-                            </Field>
                             <Field label="Date 2ème Signature">
                                 <input type={formData.date_2e_signature ? "date" : "text"} name="date_2e_signature" value={formData.date_2e_signature || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_2e_signature && (e.target.type = "text")} disabled={!canWrite} />
-                            </Field>
-                            <Field label="Date Retour 2e Sig.">
-                                <input type={formData.date_retour_2e_signature ? "date" : "text"} name="date_retour_2e_signature" value={formData.date_retour_2e_signature || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_retour_2e_signature && (e.target.type = "text")} disabled={!canWrite} />
-                            </Field>
-                            <Field label="Date Pièce Caisse">
-                                <input type={formData.date_piece_caisse ? "date" : "text"} name="date_piece_caisse" value={formData.date_piece_caisse || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_piece_caisse && (e.target.type = "text")} disabled={!canWrite} />
                             </Field>
                             <Field label="Montant Final (FCFA)">
                                 <input type="text" name="montant_final" value={formData.montant_final != null ? new Intl.NumberFormat('fr-FR').format(formData.montant_final) : '0'} readOnly 
                                     style={{ background: '#f8fafc', color: '#1e293b', fontWeight: 800, border: '1px solid #cbd5e1' }}
                                     title="Calculé automatiquement : Caution - (Détentions + Recouvrements)" />
+                            </Field>
+                            <Field label="Date Retour 1ere Sig.">
+                                <input type={formData.date_retour_1er_signature ? "date" : "text"} name="date_retour_1er_signature" value={formData.date_retour_1er_signature || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_retour_1er_signature && (e.target.type = "text")} disabled={!canWrite} />
+                            </Field>
+                            <Field label="Date Retour 2e Sig.">
+                                <input type={formData.date_retour_2e_signature ? "date" : "text"} name="date_retour_2e_signature" value={formData.date_retour_2e_signature || ''} onChange={handleChange} onFocus={(e) => (e.target.type = "date")} onBlur={(e) => !formData.date_retour_2e_signature && (e.target.type = "text")} disabled={!canWrite} />
                             </Field>
                         </div>
                     </Fieldset>
