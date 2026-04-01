@@ -1,18 +1,47 @@
 import { NextRequest, NextResponse } from 'next/server';
+import path from 'path';
 
-// Polyfill pour le moteur interne de pdf-parse (pdf.js) qui réclame des APIs web manquantes sur le serveur Vercel (Node.js)
-if (typeof global !== 'undefined' && !(global as any).DOMMatrix) {
-  (global as any).DOMMatrix = class DOMMatrix {
-      constructor() { return this; }
-  };
+export const runtime = 'nodejs';
+
+// Extraction du texte PDF via pdfjs-dist (ESM dynamique)
+// On évite pdf-parse qui accède à des fichiers de test inexistants sur Vercel
+async function extractTextFromPDF(buffer: Buffer): Promise<string> {
+  // Import dynamique ESM nécessaire pour pdfjs-dist v5+
+  const pdfjsLib = await import('pdfjs-dist/legacy/build/pdf.mjs' as any);
+
+  // On pointe vers le fichier worker inclus dans pdfjs-dist
+  // Sur Vercel, ce fichier est présent grâce à outputFileTracingIncludes
+  const workerPath = path.join(
+    process.cwd(),
+    'node_modules',
+    'pdfjs-dist',
+    'legacy',
+    'build',
+    'pdf.worker.mjs'
+  );
+  pdfjsLib.GlobalWorkerOptions.workerSrc = `file://${workerPath}`;
+
+  const uint8Array = new Uint8Array(buffer);
+  const loadingTask = pdfjsLib.getDocument({ data: uint8Array });
+
+  const pdfDocument = await loadingTask.promise;
+  const numPages = pdfDocument.numPages;
+
+  let fullText = '';
+  for (let pageNum = 1; pageNum <= numPages; pageNum++) {
+    const page = await pdfDocument.getPage(pageNum);
+    const textContent = await page.getTextContent();
+    const pageText = textContent.items
+      .map((item: any) => ('str' in item ? item.str : ''))
+      .join(' ');
+    fullText += pageText + '\n';
+  }
+
+  return fullText;
 }
 
 export async function POST(req: NextRequest) {
   try {
-    // Utilisation d'un import classique statique pour obliger Vercel à inclure le module
-    const pdfParse = require('pdf-parse');
-    const { PDFParse } = pdfParse;
-
     const formData = await req.formData();
     const file = formData.get('file') as File;
 
@@ -21,86 +50,98 @@ export async function POST(req: NextRequest) {
     }
 
     const buffer = Buffer.from(await file.arrayBuffer());
-    const parser = new PDFParse({ data: buffer });
-    const result = await parser.getText();
-    await parser.destroy();
 
-    const lines = result.text.split('\n');
+    let text: string;
+    try {
+      text = await extractTextFromPDF(buffer);
+    } catch (pdfError: any) {
+      console.error('Erreur extraction PDF:', pdfError);
+      return NextResponse.json(
+        { error: 'Erreur interne de lecture PDF', details: pdfError.message },
+        { status: 500 }
+      );
+    }
+
+    console.log('PDF text length extracted:', text.length);
+
+    const lines = text
+      .split(/[\r\n]+/)
+      .map((l: string) => l.trim())
+      .filter(Boolean);
+
     const cheques: any[] = [];
 
-    // Simple regex or split logic to parse the lines based on the structure we saw
-    // DATE N°CHEQUE BANQUE BENEFICIAIRE MONTANT MANDATAIRE FACTURE
-    // 26-mars 1643250 SGCI ISOLDE TRANSIT INTERNATIONALE 400 000 KOUILAN TCHEBLEI ZAPELEZ FI01511302
+    // Format attendu : DATE N°CHEQUE BANQUE BENEFICIAIRE MONTANT MANDATAIRE FACTURE
+    // Ex: 26-mars 1643250 SGCI ISOLDE TRANSIT INTERNATIONALE 400 000 KOUILAN TCHEBLEI FI01511302
 
-    for (const line of lines) {
-      // Normalize spaces (convert NBSP to normal space)
-      const normalizedLine = line.replace(/[\u00a0\u1680\u2000-\u200a\u2028\u2029\u202f\u205f\u3000]/g, ' ');
-      const trimmedLine = normalizedLine.trim();
-      
-      console.log('Parsing line:', trimmedLine);
-      if (!trimmedLine || trimmedLine.startsWith('LISTE') || trimmedLine.startsWith('DATE') || trimmedLine.startsWith('#') || trimmedLine.startsWith('--')) {
-        continue;
-      }
-
-      const parts = trimmedLine.split(/\s+/);
-      if (parts.length < 5) continue;
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      const parts = line.split(/\s+/);
 
       let num_facture = '';
-      // On cherche une partie qui ressemble à une facture (FI... ou un numéro long)
-      for (let i = parts.length - 1; i >= 0; i--) {
-        const pStr = parts[i];
-        if (pStr.startsWith('FI') || (pStr.length >= 8 && /^\d+$/.test(pStr))) {
-          num_facture = pStr;
+      let factureIdx = -1;
+
+      for (let j = parts.length - 1; j >= 0; j--) {
+        const p = parts[j].toUpperCase();
+        if (p.startsWith('FI') || (p.length >= 8 && /^\d+$/.test(p))) {
+          num_facture = p;
+          factureIdx = j;
           break;
         }
       }
 
-      if (!num_facture) {
-          // Si on n'a rien trouvé avec FI, on prend le dernier élément si c'est alphanumérique long
-          const lastPart = parts[parts.length - 1];
-          if (lastPart.length > 5 && /[a-zA-Z]/.test(lastPart) && /\d/.test(lastPart)) {
-              num_facture = lastPart;
-          } else {
-              continue;
-          }
-      }
+      if (!num_facture || parts.length < 4) continue;
 
-      const num_cheque = parts[1];
-      const banque = parts[2];
-      
-      // Montant usually follows banque and beneficiaire
-      // Regex: look for 1-3 digits followed by groups of 3 digits
-      const montantRegex = /\s(\d{1,3}(?:\s\d{3})*)\s/;
-      const match = trimmedLine.match(montantRegex);
-      
-      if (match) {
-        const montantStr = match[1];
-        const montantVal = parseInt(montantStr.replace(/\s/g, ''));
-        const montantPos = trimmedLine.indexOf(montantStr);
-        const montantEndPos = montantPos + montantStr.length;
-        
-        const banquePos = trimmedLine.indexOf(banque);
-        const banqueEndPos = banquePos + banque.length;
-        const beneficiaire = trimmedLine.substring(banqueEndPos, montantPos).trim();
-        
-        const numFacturePos = trimmedLine.indexOf(num_facture);
-        const mandataire = trimmedLine.substring(montantEndPos, numFacturePos).trim();
-        
+      const lineUntilFacture = parts.slice(0, factureIdx).join(' ');
+      const montantMatches = lineUntilFacture.match(/(\d{1,3}(?:\s\d{3})+|\d{4,})/g);
+
+      if (montantMatches && montantMatches.length > 0) {
+        let montantStr = '';
+        let montantVal = 0;
+        const numChequeHypothese = parts[1] || '';
+
+        for (let m = montantMatches.length - 1; m >= 0; m--) {
+          const mStr = montantMatches[m];
+          const mVal = parseInt(mStr.replace(/\s/g, ''));
+          if (mStr.replace(/\s/g, '') !== numChequeHypothese) {
+            montantStr = mStr;
+            montantVal = mVal;
+            break;
+          }
+        }
+
+        if (!montantStr) {
+          montantStr = montantMatches[montantMatches.length - 1];
+          montantVal = parseInt(montantStr.replace(/\s/g, ''));
+        }
+
+        const num_cheque = parts[1] || '';
+        const banque = parts[2] || '';
+        const montantPos = lineUntilFacture.lastIndexOf(montantStr);
+        const banqueIdx = lineUntilFacture.indexOf(banque);
+        const banqueEndPos = banqueIdx + banque.length;
+
+        const beneficiaire = lineUntilFacture.substring(banqueEndPos, montantPos).trim();
+        const mandataire = lineUntilFacture.substring(montantPos + montantStr.length).trim();
+
         cheques.push({
           num_cheque,
           banque,
           montant: montantVal,
           num_facture_caution: num_facture,
-          beneficiaire,
-          date_rex: mandataire,
-          date_cheque: ''
+          beneficiaire: beneficiaire || '—',
+          date_rex: mandataire || '—',
+          date_cheque: '',
         });
       }
     }
 
     return NextResponse.json({ cheques });
   } catch (error: any) {
-    console.error('Error parsing PDF:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error('General handling error:', error);
+    return NextResponse.json(
+      { error: 'Erreur lors du traitement du fichier', details: error.message },
+      { status: 500 }
+    );
   }
 }

@@ -9,7 +9,7 @@ export default function FieldHighlighter() {
                 const val = String(el.value).trim();
                 if (val !== '' && val !== '0') {
                     // Exclure la barre de recherche globale en haut si possible
-                    if (el.placeholder && el.placeholder.includes('Entrez le numéro')) {
+                    if (el.placeholder && (el.placeholder.includes('Entrez le numéro') || el.placeholder.includes('N° FACTURE'))) {
                         return;
                     }
                     el.classList.add('filled-field');

@@ -559,54 +559,96 @@ function HomePageInternal() {
         />
       )}
 
-      <main style={{ flex: 1, padding: isExisting ? '1rem 2rem' : '0' }}>
-        {!isExisting && (
-          <div style={{ padding: '6rem 2rem 2rem 2rem', textAlign: 'center' }}>
-            <h1 style={{ fontSize: '1.8rem', marginBottom: '2rem', color: 'var(--primary)' }}>Consulter ou Créer un nouveau dossier</h1>
-            <div style={{ maxWidth: '600px', margin: '0 auto' }} className="card">
-              <p style={{ marginBottom: '1.5rem', color: 'var(--text-muted)' }}>Entrez un numéro de facture pour commencer</p>
-              <div style={{ display: 'flex', gap: '0.75rem' }}>
-                <div style={{ flex: 1, position: 'relative' }}>
-                  <Search size={22} style={{ position: 'absolute', left: '0.8rem', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
-                  <input type="text" placeholder="N° FACTURE" value={numFacture} onChange={e => setNumFacture(e.target.value.toUpperCase())} style={{ paddingLeft: '2.5rem', fontSize: '1.9rem' }} onKeyDown={(e) => e.key === 'Enter' && doSearch()} />
-                </div>
-                <button onClick={() => doSearch()} className="btn btn-primary" style={{ padding: '0 2rem', fontSize: '1.1rem', fontWeight: 800 }}>CONSULTER</button>
+      <main style={{ flex: 1, padding: '1rem 2rem' }}>
+        
+        {/* Barre de recherche (Toujours visible au sommet) */}
+        <div style={{
+          position: 'sticky', top: 0, zIndex: 100,
+          background: 'var(--background)',
+          padding: '1rem 0 1.5rem 0',
+        }}>
+          <section className="card" style={{
+            maxWidth: '650px', margin: '0 auto',
+            padding: '1rem 1.25rem',
+            borderTop: `4px solid var(--accent)`,
+            boxShadow: 'var(--shadow-lg)',
+            borderRadius: '16px'
+          }}>
+            <form onSubmit={(e) => { e.preventDefault(); doSearch(); }} style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+              <div style={{ flex: 1, position: 'relative' }}>
+                <Search size={18} style={{ position: 'absolute', left: '0.8rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+                <input
+                  type="text"
+                  placeholder="N° DE FACTURE (ex: FI01202158)..."
+                  value={numFacture}
+                  onChange={e => setNumFacture(e.target.value.toUpperCase())}
+                  style={{ 
+                    paddingLeft: '2.5rem', 
+                    fontSize: '1.1rem', 
+                    fontWeight: 700,
+                    color: '#0f172a',
+                    textTransform: 'uppercase',
+                    border: '1px solid #e2e8f0',
+                    borderRadius: '8px',
+                    width: '100%',
+                    padding: '0.6rem 1rem 0.6rem 2.5rem',
+                  }}
+                  required
+                />
               </div>
-            </div>
-          </div>
-        )}
+              <button type="submit" className="btn btn-primary" disabled={loading} style={{ whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.5rem 1.25rem' }}>
+                {loading
+                  ? <><RefreshCw size={15} style={{ animation: 'spin 1s linear infinite' }} /> ...</>
+                  : <><Search size={15} /> Vérifier</>
+                }
+              </button>
+
+              {isExisting && canWrite && (
+                <button 
+                  type="button" 
+                  className="btn btn-primary" 
+                  onClick={doSave} 
+                  disabled={saving} 
+                  style={{ 
+                    whiteSpace: 'nowrap', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: '0.4rem', 
+                    padding: '0.5rem 1.25rem',
+                    background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                    border: 'none',
+                  }}
+                >
+                  {saving
+                    ? <><RefreshCw size={15} style={{ animation: 'spin 1s linear infinite' }} /> ...</>
+                    : <><Save size={15} /> Mettre à jour</>
+                  }
+                </button>
+              )}
+
+              {searchResult && (
+                <button type="button" className="btn btn-secondary" onClick={doReset} title="Réinitialiser" style={{ padding: '0.5rem', minWidth: '40px' }}>
+                  <RotateCcw size={15} />
+                </button>
+              )}
+            </form>
+
+            {error && (
+              <p style={{ color: '#ef4444', marginTop: '0.5rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.8rem' }}>
+                <AlertCircle size={14} /> {error}
+              </p>
+            )}
+
+            {isExisting && (
+              <div style={{ marginTop: '0.5rem', padding: '0.4rem 0.8rem', background: '#f0fdf4', borderRadius: '8px', color: '#16a34a', fontSize: '0.8rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                <CheckCircle2 size={14} /> Dossier <strong>{formData.num_facture_caution}</strong> — Modifier ou Ajouter des données
+              </div>
+            )}
+          </section>
+        </div>
 
         {isExisting && (
           <>
-            <div style={{
-              position: 'sticky', top: 0, zIndex: 100,
-              background: 'var(--background)',
-              padding: '1rem 0 0.5rem 0',
-              marginBottom: '1.5rem',
-              display: 'flex',
-              justifyContent: 'center'
-            }}>
-              <section className="card" style={{ maxWidth: '800px', width: '100%', padding: '1.25rem', border: '1px solid #e2e8f0', borderRadius: '1.25rem', boxShadow: 'var(--shadow-lg)' }}>
-                <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', marginBottom: '0.5rem' }}>
-                  <div style={{ flex: 1, position: 'relative' }}>
-                    <Search size={22} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: '#1e293b' }} />
-                    <input type="text" value={numFacture} onChange={e => setNumFacture(e.target.value.toUpperCase())} style={{ paddingLeft: '3rem', fontSize: '1.2rem', fontWeight: 900, border: '1px solid #e2e8f0', background: '#fff', color: '#1e293b' }} placeholder="N° FACTURE" onKeyDown={(e) => e.key === 'Enter' && doSearch()} />
-                  </div>
-                  <button onClick={() => doSearch()} className="btn" style={{ background: '#6366f1', color: 'white', padding: '0 1.5rem', height: '48px', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <Search size={18} /> Vérifier
-                  </button>
-                  {canWrite && (
-                    <button onClick={() => doSave()} disabled={saving} className="btn" style={{ background: '#10b981', color: 'white', padding: '0 1.5rem', height: '48px', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                      <Save size={18} /> {saving ? '...' : 'Mettre à jour'}
-                    </button>
-                  )}
-                  <button onClick={doReset} className="btn-secondary" style={{ width: '48px', height: '48px', padding: 0, borderRadius: '10px' }} title="Retour à l'accueil"><RotateCcw size={20} /></button>
-                </div>
-                <div style={{ background: '#f0fdf4', color: '#16a34a', padding: '0.4rem 1rem', borderRadius: '8px', fontSize: '0.85rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                   <CheckCircle2 size={14} /> Dossier {formData.num_facture_caution} — Modifier ou Ajouter des données
-                </div>
-              </section>
-            </div>
 
             <section className="animate-fade-in card" style={{ 
                 border: '2px solid #6366f1', 
