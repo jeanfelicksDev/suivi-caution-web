@@ -38,7 +38,9 @@ const COLS: { key: keyof ChequeRow; label: string }[] = [
 /* ── Page ────────────────────────────────────────────────── */
 export default function ChequesPage() {
     const fileRef = useRef<HTMLInputElement>(null);
+    const dateInputRef = useRef<HTMLInputElement>(null);
     const [dateListeRecu, setDateListeRecu] = useState('');
+    const [showDateWarning, setShowDateWarning] = useState(false);
     const [fileName, setFileName] = useState('');
     const [rows, setRows] = useState<ChequeRow[]>([]);
     const [importing, setImporting] = useState(false);
@@ -342,25 +344,79 @@ export default function ChequesPage() {
                         <div style={{ display: 'grid', gridTemplateColumns: '220px 1fr', gap: '1rem', alignItems: 'end', marginBottom: '1rem' }}>
 
                             {/* DateListeRecu */}
-                            <div>
+                            <div style={{ position: 'relative' }}>
                                 <label>Date Liste Reçu</label>
                                 <input
+                                    ref={dateInputRef}
                                     type={dateListeRecu ? "date" : "text"}
                                     value={dateListeRecu}
-                                    onChange={e => setDateListeRecu(e.target.value)}
+                                    onChange={e => { setDateListeRecu(e.target.value); setShowDateWarning(false); }}
                                     onFocus={(e) => (e.target.type = "date")}
                                     onBlur={(e) => !dateListeRecu && (e.target.type = "text")}
                                     placeholder="JJ/MM/AAAA"
-                                    style={{ fontWeight: 700 }}
+                                    style={{ fontWeight: 700, outline: showDateWarning ? '2px solid #ef4444' : undefined }}
                                 />
+                                {showDateWarning && (
+                                    <div style={{
+                                        position: 'absolute', top: '100%', left: 0, zIndex: 50,
+                                        marginTop: '6px',
+                                        background: '#1e293b', color: 'white',
+                                        padding: '0.5rem 0.85rem',
+                                        borderRadius: '6px',
+                                        fontSize: '0.8rem', fontWeight: 600,
+                                        whiteSpace: 'nowrap',
+                                        boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
+                                        display: 'flex', alignItems: 'center', gap: '0.4rem',
+                                        animation: 'fadeIn 0.15s ease'
+                                    }}>
+                                        <span style={{ color: '#fbbf24', fontSize: '1rem' }}>⚠</span>
+                                        La date de chèque doit d&apos;abord être renseignée
+                                        {/* Flèche vers le haut */}
+                                        <span style={{
+                                            position: 'absolute', top: '-6px', left: '18px',
+                                            width: 0, height: 0,
+                                            borderLeft: '6px solid transparent',
+                                            borderRight: '6px solid transparent',
+                                            borderBottom: '6px solid #1e293b'
+                                        }} />
+                                    </div>
+                                )}
                             </div>
 
                             {/* Zone drag & drop */}
                                 <div
-                                    onClick={() => canWriteCheque && fileRef.current?.click()}
-                                    onDragOver={e => { e.preventDefault(); canWriteCheque && setDragging(true); }}
+                                    onClick={() => {
+                                        if (!canWriteCheque) return;
+                                        if (!dateListeRecu) {
+                                            setShowDateWarning(true);
+                                            dateInputRef.current?.focus();
+                                            setTimeout(() => setShowDateWarning(false), 3000);
+                                            return;
+                                        }
+                                        fileRef.current?.click();
+                                    }}
+                                    onDragOver={e => {
+                                        e.preventDefault();
+                                        if (!canWriteCheque) return;
+                                        if (!dateListeRecu) {
+                                            setShowDateWarning(true);
+                                            dateInputRef.current?.focus();
+                                            setTimeout(() => setShowDateWarning(false), 3000);
+                                            return;
+                                        }
+                                        setDragging(true);
+                                    }}
                                     onDragLeave={() => setDragging(false)}
-                                    onDrop={handleDrop}
+                                    onDrop={e => {
+                                        if (!dateListeRecu) {
+                                            e.preventDefault();
+                                            setShowDateWarning(true);
+                                            dateInputRef.current?.focus();
+                                            setTimeout(() => setShowDateWarning(false), 3000);
+                                            return;
+                                        }
+                                        handleDrop(e);
+                                    }}
                                     style={{
                                         border: `2px dashed ${dragging ? 'var(--accent)' : 'var(--border)'}`,
                                         borderRadius: '4px',
