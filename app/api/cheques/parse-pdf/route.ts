@@ -26,8 +26,8 @@ interface ChequeRow {
 const COLS = {
   date:        { xMin: 130, xMax: 230 },
   num_cheque:  { xMin: 230, xMax: 270 },
-  banque:      { xMin: 270, xMax: 310 },
-  beneficiaire:{ xMin: 310, xMax: 400 },
+  banque:      { xMin: 270, xMax: 295 },
+  beneficiaire:{ xMin: 295, xMax: 400 },
   montant:     { xMin: 400, xMax: 440 },
   mandataire:  { xMin: 440, xMax: 500 },
   facture:     { xMin: 500, xMax: 560 },
