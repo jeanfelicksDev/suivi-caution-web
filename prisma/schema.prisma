@@ -176,5 +176,6 @@ model montant_recouvrer {
 model app_settings {
   id             Int       @id @default(1)
   scanFolderPath String?   @default("file:///C:/Chemin/Vers/Dossier/Scanne")
+  logoutDelay    Int?      @default(60)
   updated_at     DateTime? @default(now())
 }

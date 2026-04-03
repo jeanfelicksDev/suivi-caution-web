@@ -93,6 +93,7 @@ export default function UsersPermissionsPage() {
     const [successMsg, setSuccessMsg] = useState('');
     const [errorMsg, setErrorMsg] = useState('');
     const [scanPath, setScanPath] = useState('');
+    const [logoutDelay, setLogoutDelay] = useState(60);
     const { user: currentUser } = useAuth();
 
     useEffect(() => { 
@@ -101,6 +102,7 @@ export default function UsersPermissionsPage() {
             .then(res => res.json())
             .then(data => {
                 if (data.scanFolderPath) setScanPath(data.scanFolderPath);
+                if (data.logoutDelay) setLogoutDelay(data.logoutDelay);
             })
             .catch(err => console.error(err));
     }, []);
@@ -200,44 +202,57 @@ export default function UsersPermissionsPage() {
                         <h2 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>Paramètres Globaux</h2>
                     </div>
                     
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                        <div style={{ flex: 1 }}>
-                            <label style={{ display: 'block', fontWeight: 700, fontSize: '0.85rem', color: '#334155', marginBottom: '0.4rem' }}>
-                                Chemin des fichiers scannés (ex: file:///C:/MonDossier)
-                            </label>
-                            <div style={{ display: 'flex', gap: '0.75rem' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                        <div style={{ display: 'flex', gap: '1.25rem', flexWrap: 'wrap' }}>
+                            <div style={{ flex: 3, minWidth: '300px' }}>
+                                <label style={{ display: 'block', fontWeight: 700, fontSize: '0.85rem', color: '#334155', marginBottom: '0.4rem' }}>
+                                    Chemin des fichiers scannés (ex: file:///C:/MonDossier)
+                                </label>
                                 <input 
                                     type="text" 
                                     placeholder="file:///C:/..." 
                                     value={scanPath}
                                     onChange={(e) => setScanPath(e.target.value)}
-                                    style={{ flex: 1, padding: '0.6rem 1rem', borderRadius: '8px', border: '1px solid #cbd5e1' }}
+                                    style={{ width: '100%', padding: '0.6rem 1rem', borderRadius: '8px', border: '1px solid #cbd5e1' }}
                                 />
-                                <button 
-                                    className="btn btn-primary"
-                                    onClick={async () => {
-                                        if (!scanPath) return;
-                                        try {
-                                            const res = await fetch('/api/config', {
-                                                method: 'POST',
-                                                headers: { 'Content-Type': 'application/json' },
-                                                body: JSON.stringify({ scanFolderPath: scanPath })
-                                            });
-                                            if (res.ok) setSuccessMsg('Chemin mis à jour avec succès !');
-                                            else setErrorMsg('Erreur lors de la mise à jour.');
-                                            setTimeout(() => { setSuccessMsg(''); setErrorMsg(''); }, 3000);
-                                        } catch {
-                                            setErrorMsg('Erreur réseau.');
-                                        }
-                                    }}
-                                    style={{ whiteSpace: 'nowrap' }}
-                                >
-                                    <Save size={16} /> Enregistrer le chemin
-                                </button>
                             </div>
-                            <p style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '0.4rem' }}>
-                                Ce chemin sera utilisé pour le bouton "Fichier scanné" sur la page principale.
+                            <div style={{ flex: 1, minWidth: '150px' }}>
+                                <label style={{ display: 'block', fontWeight: 700, fontSize: '0.85rem', color: '#334155', marginBottom: '0.4rem' }}>
+                                    Délai de déconnexion (min)
+                                </label>
+                                <input 
+                                    type="number" 
+                                    value={logoutDelay}
+                                    onChange={(e) => setLogoutDelay(parseInt(e.target.value))}
+                                    style={{ width: '100%', padding: '0.6rem 1rem', borderRadius: '8px', border: '1px solid #cbd5e1' }}
+                                />
+                            </div>
+                        </div>
+                        
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                            <p style={{ fontSize: '0.75rem', color: '#64748b' }}>
+                                Ces paramètres affectent l'ensemble des utilisateurs de l'application.
                             </p>
+                            <button 
+                                className="btn btn-primary"
+                                onClick={async () => {
+                                    try {
+                                        const res = await fetch('/api/config', {
+                                            method: 'POST',
+                                            headers: { 'Content-Type': 'application/json' },
+                                            body: JSON.stringify({ scanFolderPath: scanPath, logoutDelay })
+                                        });
+                                        if (res.ok) setSuccessMsg('Paramètres mis à jour avec succès !');
+                                        else setErrorMsg('Erreur lors de la mise à jour.');
+                                        setTimeout(() => { setSuccessMsg(''); setErrorMsg(''); }, 3000);
+                                    } catch {
+                                        setErrorMsg('Erreur réseau.');
+                                    }
+                                }}
+                                style={{ whiteSpace: 'nowrap' }}
+                            >
+                                <Save size={16} /> Enregistrer les paramètres
+                            </button>
                         </div>
                     </div>
                 </section>

@@ -31,6 +31,7 @@ const PUBLIC_ROUTES = ['/login', '/consultation'];
 export default function AuthProvider({ children }: { children: React.ReactNode }) {
     const [user, setUser] = useState<UserSession | null>(null);
     const [loading, setLoading] = useState(true);
+    const [logoutDelay, setLogoutDelay] = useState(60); // minutes
     const router = useRouter();
     const pathname = usePathname();
 
@@ -50,6 +51,15 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
                 router.push('/login');
             }
         }
+        
+        // Fetch config
+        fetch('/api/config', { cache: 'no-store' })
+            .then(res => res.json())
+            .then(data => {
+                if (data.logoutDelay) setLogoutDelay(data.logoutDelay);
+            })
+            .catch(err => console.error('Error fetching logout delay:', err));
+
         setLoading(false);
     }, [pathname, router, isPublicRoute]);
 
@@ -65,7 +75,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
         router.push('/login');
     }, [router]);
 
-    // Inactivity logout (1 hour)
+    // Inactivity logout
     useEffect(() => {
         if (!user || isPublicRoute) return;
 
@@ -82,7 +92,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
             timeoutId = setTimeout(() => {
                 console.log('Logging out due to inactivity');
                 logout();
-            }, 3600 * 1000); // 1 hour
+            }, logoutDelay * 60 * 1000);
         };
 
         // Events to monitor for activity
@@ -97,7 +107,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
         timeoutId = setTimeout(() => {
             console.log('Logging out due to inactivity');
             logout();
-        }, 3600 * 1000);
+        }, logoutDelay * 60 * 1000);
 
         // Cleanup
         return () => {
@@ -106,7 +116,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
                 window.removeEventListener(event, resetTimer);
             });
         };
-    }, [user, isPublicRoute, logout]);
+    }, [user, isPublicRoute, logout, logoutDelay]);
 
     if (loading) return null;
 

@@ -15,3 +15,6 @@ Cette application permet de gérer les dossiers de cautions basés sur le numér
 
 ## Base de données
 Utilise `prisma/dev.db` (SQLite).
+
+## Déploiement
+L'application est déployée sur Vercel : [suivicautionweb.vercel.app](https://suivicautionweb.vercel.app)
