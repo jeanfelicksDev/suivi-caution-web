@@ -92,9 +92,18 @@ export default function UsersPermissionsPage() {
     const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null);
     const [successMsg, setSuccessMsg] = useState('');
     const [errorMsg, setErrorMsg] = useState('');
+    const [scanPath, setScanPath] = useState('');
     const { user: currentUser } = useAuth();
 
-    useEffect(() => { fetchUsers(); }, []);
+    useEffect(() => { 
+        fetchUsers(); 
+        fetch('/api/config', { cache: 'no-store' })
+            .then(res => res.json())
+            .then(data => {
+                if (data.scanFolderPath) setScanPath(data.scanFolderPath);
+            })
+            .catch(err => console.error(err));
+    }, []);
 
     const fetchUsers = async () => {
         setLoading(true);
@@ -169,15 +178,70 @@ export default function UsersPermissionsPage() {
     );
 
     return (
-        <div style={{ padding: '2rem', width: '100%' }}>
-            <header style={{ marginBottom: '2rem' }}>
-                <h1 style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '1.9rem', color: 'var(--primary)', fontWeight: 800, marginBottom: '0.4rem' }}>
-                    <ShieldCheck size={34} color="var(--accent)" /> Attribution des Droits
-                </h1>
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.88rem' }}>
-                    Configurez les accès de chaque utilisateur par section. Les <strong>Administrateurs</strong> ont un accès total automatique.
-                </p>
+        <div style={{ padding: '2rem', width: '100%', margin: '0 auto' }}>
+            <header style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+                <div>
+                    <h1 style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '1.9rem', color: 'var(--primary)', fontWeight: 800, marginBottom: '0.4rem' }}>
+                        <ShieldCheck size={34} color="var(--accent)" /> Attribution des Droits
+                    </h1>
+                    <p style={{ color: 'var(--text-muted)', fontSize: '0.88rem' }}>
+                        Configurez les accès de chaque utilisateur par section. Les <strong>Administrateurs</strong> ont un accès total automatique.
+                    </p>
+                </div>
             </header>
+
+            {/* Section Paramètres Globaux */}
+            {currentUser?.role === 'ADMIN' && (
+                <section className="card" style={{ marginBottom: '2rem', borderTop: '4px solid #6366f1' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.25rem' }}>
+                        <div style={{ background: '#eef2ff', color: '#6366f1', padding: '0.5rem', borderRadius: '8px' }}>
+                            <RefreshCw size={20} />
+                        </div>
+                        <h2 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>Paramètres Globaux</h2>
+                    </div>
+                    
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                        <div style={{ flex: 1 }}>
+                            <label style={{ display: 'block', fontWeight: 700, fontSize: '0.85rem', color: '#334155', marginBottom: '0.4rem' }}>
+                                Chemin des fichiers scannés (ex: file:///C:/MonDossier)
+                            </label>
+                            <div style={{ display: 'flex', gap: '0.75rem' }}>
+                                <input 
+                                    type="text" 
+                                    placeholder="file:///C:/..." 
+                                    value={scanPath}
+                                    onChange={(e) => setScanPath(e.target.value)}
+                                    style={{ flex: 1, padding: '0.6rem 1rem', borderRadius: '8px', border: '1px solid #cbd5e1' }}
+                                />
+                                <button 
+                                    className="btn btn-primary"
+                                    onClick={async () => {
+                                        if (!scanPath) return;
+                                        try {
+                                            const res = await fetch('/api/config', {
+                                                method: 'POST',
+                                                headers: { 'Content-Type': 'application/json' },
+                                                body: JSON.stringify({ scanFolderPath: scanPath })
+                                            });
+                                            if (res.ok) setSuccessMsg('Chemin mis à jour avec succès !');
+                                            else setErrorMsg('Erreur lors de la mise à jour.');
+                                            setTimeout(() => { setSuccessMsg(''); setErrorMsg(''); }, 3000);
+                                        } catch {
+                                            setErrorMsg('Erreur réseau.');
+                                        }
+                                    }}
+                                    style={{ whiteSpace: 'nowrap' }}
+                                >
+                                    <Save size={16} /> Enregistrer le chemin
+                                </button>
+                            </div>
+                            <p style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '0.4rem' }}>
+                                Ce chemin sera utilisé pour le bouton "Fichier scanné" sur la page principale.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+            )}
 
             {successMsg && <div style={{ padding: '0.7rem 1rem', marginBottom: '1.25rem', background: '#f0fdf4', border: '1px solid #86efac', borderRadius: '8px', color: '#15803d', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.5rem' }}><CheckCircle2 size={16} />{successMsg}</div>}
             {errorMsg && <div style={{ padding: '0.7rem 1rem', marginBottom: '1.25rem', background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: '8px', color: '#b91c1c', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.5rem' }}><AlertCircle size={16} />{errorMsg}</div>}
@@ -188,10 +252,10 @@ export default function UsersPermissionsPage() {
                         <thead>
                             {/* Row 1 – Section headers */}
                             <tr style={{ background: 'var(--primary-dark)' }}>
-                                <th rowSpan={2} style={{ padding: '0.75rem 1rem', textAlign: 'left', color: 'white', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', verticalAlign: 'middle', minWidth: 180, borderRight: '2px solid rgba(255,255,255,0.12)' }}>
+                                <th rowSpan={2} style={{ padding: '0.75rem 0.6rem', textAlign: 'left', color: 'white', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', verticalAlign: 'middle', minWidth: 150, borderRight: '2px solid rgba(255,255,255,0.12)' }}>
                                     Utilisateur
                                 </th>
-                                <th rowSpan={2} style={{ padding: '0.75rem', textAlign: 'center', color: 'white', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', verticalAlign: 'middle', minWidth: 140, borderRight: '2px solid rgba(255,255,255,0.12)' }}>
+                                <th rowSpan={2} style={{ padding: '0.75rem 0.5rem', textAlign: 'center', color: 'white', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', verticalAlign: 'middle', minWidth: 120, borderRight: '2px solid rgba(255,255,255,0.12)' }}>
                                     Rôle
                                 </th>
                                 {SECTIONS.map(s => (
@@ -238,7 +302,7 @@ export default function UsersPermissionsPage() {
                                         borderLeft: ci === 0 ? `2px solid rgba(255,255,255,0.12)` : '1px solid rgba(255,255,255,0.06)',
                                         textTransform: 'uppercase',
                                         letterSpacing: '0.04em',
-                                        minWidth: 60,
+                                        minWidth: 50,
                                     }}>
                                         {col.sub}
                                     </th>
@@ -285,7 +349,7 @@ export default function UsersPermissionsPage() {
                                                     background: isAdmin ? '#fef3c7' : 'white',
                                                     color: isAdmin ? '#92400e' : '#334155',
                                                     cursor: 'pointer', appearance: 'auto',
-                                                    minWidth: 140
+                                                    minWidth: 120
                                                 }}
                                             >
                                                 <option value="USER">Utilisateur</option>

@@ -69,7 +69,7 @@ const Sidebar = () => {
                     <Link 
                         href="/utilisateurs" 
                         className={`nav-item ${pathname === '/utilisateurs' ? 'active' : ''}`}
-                        style={{ color: '#6366f1', '--item-color': '#6366f1' } as any}
+                        style={{ color: pathname === '/utilisateurs' ? 'white' : '#6366f1', '--item-color': '#6366f1' } as any}
                     >
                         <ShieldCheck size={20} />
                         <span>Droits d&apos;Accès</span>

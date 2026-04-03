@@ -20,6 +20,7 @@ interface DossierRow {
     armateur: string | null;
     client_nom: string | null;
     transitaire_nom: string | null;
+    mandataire_nom?: string | null;
     date_reception: string | null;
     date_transmission_ligne: string | null;
     date_mise_litige: string | null;
@@ -225,7 +226,7 @@ export default function HistoriquePage() {
                 'Armateur': row.armateur || '',
                 'Client': row.client_nom || '',
                 'Transitaire': row.transitaire_nom || '',
-                'Étape Courante': etape.label
+                'Mandataire': row.mandataire_nom || ''
             };
         });
 
@@ -457,7 +458,6 @@ export default function HistoriquePage() {
                                                     <td style={{ padding: '0.55rem 0.5rem' }}>{row.armateur || '—'}</td>
                                                     <td style={{ padding: '0.55rem 0.5rem', maxWidth: '150px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={row.client_nom || ''}>{row.client_nom || '—'}</td>
                                                     <td style={{ padding: '0.55rem 0.5rem', maxWidth: '150px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={row.transitaire_nom || ''}>{row.transitaire_nom || '—'}</td>
-                                                    {/* Badge étape courante */}
                                                     <td style={{ padding: '0.55rem 0.5rem' }}>
                                                         {etape.value ? (
                                                             <span style={{

@@ -1,12 +1,13 @@
 'use client';
 
+
 import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import {
   Search, FilePlus, Save, RotateCcw, AlertCircle,
   CheckCircle2, Trash2, X, AlertTriangle, RefreshCw,
-  FileText, ExternalLink, ClipboardList, Mail, Printer,
-  Plus, LayoutDashboard, Clock, Users, TrendingUp, Edit3
+  FileText, ExternalLink, ClipboardList, Mail, Printer, FolderOpen,
+  Plus, LayoutDashboard, Clock, Users, TrendingUp, Edit3, Loader2
 } from 'lucide-react';
 
 import RecouvrementModal from '@/app/components/RecouvrementModal';
@@ -372,6 +373,8 @@ function HomePageInternal() {
   const [showFicheAvoir, setShowFicheAvoir] = useState(false);
   const [partenaireModal, setPartenaireModal] = useState<{ open: boolean; id?: number }>({ open: false });
   const [dashboardStats, setDashboardStats] = useState<any>(null);
+  const [scanFolderPath, setScanFolderPath] = useState("file:///C:/Chemin/Vers/Dossier/Scanne");
+  const [isOpeningPdf, setIsOpeningPdf] = useState(false);
 
   const searchParams = useSearchParams();
 
@@ -380,6 +383,13 @@ function HomePageInternal() {
       .then(res => res.json())
       .then(data => setDashboardStats(data))
       .catch(err => console.error('Stats error', err));
+    
+    fetch('/api/config', { cache: 'no-store' })
+      .then(res => res.json())
+      .then(data => {
+        if (data.scanFolderPath) setScanFolderPath(data.scanFolderPath);
+      })
+      .catch(err => console.error('Config error', err));
   }, []);
 
   useEffect(() => {
@@ -404,6 +414,21 @@ function HomePageInternal() {
   }, [formData.date_cheque, formData.date_cloture, formData.date_retour_compta]);
 
   const isExisting = searchResult?.found === true;
+
+  // Calcul du chemin PDF scanné pour affichage dans le rendu
+  let finalPdfUrl = '';
+  if (formData.num_facture_caution && scanFolderPath) {
+    let base = scanFolderPath.replace(/\\/g, '/');
+    if (!base.startsWith('http') && !base.startsWith('file:///')) {
+      base = 'file:///' + base.replace(/^([a-zA-Z]):\//, '$1:/').replace(/^\/+/, '');
+    }
+    // S'assurer de n'avoir qu'un seul file:///
+    if (base.startsWith('file:///file:///')) {
+        base = base.replace('file:///file:///', 'file:///');
+    }
+    if (base.endsWith('/')) base = base.slice(0, -1);
+    finalPdfUrl = `${base}/${formData.num_facture_caution}.pdf`;
+  }
 
   const showNotif = (type: 'success' | 'error', message: string) => {
     setNotification({ type, message });
@@ -659,7 +684,7 @@ function HomePageInternal() {
                 margin: '0 auto 2rem auto'
             }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', borderBottom: '1px solid #f1f5f9', paddingBottom: '1rem' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flex: 1 }}>
                         <div style={{ background: '#6366f1', color: 'white', padding: '0.5rem', borderRadius: '8px' }}>
                             <FileText size={24} />
                         </div>
@@ -668,16 +693,75 @@ function HomePageInternal() {
                             <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.85rem' }}>Modification du dossier existant</p>
                         </div>
                     </div>
-                    {isAdmin && (
-                        <button type="button" onClick={doDelete} disabled={deleting} style={{ 
-                            background: '#fef2f2', color: '#ef4444', border: '1px solid #fca5a5', 
-                            padding: '0.5rem 1rem', borderRadius: '8px', display: 'flex', 
-                            alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem', fontWeight: 700,
-                            cursor: 'pointer', transition: 'all 0.2s'
-                        }}>
-                            <Trash2 size={16} /> {deleting ? 'Suppression...' : 'Supprimer ce dossier'}
+                    
+                    <div style={{ flex: 1, display: 'flex', justifyContent: 'center', gap: '0.4rem' }}>
+                        {/* Option 1: Lien Direct File:// (Nécessite Enable Local File Links) */}
+                        <a 
+                            href={finalPdfUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            title="Ouverture standard (Nécessite extension 'Enable local file links')"
+                            style={{
+                                display: 'flex', alignItems: 'center', gap: '0.4rem',
+                                background: '#f1f5f9', color: '#334155', border: '1px solid #cbd5e1', 
+                                padding: '0.6rem 0.8rem', borderRadius: '8px', fontSize: '0.85rem', fontWeight: 700,
+                                textDecoration: 'none', cursor: 'pointer', transition: 'all 0.2s',
+                                opacity: formData.num_facture_caution ? 1 : 0.5,
+                                pointerEvents: formData.num_facture_caution ? 'auto' : 'none'
+                            }}
+                        >
+                            <ExternalLink size={16} />
+                            <span>Ouvrir</span>
+                        </a>
+
+                        {/* Option 2: Local Explorer (Puisque l'utilisateur a cette extension installée) */}
+                        <a 
+                            href={finalPdfUrl?.replace('file:///', 'localexplorer:')}
+                            title="Ouverture via l'extension 'Local Explorer'"
+                            style={{
+                                display: 'flex', alignItems: 'center', gap: '0.4rem',
+                                background: '#e0f2fe', color: '#0369a1', border: '1px solid #bae6fd', 
+                                padding: '0.6rem 0.8rem', borderRadius: '8px', fontSize: '0.85rem', fontWeight: 700,
+                                textDecoration: 'none', cursor: 'pointer', transition: 'all 0.2s',
+                                opacity: formData.num_facture_caution ? 1 : 0.5,
+                                pointerEvents: formData.num_facture_caution ? 'auto' : 'none'
+                            }}
+                        >
+                            <FolderOpen size={16} />
+                            <span>Explorer</span>
+                        </a>
+                        
+                        {/* Option 3: Copie (Sécurité absolue) */}
+                        <button
+                            type="button"
+                            onClick={() => {
+                                navigator.clipboard.writeText(finalPdfUrl);
+                                alert("Lien copié !\n\nSi les boutons ne marchent pas :\n1. Ouvrez un nouvel onglet Chrome\n2. Collez (Ctrl+V) et Entrée.");
+                            }}
+                            title="Copier le lien"
+                            disabled={!formData.num_facture_caution}
+                            style={{
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                background: '#fff', color: '#64748b', border: '1px solid #cbd5e1',
+                                padding: '0.6rem', borderRadius: '8px', cursor: 'pointer', opacity: formData.num_facture_caution ? 1 : 0.5,
+                            }}
+                        >
+                            <FileText size={18} />
                         </button>
-                    )}
+                    </div>
+
+                    <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
+                        {isAdmin && (
+                            <button type="button" onClick={doDelete} disabled={deleting} style={{ 
+                                background: '#fef2f2', color: '#ef4444', border: '1px solid #fca5a5', 
+                                padding: '0.5rem 1rem', borderRadius: '8px', display: 'flex', 
+                                alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem', fontWeight: 700,
+                                cursor: 'pointer', transition: 'all 0.2s'
+                            }}>
+                                <Trash2 size={16} /> {deleting ? 'Suppression...' : 'Supprimer ce dossier'}
+                            </button>
+                        )}
+                    </div>
                 </div>
 
                 <div className="grid grid-cols-1" style={{ gap: '1.5rem' }}>

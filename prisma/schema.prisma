@@ -172,3 +172,9 @@ model montant_recouvrer {
   created_at         DateTime? @default(now())
   updated_at         DateTime? @default(now())
 }
+
+model app_settings {
+  id             Int       @id @default(1)
+  scanFolderPath String?   @default("file:///C:/Chemin/Vers/Dossier/Scanne")
+  updated_at     DateTime? @default(now())
+}

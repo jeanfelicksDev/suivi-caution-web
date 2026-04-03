@@ -118,6 +118,7 @@ export async function GET(request: Request) {
                 armateur: true,
                 client_nom: true,
                 transitaire_nom: true,
+                mandataire_nom: true,
                 date_reception: true,
                 date_transmission_ligne: true,
                 date_mise_litige: true,
