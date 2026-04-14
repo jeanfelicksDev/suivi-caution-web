@@ -7,6 +7,7 @@ interface Partenaire {
     id_partenaire: number;
     nom_partenaire: string;
     num_fne?: string | null;
+    email?: string | null;
 }
 
 interface PartenaireComboboxProps {
@@ -14,6 +15,7 @@ interface PartenaireComboboxProps {
     onChange: (val: string) => void;
     type: 'client' | 'transitaire';
     onManage?: (id?: number) => void;
+    onPartnerSelect?: (partner: Partenaire) => void;
     placeholder?: string;
     name: string;
     formData: any;
@@ -26,6 +28,7 @@ export default function PartenaireCombobox({
     onChange,
     type,
     onManage,
+    onPartnerSelect,
     placeholder = "Sélectionner...",
     name,
     required = false,
@@ -88,6 +91,7 @@ export default function PartenaireCombobox({
         onChange(p.nom_partenaire);
         setQuery(p.nom_partenaire);
         setOpen(false);
+        if (onPartnerSelect) onPartnerSelect(p);
     };
 
     return (

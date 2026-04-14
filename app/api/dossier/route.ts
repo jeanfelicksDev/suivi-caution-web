@@ -30,7 +30,20 @@ export async function POST(request: Request) {
 
         // Send email notification (fire-and-forget, don't block the response)
         if (notificationEmail && notificationEmail.trim()) {
-            sendNewDossierEmail(notificationEmail.trim(), newDossier).catch(err => {
+            let senderDetails;
+            if (userId) {
+                const currentUser = await prisma.users.findUnique({
+                    where: { id: parseInt(userId, 10) }
+                });
+                if (currentUser && currentUser.email) {
+                    senderDetails = {
+                        name: currentUser.username,
+                        email: currentUser.email
+                    };
+                }
+            }
+
+            sendNewDossierEmail(notificationEmail.trim(), newDossier, senderDetails).catch(err => {
                 console.error('Email sending failed (non-blocking):', err);
             });
         }

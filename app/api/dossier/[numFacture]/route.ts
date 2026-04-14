@@ -200,10 +200,9 @@ export async function DELETE(
     const { numFacture } = await params;
     try {
         const userId = request.headers.get('x-user-id') || undefined;
-        // La suppression est réservée aux Administrateurs
-        const user = await prisma.users.findUnique({ where: { id: Number(userId) ? Number(userId) : 0 } });
-        if (!user || user.role !== 'ADMIN') {
-            return NextResponse.json({ error: 'Permission refusée (Admin requis)' }, { status: 403 });
+        // La suppression est autorisée pour les Administrateurs ou ceux ayant le droit d'écriture sur les dossiers
+        if (!await checkPermission(userId, 'DOSSIER_WRITE')) {
+            return NextResponse.json({ error: 'Permission refusée' }, { status: 403 });
         }
         const dossier = await prisma.dossiers_caution.findFirst({
             where: {

@@ -97,6 +97,7 @@ function NewDossierModal({
     num_facture_caution: numFacture,
   });
   const [notificationEmail, setNotificationEmail] = useState('');
+  const [emailAutoFilled, setEmailAutoFilled] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [animateError, setAnimateError] = useState(false);
@@ -124,6 +125,15 @@ function NewDossierModal({
         [name === 'client_actif' ? 'transitaire_actif' : 'client_actif']: 0
       };
     });
+  };
+
+  // Auto-remplir l'email de notification quand un partenaire avec email est sélectionné
+  const handlePartnerSelect = (partner: { email?: string | null }) => {
+    if (partner.email && partner.email.trim()) {
+      setNotificationEmail(partner.email.trim());
+      setEmailAutoFilled(true);
+      setTimeout(() => setEmailAutoFilled(false), 3000);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -255,6 +265,7 @@ function NewDossierModal({
                   onChange={(val) => setForm(prev => ({ ...prev, transitaire_nom: val }))}
                   type="transitaire"
                   onManage={(id) => setPartenaireModal({ open: true, id })}
+                  onPartnerSelect={handlePartnerSelect}
                   placeholder="Rechercher transitaire..."
                   formData={form}
                   required
@@ -275,6 +286,7 @@ function NewDossierModal({
                   onChange={(val) => setForm(prev => ({ ...prev, client_nom: val }))}
                   type="client"
                   onManage={(id) => setPartenaireModal({ open: true, id })}
+                  onPartnerSelect={handlePartnerSelect}
                   placeholder="Rechercher client..."
                   formData={form}
                   required
@@ -294,19 +306,30 @@ function NewDossierModal({
             <div style={{ position: 'relative' }}>
               <label style={{ display: 'block', fontWeight: 700, fontSize: '0.72rem', color: '#0f172a', marginBottom: '0.15rem' }}>Email de notification (optionnel)</label>
               <div style={{ position: 'relative' }}>
-                <Mail size={16} style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+                <Mail size={16} style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: emailAutoFilled ? '#7c3aed' : '#94a3b8', transition: 'color 0.3s' }} />
                 <input
                   type="email"
                   value={notificationEmail}
-                  onChange={(e) => setNotificationEmail(e.target.value)}
+                  onChange={(e) => { setNotificationEmail(e.target.value); setEmailAutoFilled(false); }}
                   placeholder="ex: client@email.com"
-                  style={{ paddingLeft: '2.5rem' }}
+                  style={{
+                    paddingLeft: '2.5rem',
+                    borderColor: emailAutoFilled ? '#7c3aed' : undefined,
+                    boxShadow: emailAutoFilled ? '0 0 0 3px rgba(124, 58, 237, 0.15)' : undefined,
+                    transition: 'border-color 0.3s, box-shadow 0.3s'
+                  }}
                   disabled={!canWrite}
                 />
               </div>
-              <p style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '0.3rem' }}>
-                Si renseigné, un email récapitulatif sera envoyé à cette adresse lors de la création.
-              </p>
+              {emailAutoFilled ? (
+                <p style={{ fontSize: '0.75rem', color: '#7c3aed', marginTop: '0.3rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                  <CheckCircle2 size={13} /> Email récupéré automatiquement depuis la fiche partenaire.
+                </p>
+              ) : (
+                <p style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '0.3rem' }}>
+                  Si renseigné, un email récapitulatif sera envoyé à cette adresse lors de la création.
+                </p>
+              )}
             </div>
           </ModalSection>
 
@@ -714,44 +737,11 @@ function HomePageInternal() {
                             <span>Ouvrir</span>
                         </a>
 
-                        {/* Option 2: Local Explorer (Puisque l'utilisateur a cette extension installée) */}
-                        <a 
-                            href={finalPdfUrl?.replace('file:///', 'localexplorer:')}
-                            title="Ouverture via l'extension 'Local Explorer'"
-                            style={{
-                                display: 'flex', alignItems: 'center', gap: '0.4rem',
-                                background: '#e0f2fe', color: '#0369a1', border: '1px solid #bae6fd', 
-                                padding: '0.6rem 0.8rem', borderRadius: '8px', fontSize: '0.85rem', fontWeight: 700,
-                                textDecoration: 'none', cursor: 'pointer', transition: 'all 0.2s',
-                                opacity: formData.num_facture_caution ? 1 : 0.5,
-                                pointerEvents: formData.num_facture_caution ? 'auto' : 'none'
-                            }}
-                        >
-                            <FolderOpen size={16} />
-                            <span>Explorer</span>
-                        </a>
-                        
-                        {/* Option 3: Copie (Sécurité absolue) */}
-                        <button
-                            type="button"
-                            onClick={() => {
-                                navigator.clipboard.writeText(finalPdfUrl);
-                                alert("Lien copié !\n\nSi les boutons ne marchent pas :\n1. Ouvrez un nouvel onglet Chrome\n2. Collez (Ctrl+V) et Entrée.");
-                            }}
-                            title="Copier le lien"
-                            disabled={!formData.num_facture_caution}
-                            style={{
-                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                background: '#fff', color: '#64748b', border: '1px solid #cbd5e1',
-                                padding: '0.6rem', borderRadius: '8px', cursor: 'pointer', opacity: formData.num_facture_caution ? 1 : 0.5,
-                            }}
-                        >
-                            <FileText size={18} />
-                        </button>
+
                     </div>
 
                     <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
-                        {isAdmin && (
+                        {canWrite && (
                             <button type="button" onClick={doDelete} disabled={deleting} style={{ 
                                 background: '#fef2f2', color: '#ef4444', border: '1px solid #fca5a5', 
                                 padding: '0.5rem 1rem', borderRadius: '8px', display: 'flex', 

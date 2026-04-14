@@ -3,7 +3,7 @@ import nodemailer from 'nodemailer';
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-        user: process.env.SMTP_USER || 'SuiviCautionDSM@gmail.com',
+        user: process.env.SMTP_USER || 'CautionDsm@gmail.com',
         pass: process.env.SMTP_PASS || '',
     },
 });
@@ -19,7 +19,7 @@ interface DossierEmailData {
     type_remboursement?: string | null;
 }
 
-export async function sendNewDossierEmail(to: string, dossier: DossierEmailData) {
+export async function sendNewDossierEmail(to: string, dossier: DossierEmailData, sender?: { name: string, email: string }) {
     const montantFormatted = dossier.montant_caution
         ? new Intl.NumberFormat('fr-FR').format(dossier.montant_caution)
         : '—';
@@ -38,6 +38,11 @@ export async function sendNewDossierEmail(to: string, dossier: DossierEmailData)
     
         <!-- Body -->
         <div style="padding: 2rem;">
+            <!-- Message de bienvenue -->
+            <div style="margin-bottom: 2rem; color: #1e293b; font-size: 1rem; line-height: 1.5;">
+                <p style="margin: 0 0 0.5rem 0; font-weight: 600;">Bonjour cher Client,</p>
+                <p style="margin: 0;">Nous vous informons que votre dossier de demande de remboursement caution a bien été reçu :</p>
+            </div>
             <!-- Numéro facture en vedette -->
             <div style="background: white; border-radius: 10px; padding: 1.25rem; margin-bottom: 1.5rem; text-align: center; border: 2px solid #e2e8f0;">
                 <p style="margin: 0; font-size: 0.8rem; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">N° Facture Caution</p>
@@ -82,15 +87,18 @@ export async function sendNewDossierEmail(to: string, dossier: DossierEmailData)
         <!-- Footer -->
         <div style="padding: 1.25rem 2rem; background: #f1f5f9; text-align: center; border-top: 1px solid #e2e8f0;">
             <p style="margin: 0; font-size: 0.8rem; color: #94a3b8;">
-                Cet email a été envoyé automatiquement par le système <strong>Suivi Caution DSM</strong>.
+                Cet email a été envoyé automatiquement par ${sender ? `<strong>${sender.name}</strong> via ` : ''}le système <strong>Suivi Caution DSM</strong>.
             </p>
         </div>
     </div>
     `;
 
     try {
+        const defaultFrom = `"Suivi Caution DSM" <${process.env.SMTP_USER || 'CautionDsm@gmail.com'}>`;
+        
         await transporter.sendMail({
-            from: `"Suivi Caution DSM" <${process.env.SMTP_USER || 'SuiviCautionDSM@gmail.com'}>`,
+            from: sender ? `"${sender.name} - Suivi Caution DSM" <${sender.email}>` : defaultFrom,
+            replyTo: sender ? `"${sender.name}" <${sender.email}>` : undefined,
             to,
             subject: `📋 Nouveau Dossier Caution — ${dossier.num_facture_caution || 'N/A'}`,
             html,
