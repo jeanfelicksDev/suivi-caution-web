@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Search, Eye, RefreshCw, CheckCircle2, AlertTriangle, AlertCircle, X } from 'lucide-react';
+import { Search, Eye, RefreshCw, CheckCircle2, AlertTriangle, X, ChevronRight, Info, Phone, Mail } from 'lucide-react';
 
 export default function ConsultationPage() {
   const [numFacture, setNumFacture] = useState('');
@@ -23,7 +23,6 @@ export default function ConsultationPage() {
 
   const [visits, setVisits] = useState({ today: 0, total: 0 });
 
-  // Tracer la visite au chargement (uniquement pour les visiteurs sans compte)
   useEffect(() => {
     const isLoggedIn = !!sessionStorage.getItem('caution_user');
     const method = isLoggedIn ? 'GET' : 'POST';
@@ -37,8 +36,8 @@ export default function ConsultationPage() {
       .catch(err => console.error('Erreur stats', err));
   }, []);
 
-  const doSearch = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const doSearch = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     if (!numFacture.trim()) return;
 
     setLoading(true);
@@ -62,235 +61,454 @@ export default function ConsultationPage() {
   };
 
   const steps = [
-    { id: 1, label: 'Réception' },
-    { id: 2, label: searchResult?.statut_text === 'Dossier suspendu' ? 'Suspendu' : 'En traitement', key: 'en_traitement' },
-    { id: 3, label: 'A la Signature', key: 'a_la_signature' },
-    { id: 4, label: 'A la compta', key: 'a_la_compta' },
-    { id: 5, label: 'Chèque dispo' },
+    { id: 1, label: 'Dossier Reçu', desc: 'Réception et scanning du dossier' },
+    { id: 2, label: searchResult?.statut_text === 'Dossier suspendu' ? 'Dossier Suspendu' : 'Traitement', key: 'en_traitement', desc: 'Analyse et vérification' },
+    { id: 3, label: 'Signature', key: 'a_la_signature', desc: 'Validation par la direction' },
+    { id: 4, label: 'Comptabilité', key: 'a_la_compta', desc: 'Ordonnancement du virement' },
+    { id: 5, label: 'Chèque / Virement Dispo', desc: 'Remboursement prêt à être récupéré' },
   ];
 
   const currentStep = searchResult?.statut_code || 0;
 
   return (
-    <div style={{ minHeight: '100vh', background: '#f8fafc', padding: '2rem 1rem', fontFamily: '"Inter", system-ui, sans-serif' }}>
-      
-      {/* Header & Stats */}
-      <div style={{ maxWidth: '800px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', gap: '1rem', flexWrap: 'wrap' }}>
-        <h1 style={{ fontSize: '1.5rem', margin: 0, color: '#1e293b', fontWeight: 800 }}>Suivre mon remboursement</h1>
-        
-        <div style={{ display: 'flex', gap: '1rem', background: 'white', padding: '0.5rem 1rem', borderRadius: '12px', boxShadow: '0 2px 10px rgba(0,0,0,0.05)', alignItems: 'center' }}>
-          <Eye size={18} color="#64748b" />
-          <div style={{ display: 'flex', flexDirection: 'column', fontSize: '0.75rem', fontWeight: 600, color: '#475569' }}>
-            <span>Aujourd'hui : <strong style={{ color: '#0f172a' }}>{visits.today}</strong></span>
-            <span>Total : <strong style={{ color: '#0f172a' }}>{visits.total}</strong></span>
+    <div className="mobile-app-container">
+      {/* Background decoration */}
+      <div className="bg-blob blob-1"></div>
+      <div className="bg-blob blob-2"></div>
+
+      <div className="app-content">
+        {/* Header Section */}
+        <header className="app-header">
+          <div className="logo-section">
+            <img src="/logo-agl.png" alt="AGL Logo" className="agl-logo" />
+            <div className="v-divider"></div>
+            <h1 className="app-title">Suivi Caution</h1>
           </div>
-        </div>
+          
+          <div className="view-stats">
+            <div className="stat-pill">
+              <Eye size={14} />
+              <span>{visits.today}</span>
+            </div>
+          </div>
+        </header>
+
+        {/* Hero / Search Section */}
+        <section className={`search-section ${searchResult ? 'minimized' : ''}`}>
+          {!searchResult && (
+            <div className="welcome-text">
+              <h2>Bienvenue, cher client</h2>
+              <p>Consultez l'état d'avancement de votre remboursement en saisissant votre numéro de facture.</p>
+            </div>
+          )}
+
+          <div className="glass-card search-card">
+            <form onSubmit={doSearch} className="search-form">
+              <div className="input-wrapper">
+                <Search className={`search-icon ${loading ? 'animate-pulse' : ''}`} size={20} />
+                <input
+                  type="text"
+                  placeholder="EX: FI41601906"
+                  value={numFacture}
+                  onChange={e => setNumFacture(e.target.value.toUpperCase())}
+                  className="search-input"
+                  required
+                />
+                {numFacture && !loading && (
+                    <X size={18} className="clear-input" onClick={() => setNumFacture('')} />
+                )}
+              </div>
+              <button type="submit" disabled={loading} className="btn-search">
+                {loading ? <RefreshCw size={22} className="animate-spin" /> : <span>Consulter</span>}
+              </button>
+            </form>
+          </div>
+
+          {error && (
+            <div className="error-badge">
+              <AlertTriangle size={16} />
+              <span>{error}</span>
+            </div>
+          )}
+        </section>
+
+        {/* Result Area */}
+        {searchResult?.found && (
+          <main className="result-area animate-fade-in">
+            {/* Status Overview */}
+            <div className="glass-card status-card">
+              <div className="status-header">
+                <span className="facture-id">Dossier #{searchResult.data.num_facture_caution}</span>
+                <div className={`status-badge ${searchResult.statut_text?.includes('suspendu') ? 'badge-red' : 'badge-green'}`}>
+                  {searchResult.statut_text}
+                </div>
+              </div>
+              <p className="client-name">{searchResult.data.client_nom}</p>
+            </div>
+
+            {/* Premium Timeline */}
+            <div className="timeline-section">
+              <h3 className="section-title">Progression du dossier</h3>
+              <div className="timeline-vertical">
+                {steps.map((step, index) => {
+                  const isPassed = step.id <= currentStep;
+                  const isActive = step.id === currentStep;
+                  const isLast = index === steps.length - 1;
+                  const isSuspended = step.label.includes('Suspendu');
+                  const duration = step.key ? (searchResult.durations ? (searchResult.durations as any)[step.key] : null) : null;
+
+                  return (
+                    <div key={step.id} className={`timeline-item ${isPassed ? 'passed' : ''} ${isActive ? 'active' : ''}`}>
+                      <div className="step-indicator">
+                        <div className="step-node">
+                          {isPassed ? (
+                            isSuspended ? <X size={16} /> : <CheckCircle2 size={16} />
+                          ) : (
+                            <span className="step-num">{step.id}</span>
+                          )}
+                        </div>
+                        {!isLast && <div className="step-connector"></div>}
+                      </div>
+                      
+                      <div className="step-content">
+                        <div className="step-header">
+                          <span className="step-label">{step.label}</span>
+                          {duration !== null && (
+                            <span className="step-duration">{duration}j</span>
+                          )}
+                        </div>
+                        <p className="step-desc">{step.desc}</p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Quick Actions / Info */}
+            <div className="glass-card info-card">
+              <h3>Besoin d'aide ?</h3>
+              <div className="contact-grid">
+                <a href="tel:+22500000000" className="contact-item">
+                  <div className="icon-box"><Phone size={18} /></div>
+                  <span>Appeler le service client</span>
+                </a>
+                <a href="mailto:support@agl.com" className="contact-item">
+                  <div className="icon-box"><Mail size={18} /></div>
+                  <span>Envoyer un email</span>
+                </a>
+              </div>
+            </div>
+          </main>
+        )}
       </div>
 
-      {/* Search Box */}
-      <section style={{ maxWidth: '800px', margin: '0 auto', background: 'white', padding: '1.5rem', borderRadius: '16px', borderTop: '4px solid #4f46e5', boxShadow: '0 4px 20px rgba(0,0,0,0.08)', marginBottom: '2rem' }}>
-        <form onSubmit={doSearch} className="search-form" style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', maxWidth: '50%', margin: '0 auto' }}>
-          <div style={{ position: 'relative' }}>
-            <Search size={22} style={{ position: 'absolute', left: '1.2rem', top: '50%', transform: 'translateY(-50%)', color: '#6366f1' }} />
-            <input
-              type="text"
-              placeholder="N° de facture (ex: FI41601906)..."
-              value={numFacture}
-              onChange={e => setNumFacture(e.target.value.toUpperCase())}
-              style={{
-                width: '100%',
-                padding: '1rem 1rem 1rem 3.5rem',
-                fontSize: '1.25rem',
-                fontFamily: 'inherit',
-                fontWeight: 800,
-                letterSpacing: '0.05em',
-                color: '#1e293b',
-                border: '2px solid #e2e8f0',
-                borderRadius: '12px',
-                outline: 'none',
-                textTransform: 'uppercase',
-                boxShadow: '0 2px 4px rgba(0,0,0,0.02)',
-                transition: 'all 0.2s'
-              }}
-              onFocus={e => {
-                e.target.style.borderColor = '#6366f1';
-                e.target.style.boxShadow = '0 0 0 4px rgba(99, 102, 241, 0.1)';
-              }}
-              onBlur={e => {
-                e.target.style.borderColor = '#e2e8f0';
-                e.target.style.boxShadow = 'none';
-              }}
-              required
-            />
-          </div>
-          <button type="submit" disabled={loading} className="btn-consulter" style={{
-            background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
-            color: 'white',
-            border: 'none',
-            borderRadius: '12px',
-            padding: '1rem',
-            fontSize: '1.1rem',
-            fontWeight: 800,
-            cursor: loading ? 'not-allowed' : 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '0.75rem',
-            transition: 'transform 0.2s, box-shadow 0.2s',
-            boxShadow: '0 4px 12px rgba(99, 102, 241, 0.3)',
-            width: '100%'
-          }}>
-            {loading ? <RefreshCw size={22} style={{ animation: 'spin 1.s linear infinite' }} /> : <Search size={22} />}
-            Consulter
-          </button>
-        </form>
-
-        {error && (
-          <div style={{ marginTop: '1rem', padding: '0.75rem 1rem', background: '#fef2f2', color: '#ef4444', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 600, fontSize: '0.9rem' }}>
-            <AlertTriangle size={18} /> {error}
-          </div>
-        )}
-      </section>
-
-      {/* Result View */}
-      {searchResult?.found && (
-        <section style={{ maxWidth: '800px', margin: '0 auto', background: 'white', padding: '2rem', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }}>
-          <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
-            <h2 style={{ fontSize: '1.25rem', color: '#1e293b', fontWeight: 600, marginBottom: '0.75rem' }}>
-              Cher client,
-            </h2>
-            <p style={{ fontSize: '1.1rem', color: '#475569', margin: 0, lineHeight: 1.5 }}>
-              Votre dossier <strong>{searchResult.data.num_facture_caution}</strong> est en ce moment <strong style={{ color: '#4f46e5', backgroundColor: '#eef2ff', padding: '0.2rem 0.5rem', borderRadius: '4px' }}>{searchResult.statut_text}</strong>.
-            </p>
-          </div>
-
-          {/* Timeline Schema */}
-          <div className="timeline-container" style={{ position: 'relative', margin: '2rem 1rem 4rem 1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            {/* Background Line */}
-            <div className="timeline-bg-line" style={{ position: 'absolute', top: '50%', left: '0', right: '0', height: '6px', background: '#e2e8f0', transform: 'translateY(-50%)', zIndex: 1, borderRadius: '3px' }} />
-            
-            {/* Active Progress Line */}
-            <div className="timeline-active-line" style={{ position: 'absolute', top: '50%', left: '0', height: '6px', background: currentStep >= 5 ? '#16a34a' : '#4f46e5', transform: 'translateY(-50%)', zIndex: 2, borderRadius: '3px', transition: 'all 0.5s ease',
-              width: currentStep > 0 ? `${((currentStep - 1) / (steps.length - 1)) * 100}%` : '0%'
-            }} />
-
-            {steps.map((step, index) => {
-              const passed = step.id <= currentStep;
-              const active = step.id === currentStep;
-              const isSuspStep = step.label === 'Suspendu';
-              const isFinalStep = step.id === 5;
-              const duration = step.key ? (searchResult.durations ? searchResult.durations[step.key as keyof typeof searchResult.durations] : null) : null;
-
-              const getStepColor = () => {
-                if (isSuspStep) return '#ef4444';
-                if (isFinalStep && passed) return '#16a34a';
-                return '#4f46e5';
-              };
-              const stepColor = getStepColor();
-
-              const getBorderColor = () => {
-                if (!passed) return '4px solid #e2e8f0';
-                if (isSuspStep) return '4px solid #fecaca';
-                if (isFinalStep) return '4px solid #bbf7d0';
-                return '4px solid #c7d2fe';
-              };
-
-              const getShadowColor = () => {
-                if (isSuspStep) return 'rgba(239, 68, 68, 0.2)';
-                if (isFinalStep) return 'rgba(22, 163, 74, 0.25)';
-                return 'rgba(79, 70, 229, 0.2)';
-              };
-
-              return (
-                <div key={step.id} className="step-item" style={{ position: 'relative', zIndex: 3, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                  <div style={{
-                    width: '32px', height: '32px', borderRadius: '50%',
-                    background: passed ? stepColor : '#f8fafc',
-                    border: getBorderColor(),
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    transition: 'all 0.3s ease',
-                    boxShadow: active ? `0 0 0 4px ${getShadowColor()}` : 'none'
-                  }}>
-                    {passed && (isSuspStep ? <X size={16} color="white" /> : <CheckCircle2 size={16} color="white" />)}
-                  </div>
-                  <div className="step-label" style={{ 
-                    position: 'absolute', top: '40px', 
-                    fontSize: '0.8rem', fontWeight: passed ? 700 : 500, 
-                    color: active ? stepColor : (passed ? '#1e293b' : '#94a3b8'),
-                    whiteSpace: 'nowrap', textAlign: 'center',
-                    display: 'flex', flexDirection: 'column', alignItems: 'center'
-                  }}>
-                    <span>{step.label}</span>
-                    {duration !== null && (
-                      <span style={{ 
-                        fontSize: '0.65rem', 
-                        background: active ? stepColor : (isSuspStep ? '#fecaca' : '#f1f5f9'), 
-                        color: active ? 'white' : (isSuspStep ? '#dc2626' : '#64748b'), 
-                        padding: '1px 6px', 
-                        borderRadius: '10px',
-                        marginTop: '4px',
-                        fontWeight: 700
-                      }}>
-                        {duration} {duration > 1 ? 'jours' : 'jour'}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-        </section>
-      )}
-
       <style jsx>{`
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        
-        @media (max-width: 640px) {
-          .search-form {
-            flex-direction: column;
-          }
-          .btn-consulter {
-            width: 100%;
-            justify-content: center;
-          }
-          .search-form {
-            max-width: 100% !important;
-          }
-          .timeline-container {
-            flex-direction: column !important;
-            align-items: flex-start !important;
-            gap: 3.5rem !important;
-            padding-left: 2rem !important;
-            margin-top: 3rem !important;
-          }
-          .timeline-bg-line {
-            left: 16px !important;
-            top: -10px !important;
-            bottom: -10px !important;
-            width: 6px !important;
-            height: auto !important;
-            transform: translateX(-50%) !important;
-          }
-          .timeline-active-line {
-            left: 16px !important;
-            top: -10px !important;
-            width: 6px !important;
-            transform: translateX(-50%) !important;
-            height: ${currentStep > 0 ? `${((currentStep - 1) / (steps.length - 1)) * 100}%` : '0%'} !important;
-            transition: height 0.5s ease;
-          }
-          .step-item {
-            flex-direction: row !important;
-            gap: 1.5rem !important;
-            width: 100%;
-          }
-          .step-label {
-            position: static !important;
-            text-align: left !important;
-            align-items: flex-start !important;
-          }
+        .mobile-app-container {
+          min-height: 100vh;
+          background: #f8fafc;
+          font-family: 'Outfit', sans-serif;
+          position: relative;
+          overflow-x: hidden;
+          padding-bottom: 3rem;
         }
+
+        .bg-blob {
+          position: fixed;
+          width: 300px;
+          height: 300px;
+          border-radius: 50%;
+          filter: blur(80px);
+          z-index: 0;
+          opacity: 0.15;
+        }
+        .blob-1 { top: -100px; right: -100px; background: #1D3557; }
+        .blob-2 { bottom: -100px; left: -100px; background: #457B9D; }
+
+        .app-content {
+          position: relative;
+          z-index: 1;
+          max-width: 500px;
+          margin: 0 auto;
+          padding: 1.5rem;
+        }
+
+        .app-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 2.5rem;
+        }
+
+        .logo-section {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+        }
+
+        .agl-logo {
+          height: 32px;
+          object-fit: contain;
+        }
+
+        .v-divider {
+          width: 1px;
+          height: 20px;
+          background: #e2e8f0;
+        }
+
+        .app-title {
+          font-size: 1.1rem;
+          font-weight: 800;
+          color: #1D3557;
+          margin: 0;
+          letter-spacing: -0.02em;
+        }
+
+        .stat-pill {
+          background: white;
+          padding: 0.4rem 0.8rem;
+          border-radius: 20px;
+          font-size: 0.75rem;
+          font-weight: 700;
+          color: #64748b;
+          box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+          display: flex;
+          align-items: center;
+          gap: 0.4rem;
+        }
+
+        .search-section {
+          transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .search-section.minimized {
+          margin-bottom: 1.5rem;
+        }
+
+        .welcome-text {
+          margin-bottom: 2rem;
+        }
+        .welcome-text h2 { font-size: 1.75rem; color: #1e293b; margin-bottom: 0.5rem; }
+        .welcome-text p { color: #64748b; line-height: 1.5; font-size: 0.95rem; }
+
+        .glass-card {
+          background: rgba(255, 255, 255, 0.8);
+          backdrop-filter: blur(12px);
+          border: 1px solid rgba(255, 255, 255, 0.5);
+          border-radius: 24px;
+          padding: 1.5rem;
+          box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05), 0 4px 6px -4px rgba(0,0,0,0.05);
+        }
+
+        .search-card {
+          padding: 0.75rem;
+        }
+
+        .search-form { display: flex; flex-direction: column; gap: 0.75rem; }
+
+        .input-wrapper {
+          position: relative;
+          display: flex;
+          align-items: center;
+        }
+
+        .search-icon {
+          position: absolute;
+          left: 1.25rem;
+          color: #1D3557;
+          opacity: 0.5;
+        }
+
+        .search-input {
+          width: 100%;
+          padding: 1rem 3rem 1rem 3.5rem;
+          border: none;
+          background: #f1f5f9;
+          border-radius: 18px;
+          font-family: inherit;
+          font-weight: 700;
+          font-size: 1.1rem;
+          color: #1e293b;
+          outline: none;
+          transition: all 0.2s;
+        }
+        .search-input:focus { background: #e2e8f0; }
+
+        .clear-input {
+          position: absolute;
+          right: 1.25rem;
+          color: #94a3b8;
+          cursor: pointer;
+        }
+
+        .btn-search {
+          background: #1D3557;
+          color: white;
+          border: none;
+          border-radius: 18px;
+          padding: 1rem;
+          font-size: 1rem;
+          font-weight: 800;
+          cursor: pointer;
+          transition: all 0.2s;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 4px 12px rgba(29, 53, 87, 0.3);
+        }
+        .btn-search:active { transform: scale(0.98); }
+
+        .error-badge {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          background: #fee2e2;
+          color: #b91c1c;
+          padding: 0.75rem 1rem;
+          border-radius: 12px;
+          margin-top: 1rem;
+          font-size: 0.85rem;
+          font-weight: 600;
+        }
+
+        .result-area {
+          display: flex;
+          flex-direction: column;
+          gap: 1.5rem;
+        }
+
+        .status-card {
+          background: linear-gradient(135deg, #1D3557 0%, #0f172a 100%);
+          color: white;
+          border: none;
+        }
+
+        .status-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 1rem;
+        }
+
+        .facture-id { font-size: 0.75rem; font-weight: 700; opacity: 0.7; letter-spacing: 0.1em; }
+        .status-badge {
+          padding: 0.4rem 0.8rem;
+          border-radius: 12px;
+          font-size: 0.75rem;
+          font-weight: 800;
+        }
+        .badge-green { background: #064e3b; color: #34d399; }
+        .badge-red { background: #7f1d1d; color: #f87171; }
+
+        .client-name {
+          font-size: 1.25rem;
+          font-weight: 700;
+          margin: 0;
+          letter-spacing: -0.02em;
+        }
+
+        .timeline-section {
+          margin-top: 1rem;
+        }
+
+        .section-title {
+          font-size: 0.95rem;
+          font-weight: 800;
+          color: #475569;
+          text-transform: uppercase;
+          letter-spacing: 0.1em;
+          margin-bottom: 1.5rem;
+        }
+
+        .timeline-vertical {
+          display: flex;
+          flex-direction: column;
+        }
+
+        .timeline-item {
+          display: flex;
+          gap: 1.25rem;
+          min-height: 80px;
+        }
+
+        .step-indicator {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
+
+        .step-node {
+          width: 28px;
+          height: 28px;
+          border-radius: 50%;
+          background: white;
+          border: 2px solid #e2e8f0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 2;
+          transition: all 0.3s;
+          color: #94a3b8;
+          font-size: 0.75rem;
+          font-weight: 800;
+        }
+
+        .step-connector {
+          width: 2px;
+          flex: 1;
+          background: #e2e8f0;
+          margin: 4px 0;
+        }
+
+        .timeline-item.passed .step-node {
+          background: #1D3557;
+          border-color: #1D3557;
+          color: white;
+        }
+        .timeline-item.passed .step-connector { background: #1D3557; }
+
+        .timeline-item.active .step-node {
+          box-shadow: 0 0 0 4px rgba(29, 53, 87, 0.15);
+          border-color: #1D3557;
+        }
+
+        .step-content { padding-bottom: 1.5rem; flex: 1; }
+        .step-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem; }
+        .step-label { font-weight: 700; color: #1e293b; font-size: 0.95rem; }
+        .step-duration { font-size: 0.65rem; font-weight: 800; background: #f1f5f9; color: #64748b; padding: 2px 6px; border-radius: 6px; }
+        .step-desc { font-size: 0.8rem; color: #64748b; margin: 0; }
+
+        .info-card h3 { font-size: 1rem; font-weight: 800; margin-bottom: 1rem; color: #1D3557; }
+        .contact-grid { display: flex; flex-direction: column; gap: 0.75rem; }
+        .contact-item {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          text-decoration: none;
+          color: #475569;
+          font-size: 0.9rem;
+          font-weight: 600;
+          padding: 0.5rem;
+          border-radius: 12px;
+          transition: background 0.2s;
+        }
+        .contact-item:hover { background: #f1f5f9; }
+        .icon-box {
+          background: #e2e8f0;
+          width: 36px;
+          height: 36px;
+          border-radius: 10px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #1D3557;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .animate-spin { animation: spin 1s linear infinite; }
       `}</style>
     </div>
   );

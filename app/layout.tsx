@@ -10,8 +10,25 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: "Suivi_caution_Web 2.0",
-  description: "Application de suivi et de gestion des cautions",
+  title: "Suivi Caution AGL 2.0",
+  description: "Application de suivi et de gestion des cautions Africa Global Logistics",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Suivi Caution",
+  },
+  formatDetection: {
+    telephone: false,
+  },
+};
+
+export const viewport = {
+  themeColor: "#1D3557",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 export default function RootLayout({

@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suivi Caution - Innovations</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
+
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            font-family: 'Inter', sans-serif;
+            background-color: #fafafa;
+            color: #333333;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slide-container {
+            width: 85%;
+            max-width: 1100px;
+            height: 75vh;
+            position: relative;
+            background: #ffffff;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+            border-radius: 20px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.8s ease-in-out, transform 0.8s ease-in-out;
+            transform: translateY(30px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 60px 100px;
+            box-sizing: border-box;
+            pointer-events: none;
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        h1 {
+            font-size: 4rem;
+            font-weight: 800;
+            color: #0f172a;
+            margin-bottom: 20px;
+            line-height: 1.1;
+        }
+
+        h2 {
+            font-size: 2.8rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 40px;
+            border-bottom: 5px solid #3b82f6;
+            display: inline-block;
+            padding-bottom: 10px;
+        }
+
+        p {
+            font-size: 1.6rem;
+            color: #475569;
+            line-height: 1.8;
+            font-weight: 300;
+            margin-bottom: 20px;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        ul li {
+            position: relative;
+            padding-left: 50px;
+            margin-bottom: 25px;
+            font-size: 1.5rem;
+            color: #475569;
+            line-height: 1.6;
+            font-weight: 300;
+        }
+
+        ul li::before {
+            content: "✦";
+            position: absolute;
+            left: 0;
+            color: #3b82f6;
+            font-size: 1.8rem;
+            font-weight: bold;
+            top: -2px;
+        }
+
+        .accent {
+            color: #3b82f6;
+            font-weight: 800;
+        }
+
+        .controls {
+            position: absolute;
+            bottom: 30px;
+            right: 40px;
+            display: flex;
+            gap: 15px;
+            z-index: 100;
+        }
+
+        button {
+            background: #f1f5f9;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            color: #3b82f6;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        button:hover {
+            background: #3b82f6;
+            color: #ffffff;
+            transform: scale(1.1);
+        }
+
+        .progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 6px;
+            background: #e2e8f0;
+            width: 100%;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: #3b82f6;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .logo {
+            position: absolute;
+            top: 40px;
+            left: 40px;
+            font-weight: 800;
+            font-size: 1.2rem;
+            color: #94a3b8;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            z-index: 10;
+        }
+
+        .slide.image-only {
+            padding: 0;
+            background: #ffffff;
+            /* fond blanc pour l'image plein écran */
+        }
+
+        .slide.image-only img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 0;
+            box-shadow: none;
+            padding: 30px;
+            box-sizing: border-box;
+        }
+
+        /* 🖨️ Styles pour l'exportation PDF (Ctrl+P) */
+        @media print {
+
+            body,
+            html {
+                background: white;
+                height: auto;
+                overflow: visible;
+                display: block;
+            }
+
+            .slide-container {
+                width: 100%;
+                max-width: none;
+                height: auto;
+                box-shadow: none;
+                overflow: visible;
+                display: block;
+            }
+
+            .slide {
+                position: relative;
+                opacity: 1;
+                transform: none;
+                height: 100vh;
+                /* Prend une page entière */
+                page-break-after: always;
+                /* Force la nouvelle page */
+                padding: 40px;
+                display: flex;
+            }
+
+            .slide.active {
+                opacity: 1;
+            }
+
+            .controls,
+            .progress {
+                display: none;
+                /* Cache les boutons d'interface à l'impression */
+            }
+
+            h1 {
+                font-size: 3rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="logo">Suivi Caution DSM - Présentation</div>
+
+    <div class="slide-container" id="deck">
+
+        <!-- Slide 1 -->
+        <div class="slide active">
+            <h1>Une Nouvelle Approche pour le<br><span class="accent">Suivi des remboursement Caution</span></h1>
+            <p>Découvrez les innovations de votre application, repensée pour l'efficacité, la transparence et la
+                mobilité, au service de nos clients.</p>
+        </div>
+
+        <!-- Slide 2 -->
+        <div class="slide">
+            <h2>Une Application Désormais En Ligne</h2>
+            <ul>
+                <li><strong>Le Hub du Responsable :</strong> Consultez l'évolution des dossiers de caution en temps
+                    réel, directement depuis votre bureau, par simple création de compte.</li>
+                <li><strong>Le Portail Client :</strong> Le client a la possibilité de consulter le statut de son
+                    dossier depuis sa position en toute transparence.</li>
+                <li><strong>Accessibilité Globale :</strong> Une interface entièrement responsive, parfaite sur
+                    l'ordinateur comme sur le téléphone.</li>
+            </ul>
+        </div>
+
+        <!-- Slide 3 (Image) -->
+        <div class="slide image-only">
+            <img src="./images/manager_portal_ui.png" alt="Interface du Manager">
+        </div>
+
+        <!-- Slide 4 -->
+        <div class="slide">
+            <h2>Un Accès Simplifié pour le Client</h2>
+            <ul>
+                <li>Fini les identifiants complexes : Chaque dossier dispose de son <strong>QR Code exclusif</strong>.
+                </li>
+                <li>Le client scanne le QR code avec la caméra de son téléphone pour accéder directement à l'évolution
+                    de son dossier.</li>
+                <li>Un lien de suivi direct et sécurisé remplace les longs échanges téléphoniques.</li>
+            </ul>
+        </div>
+
+        <!-- Slide 5 (Image) -->
+        <div class="slide image-only">
+            <img src="./images/client_tracking_ui.png" alt="Interface de statut Client">
+        </div>
+
+        <!-- Slide 6 -->
+        <div class="slide">
+            <h2>Tableau de Bord Ergonomique</h2>
+            <ul>
+                <li>Une interface <strong>claire, épurée et moderne</strong> (fonds blancs, typographies lisibles)
+                    étudiée pour limiter la fatigue visuelle.</li>
+                <li><strong>Affichage dynamique des délais :</strong> Visualisez les métriques de traitement de manière
+                    interactive et fluide.</li>
+                <li>Un pilotage intelligent qui met en évidence les dossiers nécessitant votre attention (KPI
+                    dynamiques).</li>
+            </ul>
+        </div>
+
+        <!-- Slide 7 (Image) -->
+        <div class="slide image-only">
+            <img src="./images/dashboard_ui.png" alt="Tableau de Bord">
+        </div>
+
+        <!-- Slide 8 -->
+        <div class="slide">
+            <h2>Communication Automatisée</h2>
+            <ul>
+                <li><strong>Créer la confiance instantanément :</strong> Un email de notification automatique et
+                    professionnel est envoyé au client dès l'enregistrement de son dossier.</li>
+                <li>Le client reçoit immédiatement ses références et le lien vers son statut.</li>
+                <li><strong>Gains :</strong> Un standard de service premium et une équipe libérée des envois manuels et
+                    relances.</li>
+            </ul>
+        </div>
+
+        <!-- Slide 9 (Image) -->
+        <div class="slide image-only">
+            <img src="./images/email_ui.png" alt="Notification Email">
+        </div>
+
+        <!-- Slide 10 -->
+        <div class="slide">
+            <h1>L'Application est parée.</h1>
+            <p><span class="accent">Plus intelligente. Plus fluide. Plus transparente.</span><br><br>Merci de votre
+                attention.</p>
+        </div>
+
+        <!-- Controls & Progress -->
+        <div class="controls">
+            <button onclick="prevSlide()" title="Précédent">←</button>
+            <button onclick="nextSlide()" title="Suivant">→</button>
+        </div>
+        <div class="progress">
+            <div class="progress-bar" id="progress"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const progressBar = document.getElementById('progress');
+
+        function updateSlide() {
+            slides.forEach((slide, index) => {
+                slide.classList.remove('active');
+                if (index === currentSlide) {
+                    slide.classList.add('active');
+                }
+            });
+            const progressPercentage = ((currentSlide) / (slides.length - 1)) * 100;
+            progressBar.style.width = progressPercentage + '%';
+        }
+
+        function nextSlide() {
+            if (currentSlide < slides.length - 1) {
+                currentSlide++;
+                updateSlide();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateSlide();
+            }
+        }
+
+        // Navigation clavier et espace
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                e.preventDefault();
+                nextSlide();
+            } else if (e.key === 'ArrowLeft') {
+                prevSlide();
+            }
+        });
+
+        // Initialize progress
+        updateSlide();
+    </script>
+</body>
+
+</html>
