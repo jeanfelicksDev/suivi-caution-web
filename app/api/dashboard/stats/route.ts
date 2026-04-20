@@ -271,10 +271,18 @@ export async function GET(request: Request) {
 
         const clientsUniques = new Set();
         let dosCaches = 0;
+        let countAvoir = 0;
+        let countCompta = 0;
+        let countCheque = 0;
+
         dossiers.forEach((d: any) => {
             if (d.client_nom) clientsUniques.add(d.client_nom);
             // Dossier est considéré "traité" (pour le taux de retour) s'il a atteint l'un des stades de paiement/clôture
             if (d.date_cheque || d.date_cloture) dosCaches++;
+            
+            if (d.date_mise_avoir) countAvoir++;
+            if (d.date_transmission_compta) countCompta++;
+            if (d.date_cheque) countCheque++;
         });
         const tauxRetour = totalDossiers > 0 ? Math.round((dosCaches / totalDossiers) * 100) : 0;
 
@@ -286,7 +294,10 @@ export async function GET(request: Request) {
                 totalDossiers,
                 actifs,
                 clientsUniques: clientsUniques.size,
-                tauxRetour
+                tauxRetour,
+                countAvoir,
+                countCompta,
+                countCheque
             }
         });
 

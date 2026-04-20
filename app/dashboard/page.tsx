@@ -14,6 +14,9 @@ interface StatsData {
         actifs: number;
         clientsUniques: number;
         tauxRetour: number;
+        countAvoir: number;
+        countCompta: number;
+        countCheque: number;
     };
 }
 
@@ -124,6 +127,30 @@ export default function Dashboard() {
                 </div>
             </header>
 
+            {/*  Mini Palettes Section */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
+                <MiniPalette 
+                    label="Reçus (Mois)" 
+                    value={stats?.statsCards?.totalDossiers ?? "..."} 
+                    color="#4f46e5" 
+                />
+                <MiniPalette 
+                    label="Dossiers Avoir" 
+                    value={`${stats?.statsCards?.countAvoir ?? 0} / ${stats?.statsCards?.totalDossiers ?? 0}`} 
+                    color="#f59e0b" 
+                />
+                <MiniPalette 
+                    label="À la Compta" 
+                    value={`${stats?.statsCards?.countCompta ?? 0} / ${stats?.statsCards?.totalDossiers ?? 0}`} 
+                    color="#0ea5e9" 
+                />
+                <MiniPalette 
+                    label="Chèques Dispo" 
+                    value={`${stats?.statsCards?.countCheque ?? 0} / ${stats?.statsCards?.totalDossiers ?? 0}`} 
+                    color="#10b981" 
+                />
+            </div>
+
             <div className="stat-grid" style={{ marginBottom: '2.5rem' }}>
                 <StatCard label="Nbre de Dossiers Reçus" value={stats?.statsCards?.totalDossiers ?? "..."} period={periodText} trend="" trendUp={true} icon={<LayoutDashboard color="var(--accent)" />} valueColor="#4f46e5" />
                 <StatCard label="Dossiers en traitement" value={stats?.statsCards?.actifs ?? "..."} period={periodText} trend="" trendUp={false} icon={<Clock color="#f59e0b" />} valueColor="#f97316" />
@@ -224,6 +251,29 @@ function StatCard({ label, value, trend, trendUp, icon, period, valueColor }: { 
                     </>
                 )}
                 <span style={{ color: 'var(--text-muted)', marginLeft: trend ? '0.25rem' : '0' }}>{period}</span>
+            </div>
+        </div>
+    );
+}
+
+function MiniPalette({ label, value, color }: { label: string, value: string | number, color: string }) {
+    return (
+        <div style={{ 
+            background: 'white', 
+            padding: '1rem', 
+            borderRadius: '12px', 
+            border: `1px solid #e2e8f0`, 
+            borderLeft: `4px solid ${color}`,
+            boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center'
+        }}>
+            <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.025em', marginBottom: '0.25rem' }}>
+                {label}
+            </div>
+            <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#1e293b' }}>
+                {value}
             </div>
         </div>
     );
