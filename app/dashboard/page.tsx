@@ -127,26 +127,26 @@ export default function Dashboard() {
                 </div>
             </header>
 
-            {/*  Mini Palettes Section */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
+            {/*  Mini Palettes Section — toujours visibles, loading state géré */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem', marginBottom: '1.5rem' }}>
                 <MiniPalette 
                     label="Reçus (Mois)" 
-                    value={stats?.statsCards?.totalDossiers ?? "..."} 
+                    value={stats ? String(stats.statsCards.totalDossiers) : "—"} 
                     color="#4f46e5" 
                 />
                 <MiniPalette 
                     label="Dossiers Avoir" 
-                    value={`${stats?.statsCards?.countAvoir ?? 0} / ${stats?.statsCards?.totalDossiers ?? 0}`} 
+                    value={stats ? `${stats.statsCards.countAvoir} / ${stats.statsCards.totalDossiers}` : "—"} 
                     color="#f59e0b" 
                 />
                 <MiniPalette 
                     label="À la Compta" 
-                    value={`${stats?.statsCards?.countCompta ?? 0} / ${stats?.statsCards?.totalDossiers ?? 0}`} 
+                    value={stats ? `${stats.statsCards.countCompta} / ${stats.statsCards.totalDossiers}` : "—"} 
                     color="#0ea5e9" 
                 />
                 <MiniPalette 
                     label="Chèques Dispo" 
-                    value={`${stats?.statsCards?.countCheque ?? 0} / ${stats?.statsCards?.totalDossiers ?? 0}`} 
+                    value={stats ? `${stats.statsCards.countCheque} / ${stats.statsCards.totalDossiers}` : "—"} 
                     color="#10b981" 
                 />
             </div>
