@@ -22,10 +22,19 @@ interface StatsData {
 
 export default function Dashboard() {
     const [stats, setStats] = useState<StatsData | null>(null);
+    const [globalStats, setGlobalStats] = useState<StatsData['statsCards'] | null>(null);
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
     const [armateur, setArmateur] = useState('');
     const [appliedFilters, setAppliedFilters] = useState({ armateur: '', startDate: '', endDate: '' });
+
+    // Fetch global stats (toute la base, sans filtre) pour les grandes stat-cards
+    React.useEffect(() => {
+        fetch('/api/dashboard/stats?all=true')
+            .then(r => r.json())
+            .then(data => setGlobalStats(data.statsCards))
+            .catch(console.error);
+    }, []);
 
     const fetchStats = React.useCallback(async () => {
         let url = '/api/dashboard/stats';
