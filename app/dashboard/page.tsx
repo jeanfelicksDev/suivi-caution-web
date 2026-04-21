@@ -28,14 +28,6 @@ export default function Dashboard() {
     const [armateur, setArmateur] = useState('');
     const [appliedFilters, setAppliedFilters] = useState({ armateur: '', startDate: '', endDate: '' });
 
-    // Fetch global stats (toute la base, sans filtre) pour les grandes stat-cards
-    React.useEffect(() => {
-        fetch('/api/dashboard/stats?all=true')
-            .then(r => r.json())
-            .then(data => setGlobalStats(data.statsCards))
-            .catch(console.error);
-    }, []);
-
     const fetchStats = React.useCallback(async () => {
         let url = '/api/dashboard/stats';
         const params = new URLSearchParams();
@@ -44,14 +36,24 @@ export default function Dashboard() {
         if (armateur) params.append('armateur', armateur);
         if (params.toString()) url += `?${params.toString()}`;
 
+        let globalUrl = '/api/dashboard/stats?all=true';
+        if (params.toString()) globalUrl += `&${params.toString()}`;
+
         try {
-            const res = await fetch(url);
+            const [res, globalRes] = await Promise.all([fetch(url), fetch(globalUrl)]);
             if (res.ok) {
                 const data = await res.json();
                 setStats(data);
                 setAppliedFilters({ armateur, startDate, endDate });
             } else {
                 console.error('Stats API error:', res.status, await res.text());
+            }
+
+            if (globalRes.ok) {
+                const globalData = await globalRes.json();
+                setGlobalStats(globalData.statsCards);
+            } else {
+                console.error('Global stats API error:', globalRes.status);
             }
         } catch (error) {
             console.error('Stats fetch failed:', error);

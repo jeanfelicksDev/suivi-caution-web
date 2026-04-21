@@ -76,32 +76,30 @@ export async function GET(request: Request) {
         const allData = searchParams.get('all') === 'true';
 
         const dateFilter: Record<string, string> = {};
-        if (!allData) {
-            if (startDate || endDate) {
-                if (startDate) dateFilter.gte = startDate;
-                if (endDate) {
-                    // Pour inclure toute la journée de fin
-                    const lastDay = new Date(endDate);
-                    const year = lastDay.getFullYear();
-                    const month = String(lastDay.getMonth() + 1).padStart(2, '0');
-                    const lastDayNum = lastDay.getDate();
-                    dateFilter.lte = `${year}-${month}-${String(lastDayNum).padStart(2, '0')}`;
-                }
-            } else {
-                // Par défaut : Mois en cours
-                const now = new Date();
-                const year = now.getFullYear();
-                const month = String(now.getMonth() + 1).padStart(2, '0');
-                const lastDay = new Date(year, now.getMonth() + 1, 0).getDate();
-
-                dateFilter.gte = `${year}-${month}-01`;
-                dateFilter.lte = `${year}-${month}-${String(lastDay).padStart(2, '0')}`;
+        if (startDate || endDate) {
+            if (startDate) dateFilter.gte = startDate;
+            if (endDate) {
+                // Pour inclure toute la journée de fin
+                const lastDay = new Date(endDate);
+                const year = lastDay.getFullYear();
+                const month = String(lastDay.getMonth() + 1).padStart(2, '0');
+                const lastDayNum = lastDay.getDate();
+                dateFilter.lte = `${year}-${month}-${String(lastDayNum).padStart(2, '0')}`;
             }
+        } else if (!allData) {
+            // Par défaut : Mois en cours (seulement si on ne demande pas toute la base)
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const lastDay = new Date(year, now.getMonth() + 1, 0).getDate();
+
+            dateFilter.gte = `${year}-${month}-01`;
+            dateFilter.lte = `${year}-${month}-${String(lastDay).padStart(2, '0')}`;
         }
 
         const whereClause: Record<string, unknown> = {};
-        if (!allData && Object.keys(dateFilter).length > 0) whereClause.date_reception = dateFilter;
-        if (!allData && armateur) whereClause.armateur = armateur;
+        if (Object.keys(dateFilter).length > 0) whereClause.date_reception = dateFilter;
+        if (armateur) whereClause.armateur = armateur;
 
         const dossiers = await (prisma.dossiers_caution.findMany({
             where: whereClause,
