@@ -249,7 +249,7 @@ export default function Dashboard() {
                             <TrendingUp size={16} />
                             Évolution mensuelle — 12 derniers mois
                         </h3>
-                        <MonthlyChart armateur={appliedFilters.armateur} startDate={appliedFilters.startDate} endDate={appliedFilters.endDate} />
+                        <MonthlyChart armateur={appliedFilters.armateur} />
                     </div>
 
                 </div>
