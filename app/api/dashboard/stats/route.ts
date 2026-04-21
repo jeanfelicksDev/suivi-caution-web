@@ -150,19 +150,17 @@ export async function GET(request: Request) {
             const dSusp = parseDate(dossier.date_suspendu);
             const dSuspFin = parseDate(dossier.date_fin_suspension);
 
-            // 1. Calcul global => DateReception à DateCheque (ou Date du jour si non renseigné)
-            const dChequeEffectif = dCheque || new Date();
-            if (dRecept && dChequeEffectif >= dRecept) {
-                const msDiff = dChequeEffectif.getTime() - dRecept.getTime();
+            // 1. Calcul global => DateReception à DateCheque (uniquement si le chèque est émis)
+            if (dRecept && dCheque && dCheque >= dRecept) {
+                const msDiff = dCheque.getTime() - dRecept.getTime();
                 const days = msDiff / (1000 * 3600 * 24);
                 totalDaysGlobal += days;
                 countGlobal++;
             }
 
-            // 2. Calcul Agent => DateReception à DateCompta sans exceptions, ni WE/Fériés
-            const dComptaEffectif = dCompta || new Date();
-            if (dRecept && dComptaEffectif >= dRecept) {
-                let agentDays = getNetWorkingDays(dRecept, dComptaEffectif, dSusp, dSuspFin);
+            // 2. Calcul Agent => DateReception à DateCompta (uniquement si traité compta)
+            if (dRecept && dCompta && dCompta >= dRecept) {
+                let agentDays = getNetWorkingDays(dRecept, dCompta, dSusp, dSuspFin);
 
                 // Soustraction du temps Armateur
                 const dLigne = parseDate(dossier.date_transmission_ligne);
