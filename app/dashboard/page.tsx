@@ -175,8 +175,8 @@ export default function Dashboard() {
             <div className="stat-grid" style={{ marginBottom: '2.5rem' }}>
                 <StatCard label="Nbre de Dossiers Reçus" value={globalStats?.totalDossiers ?? "..."} period="au total" trend="" trendUp={true} icon={<LayoutDashboard color="var(--accent)" />} valueColor="#4f46e5" />
                 <StatCard label="Dossiers en traitement" value={globalStats?.actifs ?? "..."} period="au total" trend="" trendUp={false} icon={<Clock color="#f59e0b" />} valueColor="#f97316" />
-                <StatCard label="Clients/Transitaires" value={globalStats?.clientsUniques ?? "..."} period="au total" trend="" trendUp={true} icon={<Users color="#3b82f6" />} valueColor="#3b82f6" />
                 <StatCard label="Dossiers traités sur dossiers reçus" value={(globalStats?.tauxRetour ?? "...") + "%"} period="au total" trend="" trendUp={true} icon={<TrendingUp color="#10b981" />} valueColor="#ec4899" />
+                <StatCard label="Clients/Transitaires" value={globalStats?.clientsUniques ?? "..."} period="au total" trend="" trendUp={true} icon={<Users color="#3b82f6" />} valueColor="#3b82f6" />
             </div>
 
             {/*  Section Durées Moyennes */}
