@@ -150,9 +150,9 @@ export async function GET(request: Request) {
             const dSusp = parseDate(dossier.date_suspendu);
             const dSuspFin = parseDate(dossier.date_fin_suspension);
 
-            // 1. Calcul global => DateReception à DateCheque (uniquement si le chèque est émis)
-            if (dRecept && dCheque && dCheque >= dRecept) {
-                const msDiff = dCheque.getTime() - dRecept.getTime();
+            // 1. Calcul global => DateReception à DateCompta (uniquement si transmis à la compta)
+            if (dRecept && dCompta && dCompta >= dRecept) {
+                const msDiff = dCompta.getTime() - dRecept.getTime();
                 const days = msDiff / (1000 * 3600 * 24);
                 totalDaysGlobal += days;
                 countGlobal++;

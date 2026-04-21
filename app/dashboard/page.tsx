@@ -193,8 +193,8 @@ export default function Dashboard() {
                                 </div>
                                 <div>
                                     <h3 style={{ margin: 0, fontSize: '1rem', color: 'var(--text-muted)' }}>Nbre de jour Calendaire pour traiter un dossier</h3>
-                                    <p style={{ fontSize: '0.75rem', color: '#94a3b8', margin: 0 }}>Date de Réception → Date de Chèque (7j/7)</p>
-                                    <p style={{ fontSize: '0.75rem', color: '#94a3b8', margin: '0.1rem 0 0 0' }}>Le temps d'attente du client avant de recevoir son chèque (jour fériés et week-end inclus)</p>
+                                    <p style={{ fontSize: '0.75rem', color: '#94a3b8', margin: 0 }}>Date de Réception → Transmission Compta (7j/7)</p>
+                                    <p style={{ fontSize: '0.75rem', color: '#94a3b8', margin: '0.1rem 0 0 0' }}>Temps total écoulé avant la logistique vers la comptabilité (jours fériés et week-end inclus)</p>
                                 </div>
                             </div>
                             <div style={{ fontSize: '3.5rem', fontWeight: 900, color: '#8b5cf6', lineHeight: 1 }}>
