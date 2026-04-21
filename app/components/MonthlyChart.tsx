@@ -83,7 +83,7 @@ export default function MonthlyChart({ armateur = '', startDate = '', endDate = 
                     Dossiers reçus
                 </span>
                 <span style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.82rem', fontWeight: 600, color: '#334155' }}>
-                    <svg width="28" height="4"><line x1="0" y1="2" x2="28" y2="2" stroke="#10b981" strokeWidth="2.5" /></svg>
+                    <svg width="28" height="4"><line x1="0" y1="2" x2="28" y2="2" stroke="#f97316" strokeWidth="2.5" /></svg>
                     Chèques émis
                 </span>
             </div>
@@ -98,9 +98,9 @@ export default function MonthlyChart({ armateur = '', startDate = '', endDate = 
                         <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.18" />
                         <stop offset="100%" stopColor="#3b82f6" stopOpacity="0" />
                     </linearGradient>
-                    <linearGradient id="gradGreen" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#10b981" stopOpacity="0.15" />
-                        <stop offset="100%" stopColor="#10b981" stopOpacity="0" />
+                    <linearGradient id="gradOrange" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#f97316" stopOpacity="0.15" />
+                        <stop offset="100%" stopColor="#f97316" stopOpacity="0" />
                     </linearGradient>
                 </defs>
 
@@ -120,7 +120,7 @@ export default function MonthlyChart({ armateur = '', startDate = '', endDate = 
 
                 {/* Aires */}
                 <polygon points={toAreaPoints(data.reçus, max)} fill="url(#gradBlue)" />
-                <polygon points={toAreaPoints(data.chèques, max)} fill="url(#gradGreen)" />
+                <polygon points={toAreaPoints(data.chèques, max)} fill="url(#gradOrange)" />
 
                 {/* Courbes */}
                 <polyline
@@ -130,7 +130,7 @@ export default function MonthlyChart({ armateur = '', startDate = '', endDate = 
                 />
                 <polyline
                     points={toPoints(data.chèques, max)}
-                    fill="none" stroke="#10b981" strokeWidth="2.5"
+                    fill="none" stroke="#f97316" strokeWidth="2.5"
                     strokeLinejoin="round" strokeLinecap="round"
                 />
 
@@ -149,7 +149,7 @@ export default function MonthlyChart({ armateur = '', startDate = '', endDate = 
                             {/* Dot reçus */}
                             <circle cx={x} cy={yR} r="4" fill="white" stroke="#3b82f6" strokeWidth="2" />
                             {/* Dot chèques */}
-                            <circle cx={x} cy={yC} r="4" fill="white" stroke="#10b981" strokeWidth="2" />
+                            <circle cx={x} cy={yC} r="4" fill="white" stroke="#f97316" strokeWidth="2" />
                             {/* Label mois */}
                             <text x={x} y={H - PAD.bottom + 16} textAnchor="middle"
                                 fontSize="11" fill="#64748b">{label}</text>
@@ -171,8 +171,8 @@ export default function MonthlyChart({ armateur = '', startDate = '', endDate = 
                             <text x={tx + 22} y={ty + 38} fontSize="11" fill="#93c5fd">
                                 Reçus : <tspan fontWeight="700" fill="white">{tooltip.recu}</tspan>
                             </text>
-                            <circle cx={tx + 14} cy={ty + 52} r="4" fill="#10b981" />
-                            <text x={tx + 22} y={ty + 56} fontSize="11" fill="#6ee7b7">
+                            <circle cx={tx + 14} cy={ty + 52} r="4" fill="#f97316" />
+                            <text x={tx + 22} y={ty + 56} fontSize="11" fill="#fdba74">
                                 Chèques : <tspan fontWeight="700" fill="white">{tooltip.cheque}</tspan>
                             </text>
                         </g>
