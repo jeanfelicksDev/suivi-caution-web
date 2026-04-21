@@ -259,8 +259,8 @@ export async function GET(request: Request) {
         });
 
         // Formatage des résultats
-        const avgGlobal = countGlobal > 0 ? Math.round(totalDaysGlobal / countGlobal) : 0;
-        const avgAgent = countAgent > 0 ? Math.round(totalDaysAgent / countAgent) : 0;
+        const avgGlobal = countGlobal > 0 ? Math.round(totalDaysGlobal / countGlobal) : "-";
+        const avgAgent = countAgent > 0 ? Math.round(totalDaysAgent / countAgent) : "-";
 
         const stepAverages = stepTotals.map((tot, i) => {
             return stepCounts[i] > 0 ? Math.round(tot / stepCounts[i]) : 0;
