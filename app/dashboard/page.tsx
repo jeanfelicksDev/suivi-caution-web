@@ -98,9 +98,9 @@ export default function Dashboard() {
                     </div>
                     <div>
                         <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: '#64748b', marginBottom: '0.3rem' }}>Période De Réception Du :</label>
-                        <input type={startDate ? "date" : "text"} className="input" 
-                            style={{ background: 'white', padding: '0.5rem', width: '160px', borderRadius: '8px', border: '1px solid #e2e8f0' }} 
-                            value={startDate} 
+                        <input type={startDate ? "date" : "text"} className="input"
+                            style={{ background: 'white', padding: '0.5rem', width: '160px', borderRadius: '8px', border: '1px solid #e2e8f0' }}
+                            value={startDate}
                             onChange={(e) => setStartDate(e.target.value)}
                             onFocus={(e) => (e.target.type = "date")}
                             onBlur={(e) => !startDate && (e.target.type = "text")}
@@ -109,9 +109,9 @@ export default function Dashboard() {
                     </div>
                     <div>
                         <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: '#64748b', marginBottom: '0.3rem' }}>Au :</label>
-                        <input type={endDate ? "date" : "text"} className="input" 
-                            style={{ background: 'white', padding: '0.5rem', width: '160px', borderRadius: '8px', border: '1px solid #e2e8f0' }} 
-                            value={endDate} 
+                        <input type={endDate ? "date" : "text"} className="input"
+                            style={{ background: 'white', padding: '0.5rem', width: '160px', borderRadius: '8px', border: '1px solid #e2e8f0' }}
+                            value={endDate}
                             onChange={(e) => setEndDate(e.target.value)}
                             onFocus={(e) => (e.target.type = "date")}
                             onBlur={(e) => !endDate && (e.target.type = "text")}
@@ -129,25 +129,25 @@ export default function Dashboard() {
 
             {/*  Mini Palettes Section — toujours visibles, loading state géré */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem', marginBottom: '1.5rem' }}>
-                <MiniPalette 
-                    label="Reçus (Mois)" 
-                    value={stats ? String(stats.statsCards.totalDossiers) : "—"} 
-                    color="#4f46e5" 
+                <MiniPalette
+                    label="Reçus (Mois)"
+                    value={stats ? String(stats.statsCards.totalDossiers) : "—"}
+                    color="#4f46e5"
                 />
-                <MiniPalette 
-                    label="Dossiers Avoir" 
-                    value={stats ? `${stats.statsCards.countAvoir} / ${stats.statsCards.totalDossiers}` : "—"} 
-                    color="#f59e0b" 
+                <MiniPalette
+                    label="Dossiers Avoir"
+                    value={stats ? `${stats.statsCards.countAvoir} / ${stats.statsCards.totalDossiers}` : "—"}
+                    color="#f59e0b"
                 />
-                <MiniPalette 
-                    label="À la Compta" 
-                    value={stats ? `${stats.statsCards.countCompta} / ${stats.statsCards.totalDossiers}` : "—"} 
-                    color="#0ea5e9" 
+                <MiniPalette
+                    label="À la Compta"
+                    value={stats ? `${stats.statsCards.countCompta} / ${stats.statsCards.totalDossiers}` : "—"}
+                    color="#0ea5e9"
                 />
-                <MiniPalette 
-                    label="Chèques Dispo" 
-                    value={stats ? `${stats.statsCards.countCheque} / ${stats.statsCards.totalDossiers}` : "—"} 
-                    color="#10b981" 
+                <MiniPalette
+                    label="Chèques Dispo"
+                    value={stats ? `${stats.statsCards.countCheque} / ${stats.statsCards.totalDossiers}` : "—"}
+                    color="#10b981"
                 />
             </div>
 
@@ -267,11 +267,11 @@ function MiniPalette({ label, value, color }: { label: string, value: string | n
     const bgColor = hexToRgba(color, 0.08);
 
     return (
-        <div style={{ 
+        <div style={{
             background: `linear-gradient(135deg, white 60%, ${bgColor})`,
-            padding: '1rem 1.25rem', 
-            borderRadius: '14px', 
-            border: `1.5px solid ${hexToRgba(color, 0.25)}`, 
+            padding: '1rem 1.25rem',
+            borderRadius: '14px',
+            border: `1.5px solid ${hexToRgba(color, 0.25)}`,
             borderLeft: `5px solid ${color}`,
             boxShadow: `0 4px 12px ${hexToRgba(color, 0.12)}, 0 1px 3px rgba(0,0,0,0.06)`,
             display: 'flex',
@@ -281,14 +281,14 @@ function MiniPalette({ label, value, color }: { label: string, value: string | n
             transition: 'transform 0.2s ease, box-shadow 0.2s ease',
             cursor: 'default',
         }}
-        onMouseEnter={e => {
-            (e.currentTarget as HTMLElement).style.transform = 'translateY(-3px)';
-            (e.currentTarget as HTMLElement).style.boxShadow = `0 8px 20px ${hexToRgba(color, 0.2)}, 0 2px 6px rgba(0,0,0,0.08)`;
-        }}
-        onMouseLeave={e => {
-            (e.currentTarget as HTMLElement).style.transform = 'translateY(0)';
-            (e.currentTarget as HTMLElement).style.boxShadow = `0 4px 12px ${hexToRgba(color, 0.12)}, 0 1px 3px rgba(0,0,0,0.06)`;
-        }}
+            onMouseEnter={e => {
+                (e.currentTarget as HTMLElement).style.transform = 'translateY(-3px)';
+                (e.currentTarget as HTMLElement).style.boxShadow = `0 8px 20px ${hexToRgba(color, 0.2)}, 0 2px 6px rgba(0,0,0,0.08)`;
+            }}
+            onMouseLeave={e => {
+                (e.currentTarget as HTMLElement).style.transform = 'translateY(0)';
+                (e.currentTarget as HTMLElement).style.boxShadow = `0 4px 12px ${hexToRgba(color, 0.12)}, 0 1px 3px rgba(0,0,0,0.06)`;
+            }}
         >
             <div style={{ fontSize: '0.72rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '0.4rem' }}>
                 {label}
