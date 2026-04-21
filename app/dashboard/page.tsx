@@ -22,7 +22,7 @@ interface StatsData {
 
 export default function Dashboard() {
     const [stats, setStats] = useState<StatsData | null>(null);
-    const [globalStats, setGlobalStats] = useState<StatsData['statsCards'] | null>(null);
+    const [globalStats, setGlobalStats] = useState<StatsData | null>(null);
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
     const [armateur, setArmateur] = useState('');
@@ -51,7 +51,7 @@ export default function Dashboard() {
 
             if (globalRes.ok) {
                 const globalData = await globalRes.json();
-                setGlobalStats(globalData.statsCards);
+                setGlobalStats(globalData);
             } else {
                 console.error('Global stats API error:', globalRes.status);
             }
@@ -175,14 +175,14 @@ export default function Dashboard() {
                 <div style={{ flex: 1, height: '1px', background: '#e2e8f0' }} />
             </div>
             <div className="stat-grid" style={{ marginBottom: '2.5rem' }}>
-                <StatCard label="Nbre de Dossiers Reçus" value={globalStats?.totalDossiers ?? "..."} period="au total" trend="" trendUp={true} icon={<LayoutDashboard color="var(--accent)" />} valueColor="#4f46e5" />
-                <StatCard label="Dossiers en traitement" value={globalStats?.actifs ?? "..."} period="au total" trend="" trendUp={false} icon={<Clock color="#f59e0b" />} valueColor="#f97316" />
-                <StatCard label="Dossiers traités sur dossiers reçus" value={(globalStats?.tauxRetour ?? "...") + "%"} period="au total" trend="" trendUp={true} icon={<TrendingUp color="#10b981" />} valueColor="#ec4899" />
-                <StatCard label="Clients/Transitaires" value={globalStats?.clientsUniques ?? "..."} period="au total" trend="" trendUp={true} icon={<Users color="#3b82f6" />} valueColor="#3b82f6" />
+                <StatCard label="Nbre de Dossiers Reçus" value={globalStats?.statsCards.totalDossiers ?? "..."} period="au total" trend="" trendUp={true} icon={<LayoutDashboard color="var(--accent)" />} valueColor="#4f46e5" />
+                <StatCard label="Dossiers en traitement" value={globalStats?.statsCards.actifs ?? "..."} period="au total" trend="" trendUp={false} icon={<Clock color="#f59e0b" />} valueColor="#f97316" />
+                <StatCard label="Dossiers traités sur dossiers reçus" value={(globalStats?.statsCards.tauxRetour ?? "...") + "%"} period="au total" trend="" trendUp={true} icon={<TrendingUp color="#10b981" />} valueColor="#ec4899" />
+                <StatCard label="Clients/Transitaires" value={globalStats?.statsCards.clientsUniques ?? "..."} period="au total" trend="" trendUp={true} icon={<Users color="#3b82f6" />} valueColor="#3b82f6" />
             </div>
 
             {/*  Section Durées Moyennes */}
-            {stats && (
+            {globalStats && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
 
                     <div className="grid grid-cols-2">
@@ -198,7 +198,7 @@ export default function Dashboard() {
                                 </div>
                             </div>
                             <div style={{ fontSize: '3.5rem', fontWeight: 900, color: '#8b5cf6', lineHeight: 1 }}>
-                                {stats.avgGlobal} <span style={{ fontSize: '1.25rem', color: '#64748b', fontWeight: 600 }}>Jours</span>
+                                {globalStats.avgGlobal} <span style={{ fontSize: '1.25rem', color: '#64748b', fontWeight: 600 }}>Jours</span>
                             </div>
                         </div>
 
@@ -214,7 +214,7 @@ export default function Dashboard() {
                                 </div>
                             </div>
                             <div style={{ fontSize: '3.5rem', fontWeight: 900, color: '#0ea5e9', lineHeight: 1 }}>
-                                {stats.avgAgent} <span style={{ fontSize: '1.25rem', color: '#64748b', fontWeight: 600 }}>Jours</span>
+                                {globalStats.avgAgent} <span style={{ fontSize: '1.25rem', color: '#64748b', fontWeight: 600 }}>Jours</span>
                             </div>
                         </div>
                     </div>
@@ -225,7 +225,7 @@ export default function Dashboard() {
                             Temps moyen de traitement mis lors des étapes ci-dessous :
                         </h3>
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
-                            {stats.stepAverages.map((avg: number, index: number) => (
+                            {globalStats.stepAverages.map((avg: number, index: number) => (
                                 <div key={index} style={{
                                     background: '#f8fafc', padding: '0.75rem 1rem', borderRadius: 'var(--radius)',
                                     border: '1px solid var(--border)', flex: '1 1 calc(33.333% - 1rem)', minWidth: '240px',
