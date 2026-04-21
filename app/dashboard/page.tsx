@@ -225,7 +225,7 @@ export default function Dashboard() {
                             Temps moyen de traitement mis lors des étapes ci-dessous :
                         </h3>
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
-                            {stats.stepAverages.map((avg: number, index: number) => (
+                            {stats?.stepAverages?.map((avg: number, index: number) => (
                                 <div key={index} style={{
                                     background: '#f8fafc', padding: '0.75rem 1rem', borderRadius: 'var(--radius)',
                                     border: '1px solid var(--border)', flex: '1 1 calc(33.333% - 1rem)', minWidth: '240px',
