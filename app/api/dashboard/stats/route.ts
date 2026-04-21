@@ -272,9 +272,9 @@ export async function GET(request: Request) {
 
         // Calculs pour les 4 cartes (StatCards) du haut
         const totalDossiers = dossiers.length;
-        const actifs = dossiers.length;
 
         const clientsUniques = new Set();
+        let actifs = 0;
         let dosCaches = 0;
         let countAvoir = 0;
         let countCompta = 0;
@@ -282,9 +282,16 @@ export async function GET(request: Request) {
 
         dossiers.forEach((d: any) => {
             if (d.client_nom) clientsUniques.add(d.client_nom);
-            // Dossier est considéré "traité" (pour le taux de retour) s'il a atteint l'un des stades de paiement/clôture
+
+            // Dossier est considéré "traité" s'il a atteint l'un des stades de paiement/clôture
             if (d.date_cheque || d.date_cloture) dosCaches++;
-            
+
+            // "En traitement" = pas de chèque émis + pas suspendu (ou suspension terminée) + non clôturé
+            const chequePasEmis = !d.date_cheque;
+            const pasSuspendu = !d.date_suspendu || !!d.date_fin_suspension;
+            const pasCloture = !d.date_cloture;
+            if (chequePasEmis && pasSuspendu && pasCloture) actifs++;
+
             if (d.date_mise_avoir) countAvoir++;
             if (d.date_transmission_compta) countCompta++;
             if (d.date_cheque) countCheque++;
