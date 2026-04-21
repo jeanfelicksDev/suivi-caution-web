@@ -139,7 +139,7 @@ export default function Dashboard() {
             {/*  Mini Palettes Section — données filtrées (période/armateur) */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
                 <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-                    📊 Aperçu de la période sélectionnée
+                    📊 Aperçu du mois en cours
                 </span>
                 <div style={{ flex: 1, height: '1px', background: '#e2e8f0' }} />
             </div>
