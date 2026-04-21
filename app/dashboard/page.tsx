@@ -257,22 +257,43 @@ function StatCard({ label, value, trend, trendUp, icon, period, valueColor }: { 
 }
 
 function MiniPalette({ label, value, color }: { label: string, value: string | number, color: string }) {
+    // Génère une version très claire de la couleur d'accent pour le fond
+    const hexToRgba = (hex: string, alpha: number) => {
+        const r = parseInt(hex.slice(1, 3), 16);
+        const g = parseInt(hex.slice(3, 5), 16);
+        const b = parseInt(hex.slice(5, 7), 16);
+        return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    };
+    const bgColor = hexToRgba(color, 0.08);
+
     return (
         <div style={{ 
-            background: 'white', 
-            padding: '1rem', 
-            borderRadius: '12px', 
-            border: `1px solid #e2e8f0`, 
-            borderLeft: `4px solid ${color}`,
-            boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+            background: `linear-gradient(135deg, white 60%, ${bgColor})`,
+            padding: '1rem 1.25rem', 
+            borderRadius: '14px', 
+            border: `1.5px solid ${hexToRgba(color, 0.25)}`, 
+            borderLeft: `5px solid ${color}`,
+            boxShadow: `0 4px 12px ${hexToRgba(color, 0.12)}, 0 1px 3px rgba(0,0,0,0.06)`,
             display: 'flex',
             flexDirection: 'column',
-            justifyContent: 'center'
-        }}>
-            <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.025em', marginBottom: '0.25rem' }}>
+            justifyContent: 'center',
+            minHeight: '80px',
+            transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+            cursor: 'default',
+        }}
+        onMouseEnter={e => {
+            (e.currentTarget as HTMLElement).style.transform = 'translateY(-3px)';
+            (e.currentTarget as HTMLElement).style.boxShadow = `0 8px 20px ${hexToRgba(color, 0.2)}, 0 2px 6px rgba(0,0,0,0.08)`;
+        }}
+        onMouseLeave={e => {
+            (e.currentTarget as HTMLElement).style.transform = 'translateY(0)';
+            (e.currentTarget as HTMLElement).style.boxShadow = `0 4px 12px ${hexToRgba(color, 0.12)}, 0 1px 3px rgba(0,0,0,0.06)`;
+        }}
+        >
+            <div style={{ fontSize: '0.72rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '0.4rem' }}>
                 {label}
             </div>
-            <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#1e293b' }}>
+            <div style={{ fontSize: '1.4rem', fontWeight: 900, color: color, letterSpacing: '-0.02em', lineHeight: 1 }}>
                 {value}
             </div>
         </div>
