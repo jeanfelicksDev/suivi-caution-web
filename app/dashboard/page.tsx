@@ -127,7 +127,13 @@ export default function Dashboard() {
                 </div>
             </header>
 
-            {/*  Mini Palettes Section — toujours visibles, loading state géré */}
+            {/*  Mini Palettes Section — données filtrées (période/armateur) */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
+                <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                    📊 Aperçu de la période sélectionnée
+                </span>
+                <div style={{ flex: 1, height: '1px', background: '#e2e8f0' }} />
+            </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem', marginBottom: '1.5rem' }}>
                 <MiniPalette
                     label="Reçus (Mois)"
@@ -151,11 +157,17 @@ export default function Dashboard() {
                 />
             </div>
 
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
+                <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                    🗂️ Vue globale — ensemble des dossiers en base
+                </span>
+                <div style={{ flex: 1, height: '1px', background: '#e2e8f0' }} />
+            </div>
             <div className="stat-grid" style={{ marginBottom: '2.5rem' }}>
-                <StatCard label="Nbre de Dossiers Reçus" value={stats?.statsCards?.totalDossiers ?? "..."} period={periodText} trend="" trendUp={true} icon={<LayoutDashboard color="var(--accent)" />} valueColor="#4f46e5" />
-                <StatCard label="Dossiers en traitement" value={stats?.statsCards?.actifs ?? "..."} period={periodText} trend="" trendUp={false} icon={<Clock color="#f59e0b" />} valueColor="#f97316" />
-                <StatCard label="Clients/Transitaires" value={stats?.statsCards?.clientsUniques ?? "..."} period={periodText} trend="" trendUp={true} icon={<Users color="#3b82f6" />} valueColor="#3b82f6" />
-                <StatCard label="Dossiers traités sur dossiers reçus" value={(stats?.statsCards?.tauxRetour ?? "...") + "%"} period={periodText} trend="" trendUp={true} icon={<TrendingUp color="#10b981" />} valueColor="#ec4899" />
+                <StatCard label="Nbre de Dossiers Reçus" value={globalStats?.totalDossiers ?? "..."} period="au total" trend="" trendUp={true} icon={<LayoutDashboard color="var(--accent)" />} valueColor="#4f46e5" />
+                <StatCard label="Dossiers en traitement" value={globalStats?.actifs ?? "..."} period="au total" trend="" trendUp={false} icon={<Clock color="#f59e0b" />} valueColor="#f97316" />
+                <StatCard label="Clients/Transitaires" value={globalStats?.clientsUniques ?? "..."} period="au total" trend="" trendUp={true} icon={<Users color="#3b82f6" />} valueColor="#3b82f6" />
+                <StatCard label="Dossiers traités sur dossiers reçus" value={(globalStats?.tauxRetour ?? "...") + "%"} period="au total" trend="" trendUp={true} icon={<TrendingUp color="#10b981" />} valueColor="#ec4899" />
             </div>
 
             {/*  Section Durées Moyennes */}
