@@ -3,6 +3,7 @@ import { Outfit } from "next/font/google";
 import "./globals.css";
 import AuthProvider from "@/app/components/AuthProvider";
 import LayoutContent from "@/app/components/LayoutContent";
+import ServiceWorkerRegistrar from "@/app/components/ServiceWorkerRegistrar";
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -39,6 +40,7 @@ export default function RootLayout({
   return (
     <html lang="fr">
       <body className={outfit.className}>
+        <ServiceWorkerRegistrar />
         <AuthProvider>
           <LayoutContent>
             {children}
