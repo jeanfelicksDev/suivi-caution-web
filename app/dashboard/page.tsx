@@ -89,6 +89,9 @@ export default function Dashboard() {
     else if (startDate) periodText = `depuis le ${formatPartDate(startDate)}`;
     else if (endDate) periodText = `jusqu'au ${formatPartDate(endDate)}`;
 
+    const currentMonthName = new Date().toLocaleString('fr-FR', { month: 'long' });
+    const monthLabel = currentMonthName.charAt(0).toUpperCase() + currentMonthName.slice(1);
+
     return (
         <div className="container" style={{ paddingBottom: '3rem' }}>
             <header style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -147,22 +150,22 @@ export default function Dashboard() {
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem', marginBottom: '1.5rem' }}>
                 <MiniPalette
-                    label="Reçus (Mois)"
+                    label={`Reçus (${monthLabel})`}
                     value={stats ? String(stats.statsCards.totalDossiers) : "—"}
                     color="#4f46e5"
                 />
                 <MiniPalette
-                    label="Dossiers Avoir"
+                    label={`Dossiers Avoir (${monthLabel})`}
                     value={stats ? `${stats.statsCards.countAvoir} / ${stats.statsCards.totalDossiers}` : "—"}
                     color="#f59e0b"
                 />
                 <MiniPalette
-                    label="À la Compta"
+                    label={`À la Compta (${monthLabel})`}
                     value={stats ? `${stats.statsCards.countCompta} / ${stats.statsCards.totalDossiers}` : "—"}
                     color="#0ea5e9"
                 />
                 <MiniPalette
-                    label="Chèques Dispo"
+                    label={`Chèques Dispo (${monthLabel})`}
                     value={stats ? `${stats.statsCards.countCheque} / ${stats.statsCards.totalDossiers}` : "—"}
                     color="#10b981"
                 />
