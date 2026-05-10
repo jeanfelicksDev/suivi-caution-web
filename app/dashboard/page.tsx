@@ -225,7 +225,7 @@ export default function Dashboard() {
                     <div className="card">
                         <h3 style={{ marginBottom: '1.25rem', fontSize: '1.1rem', color: 'var(--primary)', borderBottom: '1px solid var(--border)', paddingBottom: '0.75rem' }}>
                             <Clock size={16} style={{ display: 'inline', marginRight: '0.5rem', transform: 'translateY(-2px)' }} />
-                            Temps moyen de traitement mis lors des étapes ci-dessous :
+                            Temps moyen de traitement mis lors des étapes ci-dessous ({monthLabel}) :
                         </h3>
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
                             {stats?.stepAverages?.map((avg: number, index: number) => (
