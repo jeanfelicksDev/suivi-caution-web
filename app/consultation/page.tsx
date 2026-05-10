@@ -155,7 +155,6 @@ export default function ConsultationPage() {
                   const isActive = step.id === currentStep;
                   const isLast = index === steps.length - 1;
                   const isSuspended = step.label.includes('Suspendu');
-                  const duration = step.key ? (searchResult.durations ? (searchResult.durations as any)[step.key] : null) : null;
 
                   return (
                     <div key={step.id} className={`timeline-item ${isPassed ? 'passed' : ''} ${isActive ? 'active' : ''}`}>
@@ -173,9 +172,6 @@ export default function ConsultationPage() {
                       <div className="step-content">
                         <div className="step-header">
                           <span className="step-label">{step.label}</span>
-                          {duration !== null && (
-                            <span className="step-duration">{duration}j</span>
-                          )}
                         </div>
                         <p className="step-desc">{step.desc}</p>
                       </div>
@@ -476,7 +472,6 @@ export default function ConsultationPage() {
         .step-content { padding-bottom: 1.5rem; flex: 1; }
         .step-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem; }
         .step-label { font-weight: 700; color: #1e293b; font-size: 0.95rem; }
-        .step-duration { font-size: 0.65rem; font-weight: 800; background: #f1f5f9; color: #64748b; padding: 2px 6px; border-radius: 6px; }
         .step-desc { font-size: 0.8rem; color: #64748b; margin: 0; }
 
         .info-card h3 { font-size: 1rem; font-weight: 800; margin-bottom: 1rem; color: #1D3557; }
