@@ -179,3 +179,9 @@ model app_settings {
   logoutDelay    Int?      @default(60)
   updated_at     DateTime? @default(now())
 }
+
+model recent_consultations {
+  id                  Int       @id @default(autoincrement())
+  num_facture_caution String
+  consulted_at        DateTime  @default(now())
+}

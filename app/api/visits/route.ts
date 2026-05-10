@@ -33,8 +33,11 @@ export async function GET() {
   }
 }
 
-export async function POST() {
+export async function POST(request: Request) {
   try {
+    const body = await request.json().catch(() => ({}));
+    const numFacture = body.numFacture;
+
     const todayStr = new Date().toISOString().split('T')[0];
     
     await prisma.page_visits.upsert({
@@ -54,6 +57,14 @@ export async function POST() {
         visit_count: 1
       }
     });
+
+    if (numFacture && typeof numFacture === 'string') {
+      await prisma.recent_consultations.create({
+        data: {
+          num_facture_caution: numFacture
+        }
+      });
+    }
 
     const totalAgg = await prisma.page_visits.aggregate({
       _sum: { visit_count: true },

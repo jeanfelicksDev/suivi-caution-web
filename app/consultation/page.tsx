@@ -22,11 +22,14 @@ export default function ConsultationPage() {
   } | null>(null);
 
   const [visits, setVisits] = useState({ today: 0, total: 0 });
+  const [isInternalUser, setIsInternalUser] = useState(false);
+  const [showRecentModal, setShowRecentModal] = useState(false);
+  const [recentConsultations, setRecentConsultations] = useState<{num_facture_caution: string, consulted_at: string}[]>([]);
 
   useEffect(() => {
     const isLoggedIn = !!sessionStorage.getItem('caution_user');
-    const method = isLoggedIn ? 'GET' : 'POST';
-    fetch('/api/visits', { method })
+    setIsInternalUser(isLoggedIn);
+    fetch('/api/visits', { method: 'GET' })
       .then(res => res.json())
       .then(data => {
         if (data && typeof data.today === 'number') {
@@ -53,10 +56,37 @@ export default function ConsultationPage() {
       } else if (data.error) {
         setError(data.error);
       }
+
+      if (!isInternalUser && data.found) {
+        fetch('/api/visits', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ numFacture: numFacture.trim() })
+        })
+        .then(res => res.json())
+        .then(stats => {
+            if (stats && typeof stats.today === 'number') setVisits(stats);
+        })
+        .catch(err => console.error('Erreur save tracking', err));
+      }
     } catch {
       setError("Erreur de connexion au serveur.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleEyeClick = async () => {
+    if (!isInternalUser) return;
+    try {
+        const res = await fetch('/api/recent-consultations');
+        if(res.ok) {
+            const data = await res.json();
+            setRecentConsultations(data);
+            setShowRecentModal(true);
+        }
+    } catch(e) {
+        console.error(e);
     }
   };
 
@@ -84,7 +114,12 @@ export default function ConsultationPage() {
           </div>
           
           <div className="view-stats">
-            <div className="stat-pill">
+            <div 
+              className="stat-pill" 
+              onClick={handleEyeClick}
+              style={{ cursor: isInternalUser ? 'pointer' : 'default' }}
+              title={isInternalUser ? "Voir les dernières consultations" : ""}
+            >
               <Eye size={14} />
               <span>{visits.today}</span>
             </div>
@@ -196,6 +231,35 @@ export default function ConsultationPage() {
           </main>
         )}
       </div>
+
+      {showRecentModal && (
+        <div className="modal-backdrop" onClick={() => setShowRecentModal(false)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3 style={{ margin: 0, fontSize: '1.1rem', color: '#1e293b' }}>10 Dernières Consultations</h3>
+              <button onClick={() => setShowRecentModal(false)} className="modal-close"><X size={18} /></button>
+            </div>
+            <div className="modal-body">
+              {recentConsultations.length === 0 ? (
+                <p style={{ color: '#64748b', textAlign: 'center', margin: '2rem 0' }}>Aucune consultation récente.</p>
+              ) : (
+                <ul className="recent-list">
+                  {recentConsultations.map((item, idx) => (
+                    <li key={idx} className="recent-item">
+                      <div style={{ fontWeight: 600, color: '#1D3557' }}>{item.num_facture_caution}</div>
+                      <div style={{ fontSize: '0.8rem', color: '#94a3b8' }}>
+                        {new Date(item.consulted_at).toLocaleString('fr-FR', {
+                          day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'
+                        })}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       <style jsx>{`
         .mobile-app-container {
@@ -486,6 +550,42 @@ export default function ConsultationPage() {
           justify-content: center;
           color: #1D3557;
         }
+
+        .modal-backdrop {
+          position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+          background: rgba(15, 23, 42, 0.4);
+          backdrop-filter: blur(4px);
+          z-index: 1000;
+          display: flex; align-items: center; justify-content: center;
+          padding: 1rem;
+        }
+        .modal-content {
+          background: white;
+          border-radius: 16px;
+          width: 100%; max-width: 400px;
+          box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+          overflow: hidden;
+          animation: slideUp 0.3s ease-out forwards;
+        }
+        .modal-header {
+          display: flex; justify-content: space-between; align-items: center;
+          padding: 1.25rem 1.5rem; border-bottom: 1px solid #f1f5f9;
+        }
+        .modal-close {
+          background: transparent; border: none; color: #94a3b8; cursor: pointer;
+          display: flex; align-items: center; justify-content: center;
+          width: 32px; height: 32px; border-radius: 50%;
+          transition: all 0.2s;
+        }
+        .modal-close:hover { background: #f1f5f9; color: #1e293b; }
+        .modal-body { padding: 1rem 1.5rem 1.5rem; max-height: 60vh; overflow-y: auto; }
+        .recent-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.5rem; }
+        .recent-item {
+          display: flex; justify-content: space-between; align-items: center;
+          padding: 0.75rem 1rem;
+          background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0;
+        }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
