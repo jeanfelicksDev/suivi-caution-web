@@ -150,22 +150,22 @@ export default function Dashboard() {
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem', marginBottom: '1.5rem' }}>
                 <MiniPalette
-                    label={`Reçus (${monthLabel})`}
+                    label={<span>Reçus <span style={{ color: '#ea580c' }}>({monthLabel})</span></span>}
                     value={stats ? String(stats.statsCards.totalDossiers) : "—"}
                     color="#4f46e5"
                 />
                 <MiniPalette
-                    label={`Dossiers Avoir (${monthLabel})`}
+                    label={<span>Dossiers Avoir <span style={{ color: '#ea580c' }}>({monthLabel})</span></span>}
                     value={stats ? `${stats.statsCards.countAvoir} / ${stats.statsCards.totalDossiers}` : "—"}
                     color="#f59e0b"
                 />
                 <MiniPalette
-                    label={`À la Compta (${monthLabel})`}
+                    label={<span>À la Compta <span style={{ color: '#ea580c' }}>({monthLabel})</span></span>}
                     value={stats ? `${stats.statsCards.countCompta} / ${stats.statsCards.totalDossiers}` : "—"}
                     color="#0ea5e9"
                 />
                 <MiniPalette
-                    label={`Chèques Dispo (${monthLabel})`}
+                    label={<span>Chèques Dispo <span style={{ color: '#ea580c' }}>({monthLabel})</span></span>}
                     value={stats ? `${stats.statsCards.countCheque} / ${stats.statsCards.totalDossiers}` : "—"}
                     color="#10b981"
                 />
@@ -225,7 +225,7 @@ export default function Dashboard() {
                     <div className="card">
                         <h3 style={{ marginBottom: '1.25rem', fontSize: '1.1rem', color: 'var(--primary)', borderBottom: '1px solid var(--border)', paddingBottom: '0.75rem' }}>
                             <Clock size={16} style={{ display: 'inline', marginRight: '0.5rem', transform: 'translateY(-2px)' }} />
-                            Temps moyen de traitement mis lors des étapes ci-dessous ({monthLabel}) :
+                            Temps moyen de traitement mis lors des étapes ci-dessous <span style={{ color: '#ea580c' }}>({monthLabel})</span> :
                         </h3>
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
                             {stats?.stepAverages?.map((avg: number, index: number) => (
@@ -282,7 +282,7 @@ function StatCard({ label, value, trend, trendUp, icon, period, valueColor }: { 
     );
 }
 
-function MiniPalette({ label, value, color }: { label: string, value: string | number, color: string }) {
+function MiniPalette({ label, value, color }: { label: React.ReactNode, value: string | number, color: string }) {
     // Génère une version très claire de la couleur d'accent pour le fond
     const hexToRgba = (hex: string, alpha: number) => {
         const r = parseInt(hex.slice(1, 3), 16);
