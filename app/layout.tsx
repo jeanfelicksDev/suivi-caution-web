@@ -10,8 +10,8 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: "Suivi Caution AGL 2.0",
-  description: "Application de suivi et de gestion des cautions Africa Global Logistics",
+  title: "Suivi Caution DSM 2.0",
+  description: "Application de suivi et de gestion des cautions DSM",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
