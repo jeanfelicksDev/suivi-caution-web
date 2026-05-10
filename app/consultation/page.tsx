@@ -80,8 +80,6 @@ export default function ConsultationPage() {
         {/* Header Section */}
         <header className="app-header">
           <div className="logo-section">
-            <img src="/logo-agl.png" alt="AGL Logo" className="agl-logo" />
-            <div className="v-divider"></div>
             <h1 className="app-title">Suivi Caution</h1>
           </div>
           
@@ -240,17 +238,6 @@ export default function ConsultationPage() {
           display: flex;
           align-items: center;
           gap: 1rem;
-        }
-
-        .agl-logo {
-          height: 32px;
-          object-fit: contain;
-        }
-
-        .v-divider {
-          width: 1px;
-          height: 20px;
-          background: #e2e8f0;
         }
 
         .app-title {
