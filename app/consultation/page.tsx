@@ -236,12 +236,15 @@ export default function ConsultationPage() {
         <div className="modal-backdrop" onClick={() => setShowRecentModal(false)}>
           <div className="modal-content" onClick={e => e.stopPropagation()}>
             <div className="modal-header">
-              <h3 style={{ margin: 0, fontSize: '1.1rem', color: '#1e293b' }}>10 Dernières Consultations</h3>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '1.1rem', color: '#1e293b' }}>Historique des Consultations</h3>
+                <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>{recentConsultations.length} consultation(s) au total</span>
+              </div>
               <button onClick={() => setShowRecentModal(false)} className="modal-close"><X size={18} /></button>
             </div>
             <div className="modal-body">
               {recentConsultations.length === 0 ? (
-                <p style={{ color: '#64748b', textAlign: 'center', margin: '2rem 0' }}>Aucune consultation récente.</p>
+                <p style={{ color: '#64748b', textAlign: 'center', margin: '2rem 0' }}>Aucune consultation enregistrée.</p>
               ) : (
                 <ul className="recent-list">
                   {recentConsultations.map((item, idx) => (
