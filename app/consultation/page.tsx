@@ -24,7 +24,7 @@ export default function ConsultationPage() {
   const [visits, setVisits] = useState({ today: 0, total: 0 });
   const [isInternalUser, setIsInternalUser] = useState(false);
   const [showRecentModal, setShowRecentModal] = useState(false);
-  const [recentConsultations, setRecentConsultations] = useState<{num_facture_caution: string, consulted_at: string}[]>([]);
+  const [recentConsultations, setRecentConsultations] = useState<{num_facture_caution: string, consulted_at: string, nom: string}[]>([]);
 
   useEffect(() => {
     const isLoggedIn = !!sessionStorage.getItem('caution_user');
@@ -249,8 +249,11 @@ export default function ConsultationPage() {
                 <ul className="recent-list">
                   {recentConsultations.map((item, idx) => (
                     <li key={idx} className="recent-item">
-                      <div style={{ fontWeight: 600, color: '#1D3557' }}>{item.num_facture_caution}</div>
-                      <div style={{ fontSize: '0.8rem', color: '#94a3b8' }}>
+                      <div>
+                        <div style={{ fontWeight: 600, color: '#1D3557', fontSize: '0.9rem' }}>{item.num_facture_caution}</div>
+                        <div style={{ fontSize: '0.8rem', color: '#475569', marginTop: '0.15rem' }}>{item.nom}</div>
+                      </div>
+                      <div style={{ fontSize: '0.75rem', color: '#94a3b8', textAlign: 'right', flexShrink: 0 }}>
                         {new Date(item.consulted_at).toLocaleString('fr-FR', {
                           day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'
                         })}
