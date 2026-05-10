@@ -214,20 +214,6 @@ export default function ConsultationPage() {
               </div>
             </div>
 
-            {/* Quick Actions / Info */}
-            <div className="glass-card info-card">
-              <h3>Besoin d'aide ?</h3>
-              <div className="contact-grid">
-                <a href="tel:+22500000000" className="contact-item">
-                  <div className="icon-box"><Phone size={18} /></div>
-                  <span>Appeler le service client</span>
-                </a>
-                <a href="mailto:support@agl.com" className="contact-item">
-                  <div className="icon-box"><Mail size={18} /></div>
-                  <span>Envoyer un email</span>
-                </a>
-              </div>
-            </div>
           </main>
         )}
       </div>
